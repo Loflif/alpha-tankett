@@ -23,18 +23,7 @@ struct Client {
 	ip_address address_;
 	uint64 key_;
 	uint32 recieveSequence_ = 0;
-};
-
-struct Tank {
-	bool isAlive = true;
-	bool isConnected = false;	
-	vector2 position = { 0,0 }; //in tiles, not pixels!!
-	float angle = 0.0f;
-	uint8 eliminations = 0;
-	uint8 client_id = 0;
-	uint32 ping = -1;
-	uint8 bullet_count = 0; //we only serialize the amount of bullets specified by bullet_count	
-	vector2 bullets[10];
+	uint8 id_;
 };
 
 namespace tankett {
@@ -58,8 +47,12 @@ namespace tankett {
 	  void processPayload(ip_address remote, protocol_payload &msg);
 	  void processDisconnect(ip_address remote, protocol_payload& msg);
 
+
 	  void challengeClient(Client &client);
-	  void sendPayload(Client &client);
+	  
+	  void packPayload(Client& client);
+	  void sendPayload(Client &client, network_message_header msg);
+	  int connectedClientCount();
 
 	  void SpawnTank();
 
@@ -70,7 +63,7 @@ namespace tankett {
 		  vector2(40,29),
 	  };
 
-	  Tank tanks[4];
+	  server_to_client_data tanks[4];
 
       bool running_;
       time send_accumulator_;

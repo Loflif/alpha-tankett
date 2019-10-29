@@ -173,6 +173,7 @@ namespace tankett {
 				else {
 					text_.set_text("CONNECTED");
 					state_ = CONNECTED;
+					//payload.payload_
 				}
 				break;
 			}

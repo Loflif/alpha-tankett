@@ -159,6 +159,7 @@ namespace tankett {
 					if (client.state_ != CONNECTED) {
 						client.state_ = CONNECTED;
 						debugf("[Info] Client connected: %s", client.address_.as_string());
+						client.id_ = connectedClientCount();
 						SpawnTank();
 					}
 				}
@@ -208,11 +209,27 @@ namespace tankett {
 		//debugf("[Info] Client challenged: %s", client.address_.as_string());
 
 	}
+
+	void server::packPayload(Client& client) {
+	}
+
 	void server::sendPayload(Client& client) {
 		sendSequence_++;
 		protocol_payload payload(sendSequence_);
 
 		byte_stream stream(1024 * 4, dst_);
+
+		message_server_to_client msg;
+		msg.client_count = connectedClientCount();
+		msg.game_state = ROUND_RUNNING;
+		msg.timestamp = (char)__TIMESTAMP__;
+		for (int i = 0; i < 4; i++) {
+			msg.client_data[i] = clientData[i];
+		}
+		msg.receiver_id = client.id_;
+
+		msg.serialize(stream);
+
 		byte_stream_writer writer(stream);
 
 		payload.serialize(writer);
@@ -222,11 +239,19 @@ namespace tankett {
 		//debugf("[Info] Payload sent %s", client.address_.as_string());
 	}
 
+	int server::connectedClientCount() {
+		int count = 0;
+		for (Client client : clients) {
+			if (client.state_ == CONNECTED) count++;
+		}
+		return count;
+	}
+
 	void server::SpawnTank() {
 		for (int i = 0; i < 4; i++) {
-			if (!tanks[i].isConnected) {
-				tanks[i].isConnected = true;
-				tanks[i].position = spawnPoints[i];
+			if (!clientData[i].connected) {
+				clientData[i].connected = true;
+				clientData[i].position = spawnPoints[i];
 			}
 		}
 	}

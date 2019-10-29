@@ -259,7 +259,7 @@ namespace tankett {
    struct server_to_client_data
    {
 	   bool alive = true;
-	   bool connected = true;
+	   bool connected = false;
 	   vector2 position = { 0,0 };
 	   float angle = 0.0f;
 	   uint8 eliminations = 0;
