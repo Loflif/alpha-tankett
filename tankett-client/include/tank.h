@@ -18,9 +18,9 @@ namespace alpha {
 
 		dynamic_array<bullet*> bullets_;
 	private:
-		vector2 targetMoveDirection(keyboard kb);
-		float targetRotation(keyboard kb);
-		float targetTurretRotation(mouse m);
+		vector2 targetMoveDirection(keyboard pKeyboard);
+		float targetRotation(keyboard pKeyboard);
+		float targetTurretRotation(mouse pMouse);
 		void setColliderPosition();
 		void preventCollision();
 		bool ownsBullet(IEntity* pBullet);
