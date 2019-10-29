@@ -26,22 +26,8 @@ namespace alpha {
 	}
 
 	void bullet::onCollision(IEntity* collider) {
-		switch (collider->type_) {
-		case WALL: {
+		if (collider->type_ == WALL) {
 			isEnabled = false;
 		}
-				   break;
-				   /*case TANK: {
-					   isEnabled = false;
-				   }
-							  break;
-				   case BULLET: {
-					   isEnabled = false;
-				   }
-							  break;*/
-		default:
-			break;
-		}
 	}
-
 }

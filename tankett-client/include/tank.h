@@ -20,6 +20,8 @@ namespace alpha {
 		float getTargetTurretRotation(mouse m);
 		void setColliderPosition();
 		vector2 getAimVector(mouse ms);
+		void preventCollision();
+
 		bullet* bullet_;
 
 		const float SPEED_ = 4.0f;

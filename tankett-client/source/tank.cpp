@@ -53,9 +53,25 @@ namespace alpha {
 	}
 
 	void tank::onCollision(IEntity* collider) {
-		transform_.position_ = previousPosition;
-		turretTransform_.position_ = transform_.position_;
-		collider_.set_position(previousPosition);
+		switch (collider->type_) {
+		case WALL: {
+			preventCollision();
+		}
+		break;
+		case BULLET: {
+			//TODO: if (notOwnBullet)
+			/*isEnabled = false;*/
+		}
+		break;
+		case TANK: {
+			collider->isEnabled = false;
+			isEnabled = false;
+		}
+		break;
+		default:
+			break;
+		}
+		
 	}
 
 	vector2 tank::getTargetMoveDirection(keyboard kb) {
@@ -90,5 +106,10 @@ namespace alpha {
 	vector2 tank::getAimVector(mouse ms) {
 		vector2 mousePosition((float)ms.x_, (float)ms.y_);
 		return vector2(mousePosition - turretTransform_.position_).normalized();
+	}
+	void tank::preventCollision() {
+		transform_.position_ = previousPosition;
+		turretTransform_.position_ = transform_.position_;
+		collider_.set_position(previousPosition);
 	}
 }
