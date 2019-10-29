@@ -30,13 +30,16 @@ namespace tankett {
 		virtual bool enter() final;
 		virtual void exit() final;
 		virtual bool tick() final;
+		void checkInput();
 		void send(time dt);
 		void receive();
 		void createTile(vector2 pos, TILE_TYPE type);
 		void createLevel();
-		void createTank(vector2 p_pos);
+		tank* createTank(vector2 p_pos);
+		void createBulletBuffer();
 		void manageCollisions();
 		bool checkCollision(IEntity* firstEntity, IEntity* secondEntity);
+		void fireBullet(tank* t);
 
 		void update(time dt);
 		void render();
@@ -46,9 +49,10 @@ namespace tankett {
 		transform transform_;
 
 		texture wallTexture_;
+		texture bulletTexture_;
 		texture tankTexture_;
 		texture turretTexture_;
-
+		
 		udp_socket sock_;
 		ip_address server_ip_;
 		ip_address send_all_ip_;
@@ -61,7 +65,9 @@ namespace tankett {
 		time send_accumulator;
 
 		dynamic_array<IEntity*> entities_;
-
+		dynamic_array<bullet*>bullets_;
+		tank* playerTank_;
+		
 		TILE_TYPE level[33][44]{
 			{W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W}, //1
 			{W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W}, //2

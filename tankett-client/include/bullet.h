@@ -5,11 +5,12 @@ namespace alpha {
 
 	class bullet : public IEntity {
 	public:
-		bullet(sprite pSprite, float pPosx, float pPosY, vector2 pDirection);
+		bullet(sprite pSprite);
 		~bullet();
 
 		void update(keyboard kb, mouse ms, time dt);
 		void render(render_system& pRenderSystem);
+		void fire(float pPosX, float pPosY, vector2 pDirection);
 		void onCollision(IEntity* collider);
 
 	private:

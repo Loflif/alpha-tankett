@@ -12,7 +12,8 @@
 namespace alpha {
 	const float TILE_SIZE = 28;
 	const float TANK_SIZE = 1.5f;
-
+	const float BULLET_SIZE = 0.2f;
+	
 	typedef unsigned long long uint64;
 	typedef   signed long long int64;
 	typedef unsigned int       uint32;
