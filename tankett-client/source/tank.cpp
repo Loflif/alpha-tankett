@@ -48,8 +48,9 @@ namespace alpha {
 		}
 		break;
 		case BULLET: {
-			//TODO: if (notOwnBullet)
-			/*isEnabled = false;*/
+			if (!ownsBullet(collider)) {
+				isEnabled = false;
+			}
 		}
 		break;
 		case TANK: {
@@ -101,4 +102,13 @@ namespace alpha {
 		turretTransform_.position_ = transform_.position_;
 		collider_.set_position(previousPosition);
 	}
+
+	bool tank::ownsBullet(IEntity* pBullet) {
+		for (IEntity* b : bullets_) {
+			if (pBullet == b) return true;
+		}
+		return false;
+	}
+
+
 }

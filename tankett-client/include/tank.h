@@ -14,6 +14,8 @@ namespace alpha {
 		void update(keyboard kb, mouse ms, time dt);
 		void onCollision(IEntity* collider);
 	
+
+		dynamic_array<bullet*> bullets_;
 	private:
 		vector2 getTargetMoveDirection(keyboard kb);
 		float getTargetRotation(keyboard kb);
@@ -21,6 +23,7 @@ namespace alpha {
 		void setColliderPosition();
 		vector2 getAimVector(mouse ms);
 		void preventCollision();
+		bool ownsBullet(IEntity* pBullet);
 
 		const float SPEED_ = 4.0f;
 		vector2 size_ = { 0,0 };
