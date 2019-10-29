@@ -20,6 +20,7 @@ namespace tankett {
 		wallTexture_.create_from_file("assets/wallTile.png");
 		tankTexture_.create_from_file("assets/tank.png");
 		turretTexture_.create_from_file("assets/turret.png");
+		bulletTexture_.create_from_file("assets/bullet.png");
 	}
 
 	bool client_app::enter() {
@@ -49,7 +50,8 @@ namespace tankett {
 		send_all_ip_.set_port(PROTOCOL_PORT);
 
 		createLevel();
-		createTank(vector2(4 * TILE_SIZE, 4 * TILE_SIZE));
+		playerTank_ = createTank(vector2(4 * TILE_SIZE, 4 * TILE_SIZE));
+		createBulletBuffer();
 
 		return true;
 	}
@@ -57,7 +59,10 @@ namespace tankett {
 	void client_app::exit() {
 		network_shut();
 		for (IEntity* e : entities_) {
-			//delete(e);
+			delete(e);
+		}
+		for (bullet* b : bullets_) {
+			delete(b);
 		}
 	}
 
@@ -76,13 +81,23 @@ namespace tankett {
 			send(dt);
 			receive();
 		}
-
+		
 		update(dt);
+		checkInput();
 		manageCollisions();
 		render();
 
 		return true;
 	}
+
+	void client_app::checkInput()
+	{
+		if(mouse_.is_pressed(MOUSE_BUTTON_LEFT))
+		{
+			fireBullet(playerTank_);
+		}
+	}
+
 	void client_app::send(time dt) {
 		send_accumulator += dt;
 		if (send_accumulator > time(100)) {
@@ -198,10 +213,26 @@ namespace tankett {
 		}
 	}
 
-	void client_app::createTank(vector2 p_pos) {
+	tank* client_app::createTank(vector2 p_pos) {
 		sprite spr(tankTexture_, vector2(TILE_SIZE * TANK_SIZE, TILE_SIZE * TANK_SIZE));
 		sprite turretSpr(turretTexture_, vector2(TILE_SIZE * TANK_SIZE, TILE_SIZE * TANK_SIZE));
-		entities_.push_back(new tank(spr, turretSpr, p_pos.x_, p_pos.y_));
+		tank* t = new tank(spr, turretSpr, p_pos.x_, p_pos.y_);
+		entities_.push_back(t);
+		return t;
+	}
+
+	void client_app::createBulletBuffer()
+	{
+		const int BULLET_MAX = 30;
+
+		sprite spr(bulletTexture_, vector2(TILE_SIZE * BULLET_SIZE, TILE_SIZE * BULLET_SIZE));
+
+		for(int i = 0; i < BULLET_MAX; i++)
+		{
+			bullet* b = new bullet(spr);
+			bullets_.push_back(b);
+			entities_.push_back(b);
+		}
 	}
 
 	void client_app::update(time dt) {
@@ -242,9 +273,23 @@ namespace tankett {
 
 		if (firstTop > secondBottom || firstBottom < secondTop || firstLeft > secondRight || firstRight < secondLeft) {
 			return false;
-		}
+			}
 		else {
 			return true;
+		}
+	}
+
+	void client_app::fireBullet(tank* t)
+	{
+		for(bullet* b : bullets_)
+		{
+			if(!b->isEnabled)
+			{
+				vector2 tPos = t->transform_.position_;
+				b->fire(tPos.x_, tPos.y_, t->aimVector_);
+				t->bullets_.push_back(b);
+				break;
+			}
 		}
 	}
 
