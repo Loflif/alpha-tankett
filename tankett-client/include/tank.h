@@ -11,17 +11,17 @@ namespace alpha {
 		~tank();
 
 		void render(render_system& pRenderSystem);
-		void update(keyboard kb, mouse ms, time dt);
-		void onCollision(IEntity* collider);
+		void update(keyboard pKeyboard, mouse pMouse, time pDeltaTime);
+		void onCollision(IEntity* pCollider);
+		vector2 getAimVector(mouse pMouse);
 	
 
 		dynamic_array<bullet*> bullets_;
 	private:
-		vector2 getTargetMoveDirection(keyboard kb);
-		float getTargetRotation(keyboard kb);
-		float getTargetTurretRotation(mouse m);
+		vector2 targetMoveDirection(keyboard kb);
+		float targetRotation(keyboard kb);
+		float targetTurretRotation(mouse m);
 		void setColliderPosition();
-		vector2 getAimVector(mouse ms);
 		void preventCollision();
 		bool ownsBullet(IEntity* pBullet);
 
