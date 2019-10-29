@@ -14,6 +14,7 @@ namespace alpha {
 		void update(keyboard pKeyboard, mouse pMouse, time pDeltaTime);
 		void onCollision(IEntity* pCollider);
 		vector2 aimVector_;
+		transform transform_;
 
 		dynamic_array<bullet*> bullets_;
 	private:
@@ -29,7 +30,6 @@ namespace alpha {
 		vector2 size_ = { 0,0 };
 		sprite sprite_;
 		sprite turretSprite_;
-		transform transform_;
 		transform turretTransform_;
 		vector2 previousPosition;
 	};
