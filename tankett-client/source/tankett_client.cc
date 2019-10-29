@@ -58,11 +58,9 @@ namespace tankett {
 
 	void client_app::exit() {
 		network_shut();
+
 		for (IEntity* e : entities_) {
 			delete(e);
-		}
-		for (bullet* b : bullets_) {
-			delete(b);
 		}
 	}
 
