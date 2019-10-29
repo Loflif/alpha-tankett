@@ -69,8 +69,6 @@ namespace tankett {
 		time dt = now - current_;
 		current_ = now;
 
-
-
 		if (keyboard_.is_pressed(KEYCODE_ESCAPE)) {
 			return false;
 		}
@@ -79,7 +77,7 @@ namespace tankett {
 			send(dt);
 			receive();
 		}
-		
+
 		update(dt);
 		checkInput();
 		manageCollisions();
@@ -88,10 +86,8 @@ namespace tankett {
 		return true;
 	}
 
-	void client_app::checkInput()
-	{
-		if(mouse_.is_pressed(MOUSE_BUTTON_LEFT))
-		{
+	void client_app::checkInput() {
+		if (mouse_.is_pressed(MOUSE_BUTTON_LEFT)) {
 			fireBullet(playerTank_);
 		}
 	}
@@ -104,7 +100,6 @@ namespace tankett {
 			uint8 buffer[2048];
 
 			byte_stream stream(sizeof(buffer), buffer);
-
 			byte_stream_writer writer(stream);
 
 			switch (state_) {
@@ -123,7 +118,7 @@ namespace tankett {
 			{
 				crypt::xorinator xorinator(client_key_, server_key_);
 				uint64 encryptedKeys = 0;
-				xorinator.encrypt(sizeof(uint64), (uint8*)& encryptedKeys);
+				xorinator.encrypt(sizeof(uint64), (uint8*)&encryptedKeys);
 				protocol_challenge_response challenge_response(encryptedKeys);
 				if (challenge_response.serialize(writer)) {
 					if (!sock_.send_to(server_ip_, stream)) {
@@ -225,7 +220,7 @@ namespace tankett {
 
 		sprite spr(bulletTexture_, vector2(TILE_SIZE * BULLET_SIZE, TILE_SIZE * BULLET_SIZE));
 
-		for(int i = 0; i < BULLET_MAX; i++)
+		for (int i = 0; i < BULLET_MAX; i++)
 		{
 			bullet* b = new bullet(spr);
 			bullets_.push_back(b);
@@ -273,18 +268,15 @@ namespace tankett {
 
 		if (firstTop > secondBottom || firstBottom < secondTop || firstLeft > secondRight || firstRight < secondLeft) {
 			return false;
-			}
+		}
 		else {
 			return true;
 		}
 	}
 
-	void client_app::fireBullet(tank* t)
-	{
-		for(bullet* b : bullets_)
-		{
-			if(!b->isEnabled)
-			{
+	void client_app::fireBullet(tank* t) {
+		for (bullet* b : bullets_) {
+			if (!b->isEnabled) {
 				vector2 tPos = t->transform_.position_;
 				b->fire(tPos.x_, tPos.y_, t->aimVector_);
 				t->bullets_.push_back(b);

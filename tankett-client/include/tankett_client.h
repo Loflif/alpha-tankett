@@ -68,7 +68,7 @@ namespace tankett {
 		dynamic_array<bullet*>bullets_;
 		tank* playerTank_;
 		
-		TILE_TYPE level[33][44]{
+		TILE_TYPE level[33][44] {
 			{W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W}, //1
 			{W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W}, //2
 			{W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W}, //3

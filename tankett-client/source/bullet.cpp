@@ -23,8 +23,7 @@ namespace alpha {
 		pRenderSystem.render(sprite_, transform_);
 	}
 
-	void bullet::fire(float pPosX, float pPosY, vector2 pDirection)
-	{
+	void bullet::fire(float pPosX, float pPosY, vector2 pDirection) {
 		transform_.position_.x_ = pPosX;
 		transform_.position_.y_ = pPosY;
 		collider_.set_position(transform_.position_);
