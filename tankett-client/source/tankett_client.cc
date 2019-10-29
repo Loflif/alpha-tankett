@@ -21,6 +21,11 @@ namespace tankett {
 		tankTexture_.create_from_file("assets/tank.png");
 		turretTexture_.create_from_file("assets/turret.png");
 		bulletTexture_.create_from_file("assets/bullet.png");
+
+		collisionPairs_.push_back(std::make_pair(TANK, WALL));
+		collisionPairs_.push_back(std::make_pair(TANK, BULLET));
+		collisionPairs_.push_back(std::make_pair(TANK, TANK));
+		collisionPairs_.push_back(std::make_pair(WALL, BULLET));
 	}
 
 	bool client_app::enter() {
@@ -237,10 +242,12 @@ namespace tankett {
 	void client_app::manageCollisions() {
 		for (int i = 0; i < entities_.size(); i++) {
 			for (int j = 0; j < entities_.size(); j++) {
-				if ((j != i) && (checkCollision(entities_[i], entities_[j]))) {
-					if (entities_[i]->isEnabled && entities_[j]->isEnabled) {
-						entities_[i]->onCollision(entities_[j]);
-						entities_[j]->onCollision(entities_[i]);
+				if (isCollisionPair(entities_[i], entities_[j])) {
+					if ((j != i) && (checkCollision(entities_[i], entities_[j]))) {
+						if (entities_[i]->isEnabled && entities_[j]->isEnabled) {
+							entities_[i]->onCollision(entities_[j]);
+							entities_[j]->onCollision(entities_[i]);
+						}
 					}
 				}
 			}
@@ -284,6 +291,16 @@ namespace tankett {
 				break;
 			}
 		}
+	}
+
+	bool client_app::isCollisionPair(IEntity* pFirstEntity, IEntity* pSecondEntity) {
+		for (unsigned int i = 0; i < collisionPairs_.size(); i++) {
+			if ((collisionPairs_[i].first == pFirstEntity->type_ && collisionPairs_[i].second == pSecondEntity->type_) ||
+				(collisionPairs_[i].first == pSecondEntity->type_ && collisionPairs_[i].second == pFirstEntity->type_)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	void client_app::render() {

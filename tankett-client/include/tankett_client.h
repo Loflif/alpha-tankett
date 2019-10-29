@@ -27,6 +27,8 @@ namespace tankett {
 	struct client_app : application {
 		client_app();
 
+		dynamic_array<std::pair<ENTITY_TYPE, ENTITY_TYPE>> collisionPairs_;
+
 		virtual bool enter() final;
 		virtual void exit() final;
 		virtual bool tick() final;
@@ -40,6 +42,7 @@ namespace tankett {
 		void manageCollisions();
 		bool checkCollision(IEntity* firstEntity, IEntity* secondEntity);
 		void fireBullet(tank* t);
+		bool isCollisionPair(IEntity* pFirstEntity, IEntity* pSecondEntity);
 
 		void update(time dt);
 		void render();
