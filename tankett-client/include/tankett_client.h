@@ -43,6 +43,7 @@ namespace tankett {
 		bool checkCollision(IEntity* firstEntity, IEntity* secondEntity);
 		void fireBullet(tank* t);
 		bool isCollisionPair(IEntity* pFirstEntity, IEntity* pSecondEntity);
+		void parsePayload(protocol_payload pPayload);
 
 		void update(time dt);
 		void render();

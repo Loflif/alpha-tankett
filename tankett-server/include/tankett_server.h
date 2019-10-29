@@ -50,8 +50,7 @@ namespace tankett {
 
 	  void challengeClient(Client &client);
 	  
-	  void packPayload(Client& client);
-	  void sendPayload(Client &client, network_message_header msg);
+	  void sendPayload(Client &client);
 	  int connectedClientCount();
 
 	  void SpawnTank();
@@ -63,7 +62,7 @@ namespace tankett {
 		  vector2(40,29),
 	  };
 
-	  server_to_client_data tanks[4];
+	  server_to_client_data clientData[4];
 
       bool running_;
       time send_accumulator_;

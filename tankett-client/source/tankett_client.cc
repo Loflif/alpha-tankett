@@ -173,7 +173,7 @@ namespace tankett {
 				else {
 					text_.set_text("CONNECTED");
 					state_ = CONNECTED;
-					//payload.payload_
+					parsePayload(payload);
 				}
 				break;
 			}
@@ -301,6 +301,11 @@ namespace tankett {
 			}
 		}
 		return false;
+	}
+
+	void client_app::parsePayload(protocol_payload pPayload) {
+		message_server_to_client msg = *reinterpret_cast<message_server_to_client*>(pPayload.payload_);
+		
 	}
 
 	void client_app::render() {

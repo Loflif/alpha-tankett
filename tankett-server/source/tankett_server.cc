@@ -210,9 +210,6 @@ namespace tankett {
 
 	}
 
-	void server::packPayload(Client& client) {
-	}
-
 	void server::sendPayload(Client& client) {
 		sendSequence_++;
 		protocol_payload payload(sendSequence_);
