@@ -245,8 +245,10 @@ namespace tankett {
 		for (int i = 0; i < entities_.size(); i++) {
 			for (int j = 0; j < entities_.size(); j++) {
 				if ((j != i) && (checkCollision(entities_[i], entities_[j]))) {
-					entities_[i]->onCollision(entities_[j]);
-					entities_[j]->onCollision(entities_[i]);
+					if (entities_[i]->isEnabled && entities_[j]->isEnabled) {
+						entities_[i]->onCollision(entities_[j]);
+						entities_[j]->onCollision(entities_[i]);
+					}
 				}
 			}
 		}

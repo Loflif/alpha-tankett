@@ -54,7 +54,6 @@ namespace alpha {
 		}
 		break;
 		case TANK: {
-			collider->isEnabled = false;
 			isEnabled = false;
 		}
 		break;
