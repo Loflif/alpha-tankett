@@ -220,7 +220,6 @@ namespace tankett {
 	}
 
 	void client_app::createBulletBuffer() {
-		const int BULLET_MAX = 30;
 
 		sprite spr(bulletTexture_, vector2(TILE_SIZE * BULLET_SIZE, TILE_SIZE * BULLET_SIZE));
 

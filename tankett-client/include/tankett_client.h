@@ -68,8 +68,11 @@ namespace tankett {
 		time send_accumulator;
 
 		dynamic_array<IEntity*> entities_;
+		const int BULLET_MAX = 10;
 		dynamic_array<bullet*>bullets_;
 		tank* playerTank_;
+
+
 		
 		TILE_TYPE level[33][44] {
 			{W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W}, //1
