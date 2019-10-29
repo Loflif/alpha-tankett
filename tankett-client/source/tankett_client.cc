@@ -181,21 +181,9 @@ namespace tankett {
 	}
 
 	void client_app::createTile(vector2 p_pos, TILE_TYPE p_type) {
-		switch (p_type) {
-		case tankett::W: {
+		if (p_type == tankett::W) {
 			sprite spr(wallTexture_, vector2(TILE_SIZE, TILE_SIZE));
 			entities_.push_back(new tile(spr, p_pos.x_, p_pos.y_));
-		}
-						 break;
-		case tankett::E: {
-			/* sprite spr(0xffffff);
-			 entities_.push_back(new tile(spr, p_pos.x_, p_pos.y_));*/
-		}
-						 break;
-		default: {
-			//Invalid type
-		}
-				 break;
 		}
 	}
 
@@ -261,13 +249,12 @@ namespace tankett {
 	}
 
 	void client_app::render() {
+		render_system_.clear(0xff0e1528); //Background Color
 		for (IEntity* e : entities_) {
 			if (e->isEnabled) {
 				e->render(render_system_);
 			}
 		}
-
-		render_system_.clear(0xff0e1528); //Background Color
 		render_system_.render(text_, transform_);
 	}
 
