@@ -25,9 +25,9 @@ namespace alpha {
 
 	void tank::update(keyboard kb, mouse ms, time dt) {
 		previousPosition = transform_.position_;
-		vector2 direction = getTargetMoveDirection(kb);
-		transform_.set_rotation(getTargetRotation(kb));
-		turretTransform_.set_rotation(getTargetTurretRotation(ms));
+		vector2 direction = targetMoveDirection(kb);
+		transform_.set_rotation(targetRotation(kb));
+		turretTransform_.set_rotation(targetTurretRotation(ms));
 
 		transform_.position_.x_ += direction.x_ * SPEED_ * TILE_SIZE * dt.as_seconds();
 		transform_.position_.y_ += direction.y_ * SPEED_ * TILE_SIZE * dt.as_seconds();
@@ -64,7 +64,7 @@ namespace alpha {
 		
 	}
 
-	vector2 tank::getTargetMoveDirection(keyboard kb) {
+	vector2 tank::targetMoveDirection(keyboard kb) {
 		if (kb.is_down(KEYCODE_W) && kb.is_down(KEYCODE_D)) return { 0.7071f ,-0.7071f };  //Normalised Diagonal Vector
 		if (kb.is_down(KEYCODE_W) && kb.is_down(KEYCODE_A)) return { -0.7071f ,-0.7071f };
 		if (kb.is_down(KEYCODE_S) && kb.is_down(KEYCODE_A)) return { -0.7071f ,0.7071f };
@@ -76,7 +76,7 @@ namespace alpha {
 		return { 0,0 };
 	}
 
-	float tank::getTargetRotation(keyboard kb) {
+	float tank::targetRotation(keyboard kb) {
 		if (kb.is_down(KEYCODE_W) && kb.is_down(KEYCODE_D)) return 315;
 		if (kb.is_down(KEYCODE_W) && kb.is_down(KEYCODE_A)) return 225;
 		if (kb.is_down(KEYCODE_S) && kb.is_down(KEYCODE_A)) return 135;
@@ -88,7 +88,7 @@ namespace alpha {
 		return transform_.rotation_;
 	}
 
-	float tank::getTargetTurretRotation(mouse ms) {
+	float tank::targetTurretRotation(mouse ms) {
 		vector2 aimVector = getAimVector(ms);
 		return atan2(aimVector.y_, aimVector.x_) * (180 / PI);
 	}
