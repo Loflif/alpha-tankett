@@ -21,10 +21,6 @@ namespace alpha {
 	void tank::render(render_system& pRenderSystem) {
 		pRenderSystem.render(sprite_, transform_);
 		pRenderSystem.render(turretSprite_, turretTransform_);
-
-		if (bullet_) {
-			bullet_->render(pRenderSystem);
-		}
 	}
 
 	void tank::update(keyboard kb, mouse ms, time dt) {
@@ -37,14 +33,7 @@ namespace alpha {
 		transform_.position_.y_ += direction.y_ * SPEED_ * TILE_SIZE * dt.as_seconds();
 		turretTransform_.position_ = transform_.position_;
 
-		if (ms.is_pressed(MOUSE_BUTTON_LEFT)) {
-			bullet_ = new bullet(sprite_, transform_.position_.x_, transform_.position_.y_, getAimVector(ms));
-		}
-
 		setColliderPosition();
-		if (bullet_) {
-			bullet_->update(kb, ms, dt);
-		}
 	}
 
 	void tank::setColliderPosition() {

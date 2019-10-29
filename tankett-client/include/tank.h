@@ -22,8 +22,6 @@ namespace alpha {
 		vector2 getAimVector(mouse ms);
 		void preventCollision();
 
-		bullet* bullet_;
-
 		const float SPEED_ = 4.0f;
 		vector2 size_ = { 0,0 };
 		sprite sprite_;
