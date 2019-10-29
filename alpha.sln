@@ -1,0 +1,81 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29306.81
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "alpha-test", "alpha-test\alpha-test.vcxproj", "{C6047975-E8A1-431C-BC0B-4F234C6CCA71}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7DBCA59F-7F34-42F9-832D-107A73623E5A} = {7DBCA59F-7F34-42F9-832D-107A73623E5A}
+		{815578B9-1E4E-4ADD-8C94-DD790E3E69AD} = {815578B9-1E4E-4ADD-8C94-DD790E3E69AD}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "alpha-core", "alpha-core\alpha-core.vcxproj", "{815578B9-1E4E-4ADD-8C94-DD790E3E69AD}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "alpha-main", "alpha-main\alpha-main.vcxproj", "{7DBCA59F-7F34-42F9-832D-107A73623E5A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{815578B9-1E4E-4ADD-8C94-DD790E3E69AD} = {815578B9-1E4E-4ADD-8C94-DD790E3E69AD}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tankett-shared", "tankett-shared\tankett-shared.vcxproj", "{9756B1AD-7DEA-4459-977B-AB1250082BF6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{815578B9-1E4E-4ADD-8C94-DD790E3E69AD} = {815578B9-1E4E-4ADD-8C94-DD790E3E69AD}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tankett-client", "tankett-client\tankett-client.vcxproj", "{7FC8B3FF-8E41-40EC-A1A4-444243E7AD5A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7DBCA59F-7F34-42F9-832D-107A73623E5A} = {7DBCA59F-7F34-42F9-832D-107A73623E5A}
+		{9756B1AD-7DEA-4459-977B-AB1250082BF6} = {9756B1AD-7DEA-4459-977B-AB1250082BF6}
+		{815578B9-1E4E-4ADD-8C94-DD790E3E69AD} = {815578B9-1E4E-4ADD-8C94-DD790E3E69AD}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tankett-server", "tankett-server\tankett-server.vcxproj", "{A84627B7-5FD1-474F-BEA9-B9225174BA0F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9756B1AD-7DEA-4459-977B-AB1250082BF6} = {9756B1AD-7DEA-4459-977B-AB1250082BF6}
+		{815578B9-1E4E-4ADD-8C94-DD790E3E69AD} = {815578B9-1E4E-4ADD-8C94-DD790E3E69AD}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "alpha", "alpha", "{9A224083-9099-49CA-B2AC-FD10A9EAFD59}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C6047975-E8A1-431C-BC0B-4F234C6CCA71}.Debug|x64.ActiveCfg = Debug|x64
+		{C6047975-E8A1-431C-BC0B-4F234C6CCA71}.Debug|x64.Build.0 = Debug|x64
+		{C6047975-E8A1-431C-BC0B-4F234C6CCA71}.Release|x64.ActiveCfg = Release|x64
+		{C6047975-E8A1-431C-BC0B-4F234C6CCA71}.Release|x64.Build.0 = Release|x64
+		{815578B9-1E4E-4ADD-8C94-DD790E3E69AD}.Debug|x64.ActiveCfg = Debug|x64
+		{815578B9-1E4E-4ADD-8C94-DD790E3E69AD}.Debug|x64.Build.0 = Debug|x64
+		{815578B9-1E4E-4ADD-8C94-DD790E3E69AD}.Release|x64.ActiveCfg = Release|x64
+		{815578B9-1E4E-4ADD-8C94-DD790E3E69AD}.Release|x64.Build.0 = Release|x64
+		{7DBCA59F-7F34-42F9-832D-107A73623E5A}.Debug|x64.ActiveCfg = Debug|x64
+		{7DBCA59F-7F34-42F9-832D-107A73623E5A}.Debug|x64.Build.0 = Debug|x64
+		{7DBCA59F-7F34-42F9-832D-107A73623E5A}.Release|x64.ActiveCfg = Release|x64
+		{7DBCA59F-7F34-42F9-832D-107A73623E5A}.Release|x64.Build.0 = Release|x64
+		{7FC8B3FF-8E41-40EC-A1A4-444243E7AD5A}.Debug|x64.ActiveCfg = Debug|x64
+		{7FC8B3FF-8E41-40EC-A1A4-444243E7AD5A}.Debug|x64.Build.0 = Debug|x64
+		{7FC8B3FF-8E41-40EC-A1A4-444243E7AD5A}.Release|x64.ActiveCfg = Release|x64
+		{7FC8B3FF-8E41-40EC-A1A4-444243E7AD5A}.Release|x64.Build.0 = Release|x64
+		{A84627B7-5FD1-474F-BEA9-B9225174BA0F}.Debug|x64.ActiveCfg = Debug|x64
+		{A84627B7-5FD1-474F-BEA9-B9225174BA0F}.Debug|x64.Build.0 = Debug|x64
+		{A84627B7-5FD1-474F-BEA9-B9225174BA0F}.Release|x64.ActiveCfg = Release|x64
+		{A84627B7-5FD1-474F-BEA9-B9225174BA0F}.Release|x64.Build.0 = Release|x64
+		{9756B1AD-7DEA-4459-977B-AB1250082BF6}.Debug|x64.ActiveCfg = Debug|x64
+		{9756B1AD-7DEA-4459-977B-AB1250082BF6}.Debug|x64.Build.0 = Debug|x64
+		{9756B1AD-7DEA-4459-977B-AB1250082BF6}.Release|x64.ActiveCfg = Release|x64
+		{9756B1AD-7DEA-4459-977B-AB1250082BF6}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C6047975-E8A1-431C-BC0B-4F234C6CCA71} = {9A224083-9099-49CA-B2AC-FD10A9EAFD59}
+		{815578B9-1E4E-4ADD-8C94-DD790E3E69AD} = {9A224083-9099-49CA-B2AC-FD10A9EAFD59}
+		{7DBCA59F-7F34-42F9-832D-107A73623E5A} = {9A224083-9099-49CA-B2AC-FD10A9EAFD59}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D6190E06-4D23-4EC9-A099-D1290FF1AB7B}
+	EndGlobalSection
+EndGlobal
