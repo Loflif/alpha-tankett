@@ -95,7 +95,8 @@ namespace alpha {
 
 	vector2 tank::getAimVector(mouse ms) {
 		vector2 mousePosition((float)ms.x_, (float)ms.y_);
-		return vector2(mousePosition - turretTransform_.position_).normalized();
+		aimVector = vector2(mousePosition - turretTransform_.position_).normalized();
+		return aimVector;
 	}
 	void tank::preventCollision() {
 		transform_.position_ = previousPosition;
