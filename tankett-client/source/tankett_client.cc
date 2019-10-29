@@ -214,14 +214,12 @@ namespace tankett {
 		return t;
 	}
 
-	void client_app::createBulletBuffer()
-	{
+	void client_app::createBulletBuffer() {
 		const int BULLET_MAX = 30;
 
 		sprite spr(bulletTexture_, vector2(TILE_SIZE * BULLET_SIZE, TILE_SIZE * BULLET_SIZE));
 
-		for (int i = 0; i < BULLET_MAX; i++)
-		{
+		for (int i = 0; i < BULLET_MAX; i++) {
 			bullet* b = new bullet(spr);
 			bullets_.push_back(b);
 			entities_.push_back(b);
@@ -275,11 +273,14 @@ namespace tankett {
 	}
 
 	void client_app::fireBullet(tank* t) {
+		if (t->shootingCooldown_ > 0)
+			return;
 		for (bullet* b : bullets_) {
 			if (!b->isEnabled) {
 				vector2 tPos = t->transform_.position_;
 				b->fire(tPos.x_, tPos.y_, t->aimVector_);
 				t->bullets_.push_back(b);
+				t->shootingCooldown_ = t->FIRE_RATE_;
 				break;
 			}
 		}

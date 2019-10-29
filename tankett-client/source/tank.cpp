@@ -24,6 +24,8 @@ namespace alpha {
 	}
 
 	void tank::update(keyboard kb, mouse ms, time dt) {
+		shootingCooldown_ -= dt.as_seconds();
+		
 		previousPosition = transform_.position_;
 		vector2 direction = targetMoveDirection(kb);
 		transform_.set_rotation(targetRotation(kb));

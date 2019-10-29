@@ -16,6 +16,9 @@ namespace alpha {
 		vector2 aimVector_;
 		transform transform_;
 
+		const float FIRE_RATE_ = 1.0f;
+		float shootingCooldown_ = 0.0f;
+		
 		dynamic_array<bullet*> bullets_;
 	private:
 		vector2 targetMoveDirection(keyboard pKeyboard);
