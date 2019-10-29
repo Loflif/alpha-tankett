@@ -62,29 +62,15 @@ namespace tankett {
 	}
 
 	bool client_app::tick() {
-		// note: deltatime
 		const time now = time::now();
 		time dt = now - current_;
 		current_ = now;
 
 
 
-		// note: quit
 		if (keyboard_.is_pressed(KEYCODE_ESCAPE)) {
 			return false;
 		}
-
-		// note: connect
-		if (keyboard_.is_pressed(KEYCODE_C)) {
-		}
-
-		// note: disconnect
-		if (keyboard_.is_down(KEYCODE_D)) {
-		}
-
-		// note: rendering
-		render_system_.clear(0xff0e1528); //Background Color
-		render_system_.render(text_, transform_);
 
 		if (state_ != DISCONNECTED) {
 			send(dt);
@@ -280,6 +266,9 @@ namespace tankett {
 				e->render(render_system_);
 			}
 		}
+
+		render_system_.clear(0xff0e1528); //Background Color
+		render_system_.render(text_, transform_);
 	}
 
 
