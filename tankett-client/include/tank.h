@@ -13,7 +13,7 @@ namespace alpha {
 		void render(render_system& pRenderSystem);
 		void update(keyboard pKeyboard, mouse pMouse, time pDeltaTime);
 		void onCollision(IEntity* pCollider);
-		vector2 aimVector;
+		vector2 aimVector_;
 
 		dynamic_array<bullet*> bullets_;
 	private:
