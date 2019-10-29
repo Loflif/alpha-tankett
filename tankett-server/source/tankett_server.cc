@@ -159,7 +159,7 @@ namespace tankett {
 					if (client.state_ != CONNECTED) {
 						client.state_ = CONNECTED;
 						debugf("[Info] Client connected: %s", client.address_.as_string());
-						client.id_ = connectedClientCount();
+						client.id_ = (uint8)connectedClientCount();
 						SpawnTank();
 					}
 				}
@@ -215,19 +215,19 @@ namespace tankett {
 		protocol_payload payload(sendSequence_);
 
 		byte_stream stream(1024 * 4, dst_);
+		byte_stream_writer writer(stream);
 
 		message_server_to_client msg;
-		msg.client_count = connectedClientCount();
+		msg.client_count = (uint8)connectedClientCount();
 		msg.game_state = ROUND_RUNNING;
-		msg.timestamp = (char)__TIMESTAMP__;
 		for (int i = 0; i < 4; i++) {
 			msg.client_data[i] = clientData[i];
 		}
 		msg.receiver_id = client.id_;
 
-		msg.serialize(stream);
+		msg.serialize(writer);
 
-		byte_stream_writer writer(stream);
+		
 
 		payload.serialize(writer);
 		if (!sock_.send_to(client.address_, stream)) {
@@ -236,8 +236,8 @@ namespace tankett {
 		//debugf("[Info] Payload sent %s", client.address_.as_string());
 	}
 
-	int server::connectedClientCount() {
-		int count = 0;
+	uint8 server::connectedClientCount() {
+		uint8 count = 0;
 		for (Client client : clients) {
 			if (client.state_ == CONNECTED) count++;
 		}

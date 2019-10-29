@@ -51,7 +51,7 @@ namespace tankett {
 	  void challengeClient(Client &client);
 	  
 	  void sendPayload(Client &client);
-	  int connectedClientCount();
+	  uint8 connectedClientCount();
 
 	  void SpawnTank();
 

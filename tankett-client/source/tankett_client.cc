@@ -305,7 +305,8 @@ namespace tankett {
 
 	void client_app::parsePayload(protocol_payload pPayload) {
 		message_server_to_client msg = *reinterpret_cast<message_server_to_client*>(pPayload.payload_);
-		
+		int x = 0;
+		x++;
 	}
 
 	void client_app::render() {
