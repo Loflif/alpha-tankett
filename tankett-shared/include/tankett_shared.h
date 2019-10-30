@@ -169,9 +169,6 @@ namespace tankett {
 	   NETWORK_MESSAGE_COUNT,
    };
 
-	
-   ;
-
    struct network_message_header {
       network_message_header();
       explicit network_message_header(network_message_type type);

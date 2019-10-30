@@ -4,14 +4,14 @@
 
 namespace alpha {
    namespace {
-      template <typename T>
-      bool calculate(const uint64 capacity, uint64 &size, uint64 count = 1) {
-         if ((size + sizeof(T) * count) < capacity) {
-            return false;
-         }
-         size += sizeof(T) * count;
-         return true;
-      }
+	   template <typename T>
+	   bool calculate(const uint64 capacity, uint64& size, uint64 count = 1) {
+		   if ((size + sizeof(T) * count) > capacity) {
+			   return false;
+		   }
+		   size += sizeof(T) * count;
+		   return true;
+	   }
    } // !anon
 
    byte_stream_evaluator::byte_stream_evaluator(byte_stream &stream)

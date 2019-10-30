@@ -159,7 +159,7 @@ namespace tankett {
 					if (client.state_ != CONNECTED) {
 						client.state_ = CONNECTED;
 						debugf("[Info] Client connected: %s", client.address_.as_string());
-						client.id_ = (uint8)connectedClientCount();
+						client.id_ = connectedClientCount();
 						SpawnTank();
 					}
 				}
@@ -224,12 +224,10 @@ namespace tankett {
 			msg.client_data[i] = clientData[i];
 		}
 		msg.receiver_id = client.id_;
-
+	
+		payload.serialize(writer);
 		msg.serialize(writer);
 
-		
-
-		payload.serialize(writer);
 		if (!sock_.send_to(client.address_, stream)) {
 			debugf("[Warning] Tried to send but something went wrong");
 		}
@@ -249,6 +247,7 @@ namespace tankett {
 			if (!clientData[i].connected) {
 				clientData[i].connected = true;
 				clientData[i].position = spawnPoints[i];
+				return;
 			}
 		}
 	}
