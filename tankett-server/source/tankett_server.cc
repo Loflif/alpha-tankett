@@ -79,7 +79,7 @@ namespace tankett {
 				}
 				processConnectionRequest(remote, msg);
 			}
-												 break;
+											   break;
 			case PACKET_TYPE_CHALLENGE_RESPONSE: {
 				protocol_challenge_response msg;
 				if (!msg.serialize(reader)) {
@@ -88,7 +88,7 @@ namespace tankett {
 				}
 				processChallengeResponse(remote, msg);
 			}
-												 break;
+											   break;
 			case PACKET_TYPE_PAYLOAD: {
 				protocol_payload msg;
 				if (!msg.serialize(reader)) {
@@ -97,7 +97,7 @@ namespace tankett {
 				}
 				processPayload(remote, msg);
 			}
-									  break;
+									break;
 			default:
 				return;
 				break;
@@ -113,7 +113,7 @@ namespace tankett {
 		if (send_accumulator_ > time(100)) {
 			send_accumulator_ -= time(100);
 
-			for (client &client : clients_) {
+			for (client& client : clients_) {
 				switch (client.state_) {
 				case CHALLENGE:
 					challengeClient(client);
@@ -172,8 +172,8 @@ namespace tankett {
 				// note: did the packing succeed?
 				if (messages_evaluated != messages_packed) {
 					debugf("[err] %s - sequence: %u - messages_evaluated != messages_packed",
-						current_sequence_number,
-						client.address_.as_string());
+						   current_sequence_number,
+						   client.address_.as_string());
 					continue;
 				}
 
@@ -189,14 +189,14 @@ namespace tankett {
 					//       - delete messages sent
 					//       - remove them from client message queue
 					for (int remove_message_index = 0;
-						remove_message_index < messages_packed;
-						remove_message_index++) {
+						 remove_message_index < messages_packed;
+						 remove_message_index++) {
 						delete messages.at(remove_message_index);
 					}
 
 					messages.erase(messages.begin(), messages.begin() + messages_packed);
 				}
-			}			
+			}
 		}
 	}
 
@@ -213,9 +213,9 @@ namespace tankett {
 			auto err = network_error::get_error();
 			if (err.is_critical()) {
 				debugf("[err] %s - send error (%d) %s",
-					remote.as_string(),
-					err.code_,
-					err.as_string());
+					   remote.as_string(),
+					   err.code_,
+					   err.as_string());
 			}
 
 			return false;
@@ -250,7 +250,7 @@ namespace tankett {
 				crypt::xorinator xorinator(client.client_key_, key);
 				uint64 encryptedKeys = 0;
 				client.xorinator_ = xorinator;
-				xorinator.encrypt(sizeof(uint64), (uint8*)& encryptedKeys);
+				xorinator.encrypt(sizeof(uint64), (uint8*)&encryptedKeys);
 				if (encryptedKeys == msg.combined_key_) {
 					if (client.state_ != CONNECTED) {
 						client.state_ = CONNECTED;
@@ -271,7 +271,20 @@ namespace tankett {
 		for (client& client : clients_) {
 			if (client.address_ == remote) {
 				if (msg.is_newer(client.latest_received_sequence_)) {
-					client.latest_received_sequence_= msg.sequence_;
+					client.latest_received_sequence_ = msg.sequence_;
+					byte_stream stream(msg.length_, msg.payload_);
+					byte_stream_reader reader(stream);
+
+					client.xorinator_.decrypt(msg.length_, msg.payload_);
+					
+					network_message_type type = (network_message_type)reader.peek();
+
+					switch(type) {
+					case tankett::NETWORK_MESSAGE_CLIENT_TO_SERVER : {
+						}
+						break;
+					}
+					
 					//debugf("[Info] Payload received from: %s", client.address_.as_string());
 				}
 			}
@@ -291,7 +304,7 @@ namespace tankett {
 	}
 
 	void server::queueMessage(client& pClient) {
-		message_server_to_client *msg = new message_server_to_client;
+		message_server_to_client* msg = new message_server_to_client;
 		msg->client_count = (uint8)clients_.size();
 		for (int i = 0; i < 4; i++) {
 			msg->client_data[i] = clientData[i];

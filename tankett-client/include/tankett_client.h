@@ -34,6 +34,9 @@ namespace tankett {
 		virtual bool tick() final;
 		void checkInput();
 		void send(time dt);
+		bool pack_payload(protocol_payload& pPayload);
+		bool send_payload(protocol_payload& pPayload);
+		
 		void receive();
 		void createTile(vector2 pos, TILE_TYPE type);
 		void createLevel();
@@ -48,7 +51,8 @@ namespace tankett {
 		void UpdateLocalTank(server_to_client_data pData);
 		void UpdateRemoteTank(server_to_client_data pData, uint8 pID);
 
-
+		
+		
 		void update(time dt);
 		void render();
 
@@ -61,7 +65,7 @@ namespace tankett {
 		texture tankTexture_;
 		texture turretTexture_;
 		
-		udp_socket sock_;
+		udp_socket socket_;
 		ip_address server_ip_;
 		ip_address send_all_ip_;
 
@@ -72,6 +76,8 @@ namespace tankett {
 
 		time send_accumulator;
 
+		uint32 send_sequence_ = 0;
+		
 		dynamic_array<IEntity*> entities_;
 		const int BULLET_MAX = 10;
 		dynamic_array<bullet*>bullets_;
