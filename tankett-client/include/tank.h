@@ -21,7 +21,7 @@ namespace alpha {
 		
 		dynamic_array<bullet*> bullets_;
 
-		//Client-specific:
+		//Client-specific (keep these when refactoring later):
 		void UpdateValues(bool pAlive,
 						  vector2 pPos,
 						  float pAngle,
@@ -29,6 +29,7 @@ namespace alpha {
 		void SetPosition(vector2 pPos);
 		void SetAngle(float pAngle);
 		void SetActive(bool pIsActive);
+		//Also keep Constructor/Destructor, Render and Update, and only set aimvector when local
 
 		dynamic_array<vector2> bulletPositions_;
 
