@@ -56,11 +56,51 @@ namespace tankett {
 		send_all_ip_.set_port(PROTOCOL_PORT);
 
 		createLevel();
-		playerTank_ = createTank(vector2(4 * TILE_SIZE, 4 * TILE_SIZE));
 		createBulletBuffer();
 
 		return true;
 	}
+
+#pragma region Intialisation
+
+	void client_app::createTile(vector2 p_pos, TILE_TYPE p_type) {
+		if (p_type == tankett::W) {
+			sprite spr(wallTexture_, vector2(TILE_SIZE, TILE_SIZE));
+			entities_.push_back(new tile(spr, p_pos.x_, p_pos.y_));
+		}
+	}
+
+	void client_app::createLevel() {
+		int rows = std::extent<decltype(level), 0>::value; // Get the amount of rows
+		for (size_t row = 0; row < rows; row++) {
+			int column = 0;
+			for (TILE_TYPE type : level[row]) {
+				createTile(vector2((float)column * TILE_SIZE, (float)row * TILE_SIZE), type);
+				column++;
+			}
+		}
+	}
+
+	tank* client_app::createTank(vector2 p_pos, uint8 pID) {
+		sprite spr(tankTexture_, vector2(TILE_SIZE * TANK_SIZE, TILE_SIZE * TANK_SIZE));
+		sprite turretSpr(turretTexture_, vector2(TILE_SIZE * TANK_SIZE, TILE_SIZE * TANK_SIZE));
+		tank* t = new tank(spr, turretSpr, p_pos.x_, p_pos.y_, pID);
+		entities_.push_back(t);
+		return t;
+	}
+
+	void client_app::createBulletBuffer() {
+
+		sprite spr(bulletTexture_, vector2(TILE_SIZE * BULLET_SIZE, TILE_SIZE * BULLET_SIZE));
+
+		for (int i = 0; i < BULLET_MAX; i++) {
+			bullet* b = new bullet(spr);
+			bullets_.push_back(b);
+			entities_.push_back(b);
+		}
+	}
+
+#pragma endregion
 
 	void client_app::exit() {
 		network_shut();
@@ -238,6 +278,9 @@ namespace tankett {
 		}
 	}
 
+
+#pragma region ParseData
+
 	void client_app::parsePayload(protocol_payload pPayload) {
 		byte_stream stream(pPayload.length_, pPayload.payload_);
 		byte_stream_reader reader(stream);
@@ -270,67 +313,55 @@ namespace tankett {
 	}
 
 	void client_app::parseServerMessage(message_server_to_client pMessage) {
-		if (pMessage.client_count > (uint8)remoteTanks_.size() + 1) {
-			remoteTanks_.push_back(createTank(vector2(0,0)));
-		}
-		uint8 remoteIterator = 0;
 		for (int i = 0; i < pMessage.client_count; i++) {
 			if (i == pMessage.receiver_id - 1) {
 				UpdateLocalTank(pMessage.client_data[i]);
 			}
 			else {
-				UpdateRemoteTank(pMessage.client_data[i], remoteIterator);
-				remoteIterator++;
+				UpdateRemoteTanks(pMessage.client_data[i]);
 			}
 		}
+	}
+
+	void client_app::UpdateRemoteTanks(server_to_client_data pData) {
+		for (int j = 0; j < 3; j++) {
+			if (remoteTanks_[j]->id_ == pData.client_id) {
+				UpdateRemoteTank(pData, (uint8)j);
+				return;
+			}
+		}
+		remoteTanks_.push_back(createTank(pData.position*TILE_SIZE, pData.client_id));
 	}
 
 	void client_app::UpdateRemoteTank(server_to_client_data pData, uint8 pID) {
-		remoteTanks_[pID]->SetPosition(pData.position * TILE_SIZE);
-	}
+		dynamic_array<vector2> bulletPos;
+		for (bullet_data b : pData.bullets) {
+			bulletPos.push_back(b.position * TILE_SIZE);
+		}
 
-	
+		remoteTanks_[pID]->UpdateValues(pData.alive,
+										pData.position * TILE_SIZE,
+										pData.angle,
+										bulletPos);
+	}
 
 	void client_app::UpdateLocalTank(server_to_client_data pData) {
-		playerTank_->SetPosition(pData.position * TILE_SIZE);
-	}
-
-	void client_app::createTile(vector2 p_pos, TILE_TYPE p_type) {
-		if (p_type == tankett::W) {
-			sprite spr(wallTexture_, vector2(TILE_SIZE, TILE_SIZE));
-			entities_.push_back(new tile(spr, p_pos.x_, p_pos.y_));
+		if (playerTank_ == nullptr) {
+			playerTank_ = createTank(pData.position * TILE_SIZE, pData.client_id);
+			return;
 		}
-	}
-
-	void client_app::createLevel() {
-		int rows = std::extent<decltype(level), 0>::value; // Get the amount of rows
-		for (size_t row = 0; row < rows; row++) {
-			int column = 0;
-			for (TILE_TYPE type : level[row]) {
-				createTile(vector2((float)column * TILE_SIZE, (float)row * TILE_SIZE), type);
-				column++;
-			}
+		dynamic_array<vector2> bulletPos;
+		for (bullet_data b : pData.bullets) {
+			bulletPos.push_back(b.position * TILE_SIZE);
 		}
+
+		playerTank_->UpdateValues(pData.alive,
+								  pData.position * TILE_SIZE,
+								  pData.angle,
+								  bulletPos);
 	}
 
-	tank* client_app::createTank(vector2 p_pos) {
-		sprite spr(tankTexture_, vector2(TILE_SIZE * TANK_SIZE, TILE_SIZE * TANK_SIZE));
-		sprite turretSpr(turretTexture_, vector2(TILE_SIZE * TANK_SIZE, TILE_SIZE * TANK_SIZE));
-		tank* t = new tank(spr, turretSpr, p_pos.x_, p_pos.y_);
-		entities_.push_back(t);
-		return t;
-	}
-
-	void client_app::createBulletBuffer() {
-
-		sprite spr(bulletTexture_, vector2(TILE_SIZE * BULLET_SIZE, TILE_SIZE * BULLET_SIZE));
-
-		for (int i = 0; i < BULLET_MAX; i++) {
-			bullet* b = new bullet(spr);
-			bullets_.push_back(b);
-			entities_.push_back(b);
-		}
-	}
+#pragma endregion
 
 	void client_app::update(time dt) {
 		for (IEntity* e : entities_) {
@@ -339,6 +370,8 @@ namespace tankett {
 			}
 		}
 	}
+
+#pragma region CollisionHandling
 
 	void client_app::manageCollisions() {
 		for (int i = 0; i < entities_.size(); i++) {
@@ -380,6 +413,18 @@ namespace tankett {
 		}
 	}
 
+	bool client_app::isCollisionPair(IEntity* pFirstEntity, IEntity* pSecondEntity) {
+		for (unsigned int i = 0; i < collisionPairs_.size(); i++) {
+			if ((collisionPairs_[i].first == pFirstEntity->type_ && collisionPairs_[i].second == pSecondEntity->type_) ||
+				(collisionPairs_[i].first == pSecondEntity->type_ && collisionPairs_[i].second == pFirstEntity->type_)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+#pragma endregion
+
 	void client_app::fireBullet(tank* t) {
 		if (t->shootingCooldown_ > 0)
 			return;
@@ -394,18 +439,6 @@ namespace tankett {
 		}
 	}
 
-	bool client_app::isCollisionPair(IEntity* pFirstEntity, IEntity* pSecondEntity) {
-		for (unsigned int i = 0; i < collisionPairs_.size(); i++) {
-			if ((collisionPairs_[i].first == pFirstEntity->type_ && collisionPairs_[i].second == pSecondEntity->type_) ||
-				(collisionPairs_[i].first == pSecondEntity->type_ && collisionPairs_[i].second == pFirstEntity->type_)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-
-
 	void client_app::render() {
 		render_system_.clear(0xff0e1528); //Background Color
 		for (IEntity* e : entities_) {
@@ -415,7 +448,4 @@ namespace tankett {
 		}
 		render_system_.render(text_, transform_);
 	}
-
-
-
 } // !tankett

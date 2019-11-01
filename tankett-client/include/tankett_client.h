@@ -40,7 +40,7 @@ namespace tankett {
 		void receive();
 		void createTile(vector2 pos, TILE_TYPE type);
 		void createLevel();
-		tank* createTank(vector2 p_pos);
+		tank* createTank(vector2 p_pos, uint8 pID);
 		void createBulletBuffer();
 		void manageCollisions();
 		bool checkCollision(IEntity* firstEntity, IEntity* secondEntity);
@@ -49,6 +49,7 @@ namespace tankett {
 		void parsePayload(protocol_payload pPayload);
 		void parseServerMessage(message_server_to_client pMessage);
 		void UpdateLocalTank(server_to_client_data pData);
+		void UpdateRemoteTanks(server_to_client_data pData);
 		void UpdateRemoteTank(server_to_client_data pData, uint8 pID);
 
 		
@@ -81,7 +82,7 @@ namespace tankett {
 		dynamic_array<IEntity*> entities_;
 		const int BULLET_MAX = 10;
 		dynamic_array<bullet*>bullets_;
-		tank* playerTank_;
+		tank* playerTank_ = nullptr;
 		dynamic_array<tank*>remoteTanks_;
 
 		crypt::xorinator xorinator_;
