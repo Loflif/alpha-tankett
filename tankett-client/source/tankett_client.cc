@@ -1,6 +1,7 @@
 // tankett_client.cc
 
 #include "tankett_client.h"
+#include "../../tankett-server/include/tankett_server.h"
 
 namespace alpha {
 	application* application::create(int& width, int& height, string& title) {
@@ -38,7 +39,7 @@ namespace tankett {
 
 		state_ = CONNECTION_REQUEST;
 
-		if (!sock_.open()) {
+		if (!socket_.open()) {
 			auto error = network_error::get_error();
 			return false;
 		}
@@ -153,7 +154,7 @@ namespace tankett {
 				protocol_connection_request connection_request(client_key_);
 
 				if (connection_request.serialize(writer)) {
-					if (!sock_.send_to(send_all_ip_, stream)) {
+					if (!socket_.send_to(send_all_ip_, stream)) {
 						auto error = network_error::get_error();
 					}
 				}
@@ -167,16 +168,57 @@ namespace tankett {
 				xorinator.encrypt(sizeof(uint64), (uint8*)&encryptedKeys);
 				protocol_challenge_response challenge_response(encryptedKeys);
 				if (challenge_response.serialize(writer)) {
-					if (!sock_.send_to(server_ip_, stream)) {
+					if (!socket_.send_to(server_ip_, stream)) {
 						auto error = network_error::get_error();
 					}
 				}
 				break;
 			}
+			case CONNECTED:
+			{
+				protocol_payload payload(send_sequence_);
+				
+				pack_payload(payload);
+				send_payload(payload);
+				
+				send_sequence_++;
+			}
 			}
 		}
 	}
+	bool client_app::pack_payload(protocol_payload& pPayload) {
+		byte_stream stream(sizeof(pPayload.payload_), pPayload.payload_);
+		byte_stream_writer writer(stream);
+		message_client_to_server msg;
+		msg.input_number = 888;
+		msg.type_ = NETWORK_MESSAGE_CLIENT_TO_SERVER;
+		if(!msg.write(writer)) {
+			return false;
+		}
+		pPayload.length_ = (uint16)stream.length();
+		xorinator_.encrypt(pPayload.length_, pPayload.payload_);
+		return true;
+	}
 
+	bool client_app::send_payload(protocol_payload& pPayload) {
+		uint8 buffer[2048] = {};
+		byte_stream stream(sizeof(buffer), buffer);
+		byte_stream_writer writer(stream);
+
+		if (!pPayload.serialize(writer)) {
+			return false;
+		}
+
+		if (!socket_.send_to(server_ip_, stream)) {
+			auto err = network_error::get_error();
+
+			return false;
+		}
+
+		return true;
+	}
+
+	
 	void client_app::receive() {
 		uint8 buffer[2048];
 
@@ -187,7 +229,7 @@ namespace tankett {
 
 		ip_address remote;
 
-		if (!sock_.recv_from(remote, stream)) {
+		if (!socket_.recv_from(remote, stream)) {
 			auto error = network_error::get_error();
 		}
 		else {
