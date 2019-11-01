@@ -189,7 +189,8 @@ namespace tankett {
 	void server::parseClientMessage(message_client_to_server message, client& pClient, const time& dt) {
 		vector2 targetDirection = targetMoveDirection(message);
 		float speed = 4 * dt.as_seconds();
-		clientData[pClient.id_].position += targetDirection * speed;		
+		clientData[pClient.id_-1].position += targetDirection * speed;
+		
 	}
 
 	vector2 server::targetMoveDirection(message_client_to_server message) {

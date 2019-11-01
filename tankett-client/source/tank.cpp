@@ -32,8 +32,8 @@ namespace alpha {
 		transform_.set_rotation(targetRotation(kb));
 		turretTransform_.set_rotation(targetTurretRotation(ms));
 
-		transform_.position_.x_ += direction.x_ * SPEED_ * TILE_SIZE * dt.as_seconds();
-		transform_.position_.y_ += direction.y_ * SPEED_ * TILE_SIZE * dt.as_seconds();
+		/*transform_.position_.x_ += direction.x_ * SPEED_ * TILE_SIZE * dt.as_seconds();
+		transform_.position_.y_ += direction.y_ * SPEED_ * TILE_SIZE * dt.as_seconds();*/
 		turretTransform_.position_ = transform_.position_;
 		setColliderPosition();
 	}
