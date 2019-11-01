@@ -133,7 +133,11 @@ namespace tankett {
 	}
 
 	void client_app::checkInput() {
-		bool shoot, right, left, down, up = false;
+		bool shoot = false;
+		bool right = false;
+		bool left = false;
+		bool down = false;
+		bool up = false;
 		if (mouse_.is_pressed(MOUSE_BUTTON_LEFT)) {
 			shoot = true;
 			//fireBullet(playerTank_);
@@ -151,6 +155,11 @@ namespace tankett {
 			up = true;
 		}
 		currentMessage_.set_input(shoot, right, left, down, up);
+
+		vector2 mousePosition((float)mouse_.x_, (float)mouse_.y_);
+		vector2 aimVector = vector2(mousePosition - playerTank_->transform_.position_).normalized();
+
+		currentMessage_.turret_angle = atan2(aimVector.y_, aimVector.x_) * (180 / PI);
 	}
 
 	void client_app::send(time dt) {
