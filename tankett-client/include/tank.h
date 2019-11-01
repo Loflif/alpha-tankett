@@ -18,7 +18,8 @@ namespace alpha {
 
 		const float FIRE_RATE_ = 1.0f;
 		float shootingCooldown_ = 0.0f;
-		
+		float turretRotation = 0.0f;
+
 		dynamic_array<bullet*> bullets_;
 
 		//Client-specific (keep these when refactoring later):

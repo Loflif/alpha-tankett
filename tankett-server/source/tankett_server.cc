@@ -105,125 +105,6 @@ namespace tankett {
 		}
 	}
 
-
-
-
-	void server::send(const time& dt) {
-		send_accumulator_ += dt;
-		if (send_accumulator_ > time(100)) {
-			send_accumulator_ -= time(100);
-
-			for (client& client : clients_) {
-				switch (client.state_) {
-				case CHALLENGE:
-					challengeClient(client);
-					break;
-				case CONNECTED:
-					queueMessage(client);
-					break;
-				default:
-					break;
-				}
-			}
-
-			process_client_queues();
-
-		}
-	}
-
-
-
-	void server::process_client_queues() {
-		// note: use the same server sequence number for all sends
-		const uint32 current_sequence_number = server_sequence_++;
-		protocol_payload packet(current_sequence_number);
-
-		// note: iterate over all clients and pack messages into payload, then send
-		for (auto& client : clients_) {
-			if (client.state_ == CONNECTED) {
-				auto& messages = client.messages_;
-
-				// note: calculate the number of messages we can pack into the payload
-				int messages_evaluated = 0;
-				byte_stream stream(sizeof(packet.payload_), packet.payload_);
-				byte_stream_evaluator evaluator(stream);
-				for (auto iter = messages.begin(); iter != messages.end(); ++iter) {
-					if (!(*iter)->write(evaluator)) {
-						break;
-					}
-
-					messages_evaluated++;
-				}
-
-				// note: actual packing of messages into the payload
-				int messages_packed = 0;
-				byte_stream_writer writer(stream);
-				for (auto iter = messages.begin(); iter != messages.end(); ++iter) {
-					if (!(*iter)->write(writer)) {
-						break;
-					}
-
-					messages_packed++;
-					if (messages_evaluated == messages_packed) {
-						break;
-					}
-				}
-
-				// note: did the packing succeed?
-				if (messages_evaluated != messages_packed) {
-					debugf("[err] %s - sequence: %u - messages_evaluated != messages_packed",
-						   current_sequence_number,
-						   client.address_.as_string());
-					continue;
-				}
-
-				// note: finalize packet by setting the payload length
-				packet.length_ = (uint16)stream.length();
-
-				// note: ... then we encrypt it!
-				client.xorinator_.encrypt(packet.length_, packet.payload_);
-
-				// note: send payload to client
-				if (send_payload(client.address_, packet)) {
-					// note: if sending succeeds we can:
-					//       - delete messages sent
-					//       - remove them from client message queue
-					for (int remove_message_index = 0;
-						 remove_message_index < messages_packed;
-						 remove_message_index++) {
-						delete messages.at(remove_message_index);
-					}
-
-					messages.erase(messages.begin(), messages.begin() + messages_packed);
-				}
-			}
-		}
-	}
-
-	bool server::send_payload(const ip_address& remote, protocol_payload& packet) {
-		uint8 buffer[2048] = {};
-		byte_stream stream(sizeof(buffer), buffer);
-		byte_stream_writer writer(stream);
-
-		if (!packet.serialize(writer)) {
-			return false;
-		}
-
-		if (!socket_.send_to(remote, stream)) {
-			auto err = network_error::get_error();
-			if (err.is_critical()) {
-				debugf("[err] %s - send error (%d) %s",
-					   remote.as_string(),
-					   err.code_,
-					   err.as_string());
-			}
-
-			return false;
-		}
-
-		return true;
-	}
-
 	bool server::hasAddress(ip_address addr) {
 		for (client client : clients_) {
 			if (client.address_ == addr) {
@@ -304,12 +185,11 @@ namespace tankett {
 			}
 		}
 	}
-
+#pragma region ParseInput
 	void server::parseClientMessage(message_client_to_server message, client& pClient, const time& dt) {
 		vector2 targetDirection = targetMoveDirection(message);
 		float speed = 4 * dt.as_seconds();
-		clientData[pClient.id_].position += targetDirection * speed;
-		
+		clientData[pClient.id_].position += targetDirection * speed;		
 	}
 
 	vector2 server::targetMoveDirection(message_client_to_server message) {
@@ -323,7 +203,7 @@ namespace tankett {
 		if (message.get_input(message_client_to_server::DOWN))	return { 0, 1.0f };
 		return { 0,0 };
 	}
-
+#pragma endregion
 
 	void server::processDisconnect(ip_address remote, protocol_payload& msg) { //TODO: TEST!
 		int iterator = -1;
@@ -335,6 +215,122 @@ namespace tankett {
 		if (iterator >= 0) {
 			clients_.erase(clients_.begin() + iterator);
 		}
+	}
+#pragma region Send
+	void server::send(const time& dt) {
+		send_accumulator_ += dt;
+		if (send_accumulator_ > time(100)) {
+			send_accumulator_ -= time(100);
+
+			for (client& client : clients_) {
+				switch (client.state_) {
+				case CHALLENGE:
+					challengeClient(client);
+					break;
+				case CONNECTED:
+					queueMessage(client);
+					break;
+				default:
+					break;
+				}
+			}
+
+			process_client_queues();
+
+		}
+	}
+
+
+
+	void server::process_client_queues() {
+		// note: use the same server sequence number for all sends
+		const uint32 current_sequence_number = server_sequence_++;
+		protocol_payload packet(current_sequence_number);
+
+		// note: iterate over all clients and pack messages into payload, then send
+		for (auto& client : clients_) {
+			if (client.state_ == CONNECTED) {
+				auto& messages = client.messages_;
+
+				// note: calculate the number of messages we can pack into the payload
+				int messages_evaluated = 0;
+				byte_stream stream(sizeof(packet.payload_), packet.payload_);
+				byte_stream_evaluator evaluator(stream);
+				for (auto iter = messages.begin(); iter != messages.end(); ++iter) {
+					if (!(*iter)->write(evaluator)) {
+						break;
+					}
+
+					messages_evaluated++;
+				}
+
+				// note: actual packing of messages into the payload
+				int messages_packed = 0;
+				byte_stream_writer writer(stream);
+				for (auto iter = messages.begin(); iter != messages.end(); ++iter) {
+					if (!(*iter)->write(writer)) {
+						break;
+					}
+
+					messages_packed++;
+					if (messages_evaluated == messages_packed) {
+						break;
+					}
+				}
+
+				// note: did the packing succeed?
+				if (messages_evaluated != messages_packed) {
+					debugf("[err] %s - sequence: %u - messages_evaluated != messages_packed",
+						current_sequence_number,
+						client.address_.as_string());
+					continue;
+				}
+
+				// note: finalize packet by setting the payload length
+				packet.length_ = (uint16)stream.length();
+
+				// note: ... then we encrypt it!
+				client.xorinator_.encrypt(packet.length_, packet.payload_);
+
+				// note: send payload to client
+				if (send_payload(client.address_, packet)) {
+					// note: if sending succeeds we can:
+					//       - delete messages sent
+					//       - remove them from client message queue
+					for (int remove_message_index = 0;
+						remove_message_index < messages_packed;
+						remove_message_index++) {
+						delete messages.at(remove_message_index);
+					}
+
+					messages.erase(messages.begin(), messages.begin() + messages_packed);
+				}
+			}
+		}
+	}
+
+	bool server::send_payload(const ip_address& remote, protocol_payload& packet) {
+		uint8 buffer[2048] = {};
+		byte_stream stream(sizeof(buffer), buffer);
+		byte_stream_writer writer(stream);
+
+		if (!packet.serialize(writer)) {
+			return false;
+		}
+
+		if (!socket_.send_to(remote, stream)) {
+			auto err = network_error::get_error();
+			if (err.is_critical()) {
+				debugf("[err] %s - send error (%d) %s",
+					remote.as_string(),
+					err.code_,
+					err.as_string());
+			}
+
+			return false;
+		}
+
+		return true;
 	}
 
 	void server::queueMessage(client& pClient) {
@@ -370,6 +366,7 @@ namespace tankett {
 		return count;
 	}
 
+#pragma endregion
 	void server::SpawnTank() {
 		for (int i = 0; i < 4; i++) {
 			if (!clientData[i].connected) {

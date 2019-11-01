@@ -91,7 +91,8 @@ namespace alpha {
 
 	float tank::targetTurretRotation(mouse ms) {
 		vector2 aimVector = getAimVector(ms);
-		return atan2(aimVector.y_, aimVector.x_) * (180 / PI);
+		turretRotation = atan2(aimVector.y_, aimVector.x_) * (180 / PI);
+		return turretRotation;
 	}
 
 	vector2 tank::getAimVector(mouse ms) {
