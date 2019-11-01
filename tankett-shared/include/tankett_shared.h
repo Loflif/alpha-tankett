@@ -170,10 +170,14 @@ namespace tankett {
    };
 
    struct network_message_header {
-      network_message_header();
-      explicit network_message_header(network_message_type type);
+	  network_message_header();
+	  explicit network_message_header(network_message_type type);
 
-      uint8 type_;
+	  virtual bool write(byte_stream_writer& writer) = 0;
+	  virtual bool write(byte_stream_evaluator& evaluator) = 0;
+	  virtual bool read(byte_stream_reader& reader) = 0;
+
+	  uint8 type_;
    };
 
    struct network_message_ping : network_message_header {

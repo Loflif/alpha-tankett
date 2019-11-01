@@ -18,16 +18,21 @@ enum ClientState {
 	DISCONNECTED,
 };
 
-struct Client {
-	ClientState state_;
-	ip_address address_;
-	uint64 key_;
-	uint32 recieveSequence_ = 0;
-	uint8 id_;
-};
-
 namespace tankett {
    void debugf(const char *format, ...);
+
+   struct client {
+	   ClientState state_;
+	   ip_address address_;
+	   time connection_time_;
+	   uint64 client_key_{};
+	   uint64 server_key_{};
+	   uint8 id_;
+	   crypt::xorinator xorinator_;
+	   uint32 latest_received_sequence_{};
+	   time latest_receive_time_;
+	   dynamic_array<network_message_header*> messages_;
+   };
 
    struct server {
       server();
@@ -48,9 +53,9 @@ namespace tankett {
 	  void processDisconnect(ip_address remote, protocol_payload& msg);
 
 
-	  void challengeClient(Client &client);
+	  void challengeClient(client &client);
 	  
-	  void sendPayload(Client &client);
+	  //void sendPayload(Client &client);
 	  uint8 connectedClientCount();
 
 	  void SpawnTank();
@@ -71,9 +76,16 @@ namespace tankett {
 	  uint64 key;
 	  uint32 sendSequence_ = 0;
 
-	  udp_socket sock_;
+	  udp_socket socket_;
 	  uint8 dst_[1024 * 4];
-	  dynamic_array<Client> clients;
+
+	  // note: example below
+	  void process_client_queues();
+	  bool send_payload(const ip_address& remote, protocol_payload& packet);
+
+	  uint32 server_sequence_{};
+	  
+	  dynamic_array<client> clients_;
 
    };
 } // !tankett
