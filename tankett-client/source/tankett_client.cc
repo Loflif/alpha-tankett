@@ -133,9 +133,24 @@ namespace tankett {
 	}
 
 	void client_app::checkInput() {
+		bool shoot, right, left, down, up = false;
 		if (mouse_.is_pressed(MOUSE_BUTTON_LEFT)) {
-			fireBullet(playerTank_);
+			shoot = true;
+			//fireBullet(playerTank_);
 		}
+		if (keyboard_.is_pressed(KEYCODE_D)) {
+			right = true;
+		}
+		if(keyboard_.is_pressed(KEYCODE_A)) {
+			left = true;
+		}
+		if (keyboard_.is_pressed(KEYCODE_S)) {
+			down = true;
+		}
+		if (keyboard_.is_pressed(KEYCODE_W)) {
+			up = true;
+		}
+		currentMessage_.set_input(shoot, right, left, down, up);
 	}
 
 	void client_app::send(time dt) {
@@ -189,10 +204,10 @@ namespace tankett {
 	bool client_app::pack_payload(protocol_payload& pPayload) {
 		byte_stream stream(sizeof(pPayload.payload_), pPayload.payload_);
 		byte_stream_writer writer(stream);
-		message_client_to_server msg;
-		msg.input_number = 888;
-		msg.type_ = NETWORK_MESSAGE_CLIENT_TO_SERVER;
-		if(!msg.write(writer)) {
+		//message_client_to_server msg;
+		currentMessage_.input_number = 888;
+		currentMessage_.type_ = NETWORK_MESSAGE_CLIENT_TO_SERVER;
+		if(!currentMessage_.write(writer)) {
 			return false;
 		}
 		pPayload.length_ = (uint16)stream.length();
@@ -324,7 +339,7 @@ namespace tankett {
 	}
 
 	void client_app::UpdateRemoteTanks(server_to_client_data pData) {
-		for (int j = 0; j < 3; j++) {
+		for (int j = 0; j < remoteTanks_.size(); j++) {
 			if (remoteTanks_[j]->id_ == pData.client_id) {
 				UpdateRemoteTank(pData, (uint8)j);
 				return;

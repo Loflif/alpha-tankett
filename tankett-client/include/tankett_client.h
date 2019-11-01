@@ -29,6 +29,7 @@ namespace tankett {
 
 		dynamic_array<std::pair<ENTITY_TYPE, ENTITY_TYPE>> collisionPairs_;
 
+		
 		virtual bool enter() final;
 		virtual void exit() final;
 		virtual bool tick() final;
@@ -86,6 +87,9 @@ namespace tankett {
 		dynamic_array<tank*>remoteTanks_;
 
 		crypt::xorinator xorinator_;
+
+		message_client_to_server currentMessage_;
+		//dynamic_array<network_message_header*>messages_;
 		
 		TILE_TYPE level[33][44] {
 			{W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W}, //1
