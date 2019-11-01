@@ -55,7 +55,6 @@ namespace tankett {
 		send_all_ip_.set_port(PROTOCOL_PORT);
 
 		createLevel();
-		playerTank_ = createTank(vector2(4 * TILE_SIZE, 4 * TILE_SIZE));
 		createBulletBuffer();
 
 		return true;
@@ -227,28 +226,55 @@ namespace tankett {
 	}
 
 	void client_app::parseServerMessage(message_server_to_client pMessage) {
-		if (pMessage.client_count > (uint8)remoteTanks_.size() + 1) {
-			remoteTanks_.push_back(createTank(vector2(0,0)));
-		}
-		uint8 remoteIterator = 0;
 		for (int i = 0; i < pMessage.client_count; i++) {
 			if (i == pMessage.receiver_id - 1) {
 				UpdateLocalTank(pMessage.client_data[i]);
 			}
 			else {
-				UpdateRemoteTank(pMessage.client_data[i], remoteIterator);
-				remoteIterator++;
+				UpdateRemoteTanks(pMessage.client_data[i]);
 			}
 		}
 	}
 
+	void client_app::UpdateRemoteTanks(server_to_client_data pData) {
+		for (int j = 0; j < 3; j++) {
+			if (remoteTanks_[j]->id_ == pData.client_id) {
+				UpdateRemoteTank(pData, (uint8)j);
+				return;
+			}
+		}
+		remoteTanks_.push_back(createTank(pData.position*TILE_SIZE, pData.client_id));
+	}
+
 	void client_app::UpdateRemoteTank(server_to_client_data pData, uint8 pID) {
-		remoteTanks_[pID]->SetPosition(pData.position * TILE_SIZE);
+		dynamic_array<vector2> bulletPos;
+		for (bullet_data b : pData.bullets) {
+			bulletPos.push_back(b.position * TILE_SIZE);
+		}
+
+		remoteTanks_[pID]->UpdateValues(pData.alive,
+										pData.position * TILE_SIZE,
+										pData.angle,
+										bulletPos);
 	}
 
 	void client_app::UpdateLocalTank(server_to_client_data pData) {
-		playerTank_->SetPosition(pData.position * TILE_SIZE);
+		if (playerTank_ == nullptr) {
+			playerTank_ = createTank(pData.position * TILE_SIZE, pData.client_id);
+			return;
+		}
+		dynamic_array<vector2> bulletPos;
+		for (bullet_data b : pData.bullets) {
+			bulletPos.push_back(b.position * TILE_SIZE);
+		}
+
+		playerTank_->UpdateValues(pData.alive,
+								  pData.position * TILE_SIZE,
+								  pData.angle,
+								  bulletPos);
 	}
+
+
 
 	void client_app::createTile(vector2 p_pos, TILE_TYPE p_type) {
 		if (p_type == tankett::W) {
@@ -268,10 +294,10 @@ namespace tankett {
 		}
 	}
 
-	tank* client_app::createTank(vector2 p_pos) {
+	tank* client_app::createTank(vector2 p_pos, uint8 pID) {
 		sprite spr(tankTexture_, vector2(TILE_SIZE * TANK_SIZE, TILE_SIZE * TANK_SIZE));
 		sprite turretSpr(turretTexture_, vector2(TILE_SIZE * TANK_SIZE, TILE_SIZE * TANK_SIZE));
-		tank* t = new tank(spr, turretSpr, p_pos.x_, p_pos.y_);
+		tank* t = new tank(spr, turretSpr, p_pos.x_, p_pos.y_, pID);
 		entities_.push_back(t);
 		return t;
 	}

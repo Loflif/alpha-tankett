@@ -2,7 +2,7 @@
 
 namespace alpha {
 
-	tank::tank(sprite pSprite, sprite pTurretSprite, float pPosX, float pPosY) {
+	tank::tank(sprite pSprite, sprite pTurretSprite, float pPosX, float pPosY, uint8 pID) {
 		sprite_ = pSprite;
 		size_ = pSprite.size_;
 		turretSprite_ = pTurretSprite;
@@ -13,6 +13,7 @@ namespace alpha {
 		collider_ = rectangle(0, 0, size_.x_, size_.y_);
 		setColliderPosition();
 		type_ = TANK;
+		id_ = pID;
 	}
 
 	tank::~tank() {
@@ -113,10 +114,27 @@ namespace alpha {
 
 #pragma region ClientSpecificFunctions
 
+	void tank::UpdateValues(bool pAlive,
+							vector2 pPos, 
+							float pAngle,
+							dynamic_array<vector2> bullets){
+		SetPosition(pPos);
+		SetAngle(pAngle);
+		SetActive(pAlive);
+	}
+
 	void tank::SetPosition(vector2 pPos) {
-		transform_.position_ = pPos;
+		transform_.set_position(pPos);
 		turretTransform_.position_ = transform_.position_;
 		setColliderPosition();
+	}
+
+	void tank::SetAngle(float pAngle) {
+		transform_.set_rotation(pAngle);
+	}
+
+	void tank::SetActive(bool pIsActive) {
+		isEnabled = pIsActive;
 	}
 
 #pragma endregion

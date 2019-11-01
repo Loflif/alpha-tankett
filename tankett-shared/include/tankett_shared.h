@@ -194,6 +194,8 @@ namespace tankett {
 
    struct message_client_to_server : network_message_header
    {
+   public:
+
 	   message_client_to_server() : network_message_header(NETWORK_MESSAGE_CLIENT_TO_SERVER)
 	   {}
 
