@@ -282,7 +282,7 @@ namespace tankett {
 	}
 
 	void client_app::UpdateRemoteTanks(server_to_client_data pData) {
-		for (int j = 0; j < 3; j++) {
+		for (int j = 0; j < remoteTanks_.size(); j++) {
 			if (remoteTanks_[j]->id_ == pData.client_id) {
 				UpdateRemoteTank(pData, (uint8)j);
 				return;

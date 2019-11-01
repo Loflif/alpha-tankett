@@ -95,7 +95,7 @@ namespace tankett {
 					debugf("[Warning] Tried to serialize challenge response but it didnt work for some reason.");
 					break;
 				}
-				processPayload(remote, msg);
+				processPayload(remote, msg, dt);
 			}
 									  break;
 			default:
@@ -267,16 +267,63 @@ namespace tankett {
 		}
 	}
 
-	void server::processPayload(ip_address remote, protocol_payload& msg) {
+	void server::processPayload(ip_address remote, protocol_payload& msg, const time& dt) {
 		for (client& client : clients_) {
 			if (client.address_ == remote) {
 				if (msg.is_newer(client.latest_received_sequence_)) {
-					client.latest_received_sequence_= msg.sequence_;
-					//debugf("[Info] Payload received from: %s", client.address_.as_string());
+					byte_stream stream(msg.length_, msg.payload_);
+					byte_stream_reader reader(stream);
+
+					client.xorinator_.decrypt(msg.length_, msg.payload_);
+
+					network_message_type type = (network_message_type)reader.peek();
+
+					switch (type) {
+					case tankett::NETWORK_MESSAGE_PING: {
+					}
+														break;
+					case tankett::NETWORK_MESSAGE_CLIENT_TO_SERVER: {
+						message_client_to_server message;
+						if (!message.serialize(reader)) {
+							auto error = network_error::get_error();
+						}
+						else {
+							parseClientMessage(message, client, dt);
+						}
+					}
+																	break;
+					case tankett::NETWORK_MESSAGE_COUNT: {
+
+					}
+														 break;
+					default:
+						break;
+					}
+					
 				}
 			}
 		}
 	}
+
+	void server::parseClientMessage(message_client_to_server message, client& pClient, const time& dt) {
+		vector2 targetDirection = targetMoveDirection(message);
+		float speed = 4 * dt.as_seconds();
+		clientData[pClient.id_].position += targetDirection * speed;
+		
+	}
+
+	vector2 server::targetMoveDirection(message_client_to_server message) {
+		if (message.get_input(message_client_to_server::UP) && message.get_input(message_client_to_server::RIGHT)) return { 0.7071f ,-0.7071f };  //Normalised Diagonal Vector
+		if (message.get_input(message_client_to_server::UP) && message.get_input(message_client_to_server::LEFT)) return { -0.7071f ,-0.7071f };
+		if (message.get_input(message_client_to_server::DOWN) && message.get_input(message_client_to_server::LEFT)) return { -0.7071f ,0.7071f };
+		if (message.get_input(message_client_to_server::DOWN) && message.get_input(message_client_to_server::RIGHT)) return { 0.7071f ,0.7071f };
+		if (message.get_input(message_client_to_server::RIGHT))  return { 1.0f ,0 };
+		if (message.get_input(message_client_to_server::LEFT))  return { -1.0f,0 };
+		if (message.get_input(message_client_to_server::UP))	return { 0,-1.0f };
+		if (message.get_input(message_client_to_server::DOWN))	return { 0, 1.0f };
+		return { 0,0 };
+	}
+
 
 	void server::processDisconnect(ip_address remote, protocol_payload& msg) { //TODO: TEST!
 		int iterator = -1;
@@ -300,8 +347,6 @@ namespace tankett {
 		msg->type_ = NETWORK_MESSAGE_SERVER_TO_CLIENT;
 		pClient.messages_.push_back(msg);
 	}
-
-
 
 	void server::challengeClient(client& client) {
 		protocol_connection_challenge challenge(key);
