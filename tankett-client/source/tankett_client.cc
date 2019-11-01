@@ -123,10 +123,11 @@ namespace tankett {
 			send(dt);
 			receive();
 		}
-
-		update(dt);
-		checkInput();
-		manageCollisions();
+		if(state_ == CONNECTED) {
+			update(dt);
+			checkInput();
+			manageCollisions();
+		}
 		render();
 
 		return true;
