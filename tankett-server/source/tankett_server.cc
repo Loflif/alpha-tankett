@@ -138,61 +138,63 @@ namespace tankett {
 
 		// note: iterate over all clients and pack messages into payload, then send
 		for (auto& client : clients_) {
-			auto& messages = client.messages_;
+			if (client.state_ == CONNECTED) {
+				auto& messages = client.messages_;
 
-			// note: calculate the number of messages we can pack into the payload
-			int messages_evaluated = 0;
-			byte_stream stream(sizeof(packet.payload_), packet.payload_);
-			byte_stream_evaluator evaluator(stream);
-			for (auto iter = messages.begin(); iter != messages.end(); ++iter) {
-				if (!(*iter)->write(evaluator)) {
-					break;
+				// note: calculate the number of messages we can pack into the payload
+				int messages_evaluated = 0;
+				byte_stream stream(sizeof(packet.payload_), packet.payload_);
+				byte_stream_evaluator evaluator(stream);
+				for (auto iter = messages.begin(); iter != messages.end(); ++iter) {
+					if (!(*iter)->write(evaluator)) {
+						break;
+					}
+
+					messages_evaluated++;
 				}
 
-				messages_evaluated++;
-			}
+				// note: actual packing of messages into the payload
+				int messages_packed = 0;
+				byte_stream_writer writer(stream);
+				for (auto iter = messages.begin(); iter != messages.end(); ++iter) {
+					if (!(*iter)->write(writer)) {
+						break;
+					}
 
-			// note: actual packing of messages into the payload
-			int messages_packed = 0;
-			byte_stream_writer writer(stream);
-			for (auto iter = messages.begin(); iter != messages.end(); ++iter) {
-				if (!(*iter)->write(writer)) {
-					break;
+					messages_packed++;
+					if (messages_evaluated == messages_packed) {
+						break;
+					}
 				}
 
-				messages_packed++;
-				if (messages_evaluated == messages_packed) {
-					break;
-				}
-			}
-
-			// note: did the packing succeed?
-			if (messages_evaluated != messages_packed) {
-				debugf("[err] %s - sequence: %u - messages_evaluated != messages_packed",
-					current_sequence_number,
-					client.address_.as_string());
-				continue;
-			}
-
-			// note: finalize packet by setting the payload length
-			packet.length_ = (uint16)stream.length();
-
-			// note: ... then we encrypt it!
-			client.xorinator_.encrypt(packet.length_, packet.payload_);
-
-			// note: send payload to client
-			if (send_payload(client.address_, packet)) {
-				// note: if sending succeeds we can:
-				//       - delete messages sent
-				//       - remove them from client message queue
-				for (int remove_message_index = 0;
-					remove_message_index < messages_packed;
-					remove_message_index++) {
-					delete messages.front();
+				// note: did the packing succeed?
+				if (messages_evaluated != messages_packed) {
+					debugf("[err] %s - sequence: %u - messages_evaluated != messages_packed",
+						current_sequence_number,
+						client.address_.as_string());
+					continue;
 				}
 
-				messages.erase(messages.begin(), messages.begin() + messages_packed);
-			}
+				// note: finalize packet by setting the payload length
+				packet.length_ = (uint16)stream.length();
+
+				// note: ... then we encrypt it!
+				client.xorinator_.encrypt(packet.length_, packet.payload_);
+
+				// note: send payload to client
+				if (send_payload(client.address_, packet)) {
+					// note: if sending succeeds we can:
+					//       - delete messages sent
+					//       - remove them from client message queue
+					for (int remove_message_index = 0;
+						remove_message_index < messages_packed;
+						remove_message_index++) {
+						delete messages.front();
+					}
+
+					messages.erase(messages.begin(), messages.begin() + messages_packed);
+				}
+			}			
 		}
 	}
 
