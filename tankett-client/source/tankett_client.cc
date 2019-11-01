@@ -122,6 +122,7 @@ namespace tankett {
 			case CHALLENGE_RESPONSE:
 			{
 				crypt::xorinator xorinator(client_key_, server_key_);
+				xorinator_ = xorinator;
 				uint64 encryptedKeys = 0;
 				xorinator.encrypt(sizeof(uint64), (uint8*)&encryptedKeys);
 				protocol_challenge_response challenge_response(encryptedKeys);
@@ -192,6 +193,51 @@ namespace tankett {
 			}
 			}
 		}
+	}
+
+	void client_app::parsePayload(protocol_payload pPayload) {
+		byte_stream stream(pPayload.length_, pPayload.payload_);
+		byte_stream_reader reader(stream);
+		
+		xorinator_.decrypt(pPayload.length_, pPayload.payload_);
+
+		network_message_type type = (network_message_type)reader.peek();
+
+		switch (type) {
+		case tankett::NETWORK_MESSAGE_PING: {
+		}
+			break;
+		case tankett::NETWORK_MESSAGE_SERVER_TO_CLIENT: {
+			message_server_to_client message;
+			if (!message.serialize(reader)) {
+				auto error = network_error::get_error();
+			}
+			else {
+				for (int i = 0; i < message.client_count; i++) {
+					if (i == message.receiver_id - 1) {
+						UpdateLocalTank(message.client_data[i]);
+					}
+					else {
+						UpdateRemoteTank(message.client_data[i]);
+					}
+				}
+			}
+		}
+			break;
+		case tankett::NETWORK_MESSAGE_COUNT: {
+
+		}
+			break;
+		default:
+			break;
+		}
+	}
+
+	void client_app::UpdateRemoteTank(server_to_client_data pData) {
+	}
+
+	void client_app::UpdateLocalTank(server_to_client_data pData) {
+		playerTank_->transform_.position_ = pData.position * TILE_SIZE;
 	}
 
 	void client_app::createTile(vector2 p_pos, TILE_TYPE p_type) {
@@ -303,11 +349,7 @@ namespace tankett {
 		return false;
 	}
 
-	void client_app::parsePayload(protocol_payload pPayload) {
-		message_server_to_client msg = *reinterpret_cast<message_server_to_client*>(pPayload.payload_);
-		int x = 0;
-		x++;
-	}
+
 
 	void client_app::render() {
 		render_system_.clear(0xff0e1528); //Background Color

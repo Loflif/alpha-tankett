@@ -51,6 +51,7 @@ namespace tankett {
 	  void processChallengeResponse(ip_address remote, protocol_challenge_response  &msg);
 	  void processPayload(ip_address remote, protocol_payload &msg);
 	  void processDisconnect(ip_address remote, protocol_payload& msg);
+	  void queueMessage(client &pClient);
 
 
 	  void challengeClient(client &client);

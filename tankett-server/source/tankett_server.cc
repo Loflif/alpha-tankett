@@ -113,13 +113,13 @@ namespace tankett {
 		if (send_accumulator_ > time(100)) {
 			send_accumulator_ -= time(100);
 
-			for (client client : clients_) {
+			for (client &client : clients_) {
 				switch (client.state_) {
 				case CHALLENGE:
 					challengeClient(client);
 					break;
 				case CONNECTED:
-					//TODO: Queue payloads!!
+					queueMessage(client);
 					break;
 				default:
 					break;
@@ -130,6 +130,8 @@ namespace tankett {
 
 		}
 	}
+
+
 
 	void server::process_client_queues() {
 		// note: use the same server sequence number for all sends
@@ -189,7 +191,7 @@ namespace tankett {
 					for (int remove_message_index = 0;
 						remove_message_index < messages_packed;
 						remove_message_index++) {
-						delete messages.front();
+						delete messages.at(remove_message_index);
 					}
 
 					messages.erase(messages.begin(), messages.begin() + messages_packed);
@@ -247,6 +249,7 @@ namespace tankett {
 			if (client.address_ == remote) {
 				crypt::xorinator xorinator(client.client_key_, key);
 				uint64 encryptedKeys = 0;
+				client.xorinator_ = xorinator;
 				xorinator.encrypt(sizeof(uint64), (uint8*)& encryptedKeys);
 				if (encryptedKeys == msg.combined_key_) {
 					if (client.state_ != CONNECTED) {
@@ -285,6 +288,17 @@ namespace tankett {
 		if (iterator >= 0) {
 			clients_.erase(clients_.begin() + iterator);
 		}
+	}
+
+	void server::queueMessage(client& pClient) {
+		message_server_to_client *msg = new message_server_to_client;
+		msg->client_count = (uint8)clients_.size();
+		for (int i = 0; i < 4; i++) {
+			msg->client_data[i] = clientData[i];
+		}
+		msg->receiver_id = pClient.id_;
+		msg->type_ = NETWORK_MESSAGE_SERVER_TO_CLIENT;
+		pClient.messages_.push_back(msg);
 	}
 
 
