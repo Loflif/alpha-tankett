@@ -213,14 +213,7 @@ namespace tankett {
 				auto error = network_error::get_error();
 			}
 			else {
-				for (int i = 0; i < message.client_count; i++) {
-					if (i == message.receiver_id - 1) {
-						UpdateLocalTank(message.client_data[i]);
-					}
-					else {
-						UpdateRemoteTank(message.client_data[i]);
-					}
-				}
+				parseServerMessage(message);
 			}
 		}
 			break;
@@ -233,11 +226,28 @@ namespace tankett {
 		}
 	}
 
-	void client_app::UpdateRemoteTank(server_to_client_data pData) {
+	void client_app::parseServerMessage(message_server_to_client pMessage) {
+		if (pMessage.client_count > (uint8)remoteTanks_.size() + 1) {
+			remoteTanks_.push_back(createTank(vector2(0,0)));
+		}
+		uint8 remoteIterator = 0;
+		for (int i = 0; i < pMessage.client_count; i++) {
+			if (i == pMessage.receiver_id - 1) {
+				UpdateLocalTank(pMessage.client_data[i]);
+			}
+			else {
+				UpdateRemoteTank(pMessage.client_data[i], remoteIterator);
+				remoteIterator++;
+			}
+		}
+	}
+
+	void client_app::UpdateRemoteTank(server_to_client_data pData, uint8 pID) {
+		remoteTanks_[pID]->SetPosition(pData.position * TILE_SIZE);
 	}
 
 	void client_app::UpdateLocalTank(server_to_client_data pData) {
-		playerTank_->transform_.position_ = pData.position * TILE_SIZE;
+		playerTank_->SetPosition(pData.position * TILE_SIZE);
 	}
 
 	void client_app::createTile(vector2 p_pos, TILE_TYPE p_type) {

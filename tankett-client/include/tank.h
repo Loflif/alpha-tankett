@@ -20,6 +20,10 @@ namespace alpha {
 		float shootingCooldown_ = 0.0f;
 		
 		dynamic_array<bullet*> bullets_;
+
+		//Client-specific:
+		void SetPosition(vector2 pPos);
+
 	private:
 		vector2 targetMoveDirection(keyboard pKeyboard);
 		float targetRotation(keyboard pKeyboard);

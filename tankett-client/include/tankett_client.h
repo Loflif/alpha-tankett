@@ -44,8 +44,9 @@ namespace tankett {
 		void fireBullet(tank* t);
 		bool isCollisionPair(IEntity* pFirstEntity, IEntity* pSecondEntity);
 		void parsePayload(protocol_payload pPayload);
+		void parseServerMessage(message_server_to_client pMessage);
 		void UpdateLocalTank(server_to_client_data pData);
-		void UpdateRemoteTank(server_to_client_data pData);
+		void UpdateRemoteTank(server_to_client_data pData, uint8 pID);
 
 
 		void update(time dt);
@@ -75,6 +76,7 @@ namespace tankett {
 		const int BULLET_MAX = 10;
 		dynamic_array<bullet*>bullets_;
 		tank* playerTank_;
+		dynamic_array<tank*>remoteTanks_;
 
 		crypt::xorinator xorinator_;
 		

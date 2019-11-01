@@ -133,7 +133,6 @@ namespace alpha {
 		vector2();
 		vector2(float x, float y);
 
-
 		vector2& operator += (const vector2& v) { x_ += v.x_; y_ += v.y_; return *this; }
 		vector2& operator -= (const vector2& v) { x_ -= v.x_; y_ -= v.y_; return *this; }
 
