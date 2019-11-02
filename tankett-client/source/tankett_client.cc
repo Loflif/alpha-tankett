@@ -129,11 +129,12 @@ namespace tankett {
 			manageCollisions();
 		}
 		render();
-
+		
 		return true;
 	}
 
 	void client_app::checkInput() {
+		message_client_to_server* msg = new message_client_to_server;
 		bool shoot = false;
 		bool right = false;
 		bool left = false;
@@ -155,12 +156,14 @@ namespace tankett {
 		if (keyboard_.is_down(KEYCODE_W)) {
 			up = true;
 		}
-		currentMessage_.set_input(shoot, right, left, down, up);
+		msg->set_input(shoot, right, left, down, up);
 
 		vector2 mousePosition((float)mouse_.x_, (float)mouse_.y_);
 		vector2 aimVector = vector2(mousePosition - playerTank_->transform_.position_).normalized();
 
-		currentMessage_.turret_angle = atan2(aimVector.y_, aimVector.x_) * (180 / PI);
+		msg->turret_angle = atan2(aimVector.y_, aimVector.x_) * (180 / PI);
+		msg->type_ = NETWORK_MESSAGE_CLIENT_TO_SERVER;
+		messages_.push_back(msg);
 	}
 
 	void client_app::send(time dt) {
@@ -204,7 +207,7 @@ namespace tankett {
 				protocol_payload payload(send_sequence_);
 				
 				pack_payload(payload);
-				send_payload(payload);
+				//send_payload(payload);
 				
 				send_sequence_++;
 			}
@@ -212,16 +215,49 @@ namespace tankett {
 		}
 	}
 	bool client_app::pack_payload(protocol_payload& pPayload) {
+		/*byte_stream stream(sizeof(pPayload.payload_), pPayload.payload_);
+		byte_stream_writer writer(stream);*/
+
+		// note: calculate the number of messages we can pack into the payload
+		int messages_evaluated = 0;
 		byte_stream stream(sizeof(pPayload.payload_), pPayload.payload_);
+		byte_stream_evaluator evaluator(stream);
+		for (auto iter = messages_.begin(); iter != messages_.end(); ++iter) {
+			if (!(*iter)->write(evaluator)) {
+				break;
+			}
+
+			messages_evaluated++;
+		}
+
+		// note: actual packing of messages into the payload
+		int messages_packed = 0;
 		byte_stream_writer writer(stream);
-		//message_client_to_server msg;
-		currentMessage_.input_number = 888;
-		currentMessage_.type_ = NETWORK_MESSAGE_CLIENT_TO_SERVER;
-		if(!currentMessage_.write(writer)) {
-			return false;
+		for (auto iter = messages_.begin(); iter != messages_.end(); ++iter) {
+			if (!(*iter)->write(writer)) {
+				break;
+			}
+
+			messages_packed++;
+			if (messages_evaluated == messages_packed) {
+				break;
+			}
 		}
 		pPayload.length_ = (uint16)stream.length();
 		xorinator_.encrypt(pPayload.length_, pPayload.payload_);
+
+		if (send_payload(pPayload)) {
+			// note: if sending succeeds we can:
+			//       - delete messages sent
+			//       - remove them from client message queue
+			for (int remove_message_index = 0;
+				 remove_message_index < messages_packed;
+				 remove_message_index++) {
+				delete messages_.at(remove_message_index);
+			}
+
+			messages_.erase(messages_.begin(), messages_.begin() + messages_packed);
+		}
 		return true;
 	}
 
@@ -233,7 +269,7 @@ namespace tankett {
 		if (!pPayload.serialize(writer)) {
 			return false;
 		}
-
+		
 		if (!socket_.send_to(server_ip_, stream)) {
 			auto err = network_error::get_error();
 

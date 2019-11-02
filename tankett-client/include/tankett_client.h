@@ -88,6 +88,8 @@ namespace tankett {
 
 		crypt::xorinator xorinator_;
 
+		dynamic_array<network_message_header*> messages_;
+		
 		message_client_to_server currentMessage_;
 		//dynamic_array<network_message_header*>messages_;
 		
