@@ -60,7 +60,7 @@ namespace tankett {
 	void server::update(const time& dt) {
 
 	}
-
+#pragma region Receive
 	void server::receive(const time& dt) {
 		ip_address remote;
 		byte_stream stream(1024 * 4, dst_);
@@ -96,7 +96,7 @@ namespace tankett {
 					debugf("[Warning] Tried to serialize challenge response but it didnt work for some reason.");
 					break;
 				}
-				processPayload(remote, msg, dt);
+				processPayload(remote, msg);
 			}
 									break;
 			default:
@@ -149,7 +149,7 @@ namespace tankett {
 		}
 	}
 
-	void server::processPayload(ip_address remote, protocol_payload& msg, const time& dt) {
+	void server::processPayload(ip_address remote, protocol_payload& msg) {
 		for (client& client : clients_) {
 			if (client.address_ == remote) {
 				if (msg.is_newer(client.latest_received_sequence_)) {
@@ -157,7 +157,6 @@ namespace tankett {
 					byte_stream_reader reader(stream);
 
 					client.xorinator_.decrypt(msg.length_, msg.payload_);
-
 					network_message_type type = (network_message_type)reader.peek();
 
 					switch (type) {
@@ -170,7 +169,8 @@ namespace tankett {
 							auto error = network_error::get_error();
 						}
 						else {
-							parseClientMessage(message, client, dt);
+							time deltaReceiveTime = time::now() - client.latest_receive_time_;
+							parseClientMessage(message, client, deltaReceiveTime);
 						}
 					}
 																	break;
@@ -181,15 +181,32 @@ namespace tankett {
 					default:
 						break;
 					}
+
+					client.latest_receive_time_ = time::now();
 					
 				}
 			}
 		}
 	}
+
+
+	void server::processDisconnect(ip_address remote, protocol_payload& msg) { //TODO: TEST!
+		int iterator = -1;
+		for (int i = 0; i < clients_.size(); i++) {
+			if (clients_[i].address_ == remote) {
+				iterator = i;
+			}
+		}
+		if (iterator >= 0) {
+			clients_.erase(clients_.begin() + iterator);
+		}
+	}
+#pragma endregion
+
 #pragma region ParseInput
-	void server::parseClientMessage(message_client_to_server message, client& pClient, const time& dt) {
+	void server::parseClientMessage(message_client_to_server message, client& pClient, const time& pDeltaRecieveTime) {
 		vector2 targetDirection = targetMoveDirection(message);
-		float speed = 4 * dt.as_seconds();
+		float speed = 4 * pDeltaRecieveTime.as_seconds();
 		clientData[pClient.id_-1].position += targetDirection * speed;
 		
 	}
@@ -206,18 +223,7 @@ namespace tankett {
 		return { 0,0 };
 	}
 #pragma endregion
-
-	void server::processDisconnect(ip_address remote, protocol_payload& msg) { //TODO: TEST!
-		int iterator = -1;
-		for (int i = 0; i < clients_.size(); i++) {
-			if (clients_[i].address_ == remote) {
-				iterator = i;
-			}
-		}
-		if (iterator >= 0) {
-			clients_.erase(clients_.begin() + iterator);
-		}
-	}
+	
 #pragma region Send
 	void server::send(const time& dt) {
 		send_accumulator_ += dt;
@@ -369,6 +375,7 @@ namespace tankett {
 	}
 
 #pragma endregion
+
 	void server::SpawnTank() {
 		for (int i = 0; i < 4; i++) {
 			if (!clientData[i].connected) {

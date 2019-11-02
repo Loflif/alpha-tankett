@@ -49,7 +49,7 @@ namespace tankett {
 
 	  void processConnectionRequest(ip_address remote, protocol_connection_request &msg);
 	  void processChallengeResponse(ip_address remote, protocol_challenge_response  &msg);
-	  void processPayload(ip_address remote, protocol_payload &msg, const time& dt);
+	  void processPayload(ip_address remote, protocol_payload &msg);
 	  void processDisconnect(ip_address remote, protocol_payload& msg);
 	  void queueMessage(client &pClient);
 
@@ -81,7 +81,7 @@ namespace tankett {
 	  uint32 sendSequence_ = 0;
 
 	  udp_socket socket_;
-	  uint8 dst_[1024 * 4];
+	  uint8 dst_[2048];
 
 	  // note: example below
 	  void process_client_queues();
