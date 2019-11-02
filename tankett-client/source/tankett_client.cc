@@ -123,7 +123,7 @@ namespace tankett {
 			send(dt);
 			receive();
 		}
-		if(state_ == CONNECTED) {
+		if (state_ == CONNECTED) {
 			update(dt);
 			checkInput();
 			manageCollisions();
@@ -146,7 +146,7 @@ namespace tankett {
 		if (keyboard_.is_down(KEYCODE_D)) {
 			right = true;
 		}
-		if(keyboard_.is_down(KEYCODE_A)) {
+		if (keyboard_.is_down(KEYCODE_A)) {
 			left = true;
 		}
 		if (keyboard_.is_down(KEYCODE_S)) {
@@ -190,7 +190,7 @@ namespace tankett {
 				crypt::xorinator xorinator(client_key_, server_key_);
 				xorinator_ = xorinator;
 				uint64 encryptedKeys = 0;
-				xorinator.encrypt(sizeof(uint64), (uint8*)&encryptedKeys);
+				xorinator.encrypt(sizeof(uint64), (uint8*)& encryptedKeys);
 				protocol_challenge_response challenge_response(encryptedKeys);
 				if (challenge_response.serialize(writer)) {
 					if (!socket_.send_to(server_ip_, stream)) {
@@ -202,10 +202,10 @@ namespace tankett {
 			case CONNECTED:
 			{
 				protocol_payload payload(send_sequence_);
-				
+
 				pack_payload(payload);
 				send_payload(payload);
-				
+
 				send_sequence_++;
 			}
 			}
@@ -217,7 +217,7 @@ namespace tankett {
 		//message_client_to_server msg;
 		currentMessage_.input_number = 888;
 		currentMessage_.type_ = NETWORK_MESSAGE_CLIENT_TO_SERVER;
-		if(!currentMessage_.write(writer)) {
+		if (!currentMessage_.write(writer)) {
 			return false;
 		}
 		pPayload.length_ = (uint16)stream.length();
@@ -243,7 +243,7 @@ namespace tankett {
 		return true;
 	}
 
-	
+
 	void client_app::receive() {
 		uint8 buffer[2048];
 
@@ -256,12 +256,12 @@ namespace tankett {
 
 		if (!socket_.recv_from(remote, stream)) {
 			auto error = network_error::get_error();
+			return;
 		}
-		else {
+		while (!reader.eos()) {
 			type = (packet_type)reader.peek();
 			switch (type) {
-			case PACKET_TYPE_CONNECTION_CHALLENGE:
-			{
+			case PACKET_TYPE_CONNECTION_CHALLENGE: {
 				protocol_connection_challenge connection_challenge;
 				if (!connection_challenge.serialize(reader)) {
 					auto error = network_error::get_error();
@@ -273,8 +273,7 @@ namespace tankett {
 				}
 				break;
 			}
-			case PACKET_TYPE_PAYLOAD:
-			{
+			case PACKET_TYPE_PAYLOAD: {
 				protocol_payload payload;
 				if (!payload.serialize(reader)) {
 					auto error = network_error::get_error();
@@ -287,8 +286,7 @@ namespace tankett {
 				break;
 			}
 
-			case PACKET_TYPE_CONNECTION_DENIED:
-			{
+			case PACKET_TYPE_CONNECTION_DENIED: {
 				protocol_connection_denied connection_denied;
 				if (!connection_denied.serialize(reader)) {
 					auto error = network_error::get_error();
@@ -299,6 +297,9 @@ namespace tankett {
 				}
 				break;
 			}
+			default:
+				return;
+				break;
 			}
 		}
 	}
@@ -309,7 +310,7 @@ namespace tankett {
 	void client_app::parsePayload(protocol_payload pPayload) {
 		byte_stream stream(pPayload.length_, pPayload.payload_);
 		byte_stream_reader reader(stream);
-		
+
 		xorinator_.decrypt(pPayload.length_, pPayload.payload_);
 
 		network_message_type type = (network_message_type)reader.peek();
@@ -317,7 +318,7 @@ namespace tankett {
 		switch (type) {
 		case tankett::NETWORK_MESSAGE_PING: {
 		}
-			break;
+											break;
 		case tankett::NETWORK_MESSAGE_SERVER_TO_CLIENT: {
 			message_server_to_client message;
 			if (!message.serialize(reader)) {
@@ -327,11 +328,11 @@ namespace tankett {
 				parseServerMessage(message);
 			}
 		}
-			break;
+														break;
 		case tankett::NETWORK_MESSAGE_COUNT: {
 
 		}
-			break;
+											 break;
 		default:
 			break;
 		}
@@ -355,7 +356,7 @@ namespace tankett {
 				return;
 			}
 		}
-		remoteTanks_.push_back(createTank(pData.position*TILE_SIZE, pData.client_id));
+		remoteTanks_.push_back(createTank(pData.position * TILE_SIZE, pData.client_id));
 	}
 
 	void client_app::UpdateRemoteTank(server_to_client_data pData, uint8 pID) {
@@ -365,9 +366,9 @@ namespace tankett {
 		}
 
 		remoteTanks_[pID]->UpdateValues(pData.alive,
-										pData.position * TILE_SIZE,
-										pData.angle,
-										bulletPos);
+			pData.position * TILE_SIZE,
+			pData.angle,
+			bulletPos);
 	}
 
 	void client_app::UpdateLocalTank(server_to_client_data pData) {
@@ -381,9 +382,9 @@ namespace tankett {
 		}
 
 		playerTank_->UpdateValues(pData.alive,
-								  pData.position * TILE_SIZE,
-								  pData.angle,
-								  bulletPos);
+			pData.position * TILE_SIZE,
+			pData.angle,
+			bulletPos);
 	}
 
 #pragma endregion

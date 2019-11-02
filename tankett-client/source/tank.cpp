@@ -25,17 +25,16 @@ namespace alpha {
 	}
 
 	void tank::update(keyboard kb, mouse ms, time dt) {
-		shootingCooldown_ -= dt.as_seconds();
-		
 		previousPosition = transform_.position_;
-		vector2 direction = targetMoveDirection(kb);
-		transform_.set_rotation(targetRotation(kb));
-		turretTransform_.set_rotation(targetTurretRotation(ms));
+		//shootingCooldown_ -= dt.as_seconds();
+		//vector2 direction = targetMoveDirection(kb);
+		//transform_.set_rotation(targetRotation(kb));
+		//turretTransform_.set_rotation(targetTurretRotation(ms));
 
-		/*transform_.position_.x_ += direction.x_ * SPEED_ * TILE_SIZE * dt.as_seconds();
-		transform_.position_.y_ += direction.y_ * SPEED_ * TILE_SIZE * dt.as_seconds();*/
-		turretTransform_.position_ = transform_.position_;
-		setColliderPosition();
+		///*transform_.position_.x_ += direction.x_ * SPEED_ * TILE_SIZE * dt.as_seconds();
+		//transform_.position_.y_ += direction.y_ * SPEED_ * TILE_SIZE * dt.as_seconds();*/
+		//turretTransform_.position_ = transform_.position_;
+		//setColliderPosition();
 	}
 
 	void tank::setColliderPosition() {
