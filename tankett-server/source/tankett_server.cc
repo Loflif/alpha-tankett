@@ -1,6 +1,7 @@
 // tankett_server.cc
 
 #include "tankett_server.h"
+#include <dos.h>
 
 namespace tankett {
 	server::server()
@@ -220,8 +221,8 @@ namespace tankett {
 #pragma region Send
 	void server::send(const time& dt) {
 		send_accumulator_ += dt;
-		if (send_accumulator_ > time(100)) {
-			send_accumulator_ -= time(100);
+		if (send_accumulator_ > time(33)) {
+			send_accumulator_ -= time(33);
 
 			for (client& client : clients_) {
 				switch (client.state_) {

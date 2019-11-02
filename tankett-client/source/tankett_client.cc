@@ -143,16 +143,16 @@ namespace tankett {
 			shoot = true;
 			//fireBullet(playerTank_);
 		}
-		if (keyboard_.is_pressed(KEYCODE_D)) {
+		if (keyboard_.is_down(KEYCODE_D)) {
 			right = true;
 		}
-		if(keyboard_.is_pressed(KEYCODE_A)) {
+		if(keyboard_.is_down(KEYCODE_A)) {
 			left = true;
 		}
-		if (keyboard_.is_pressed(KEYCODE_S)) {
+		if (keyboard_.is_down(KEYCODE_S)) {
 			down = true;
 		}
-		if (keyboard_.is_pressed(KEYCODE_W)) {
+		if (keyboard_.is_down(KEYCODE_W)) {
 			up = true;
 		}
 		currentMessage_.set_input(shoot, right, left, down, up);
@@ -165,8 +165,8 @@ namespace tankett {
 
 	void client_app::send(time dt) {
 		send_accumulator += dt;
-		if (send_accumulator > time(100)) {
-			send_accumulator -= time(100);
+		if (send_accumulator > time(33)) {
+			send_accumulator -= time(33);
 
 			uint8 buffer[2048];
 
