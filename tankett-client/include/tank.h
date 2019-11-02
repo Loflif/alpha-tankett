@@ -30,6 +30,7 @@ namespace alpha {
 		void SetPosition(vector2 pPos);
 		void SetAngle(float pAngle);
 		void SetActive(bool pIsActive);
+		void UpdatePosition(keyboard kb, time dt);
 		//Also keep Constructor/Destructor, Render and Update, and only set aimvector when local
 
 		dynamic_array<vector2> bulletPositions_;
@@ -51,6 +52,11 @@ namespace alpha {
 		sprite turretSprite_;
 		transform turretTransform_;
 		vector2 previousPosition;
+
+		//For Prediciton:
+		void PredictPosition(vector2 pReceivedPos);
+		dynamic_array<vector2> predictedPositionOffsets_;
+		vector2 lastReceivedPosition_;
 	};
 
 }

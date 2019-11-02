@@ -26,6 +26,7 @@ namespace alpha {
 
 	void tank::update(keyboard kb, mouse ms, time dt) {
 		previousPosition = transform_.position_;
+		UpdatePosition(kb, dt);
 		//shootingCooldown_ -= dt.as_seconds();
 		//vector2 direction = targetMoveDirection(kb);
 		//transform_.set_rotation(targetRotation(kb));
@@ -64,6 +65,18 @@ namespace alpha {
 		
 	}
 
+	void tank::UpdatePosition(keyboard kb, time dt) {
+		vector2 newOffset = targetMoveDirection(kb) * (SPEED_ * TILE_SIZE *dt.as_seconds());
+		predictedPositionOffsets_.push_back(newOffset);
+
+		vector2 destination = lastReceivedPosition_;
+		for (vector2 offset : predictedPositionOffsets_) {
+			destination += offset;
+		}
+
+		SetPosition(vector2::Lerp(transform_.position_, destination, 0.9f));
+	}
+
 	vector2 tank::targetMoveDirection(keyboard kb) {
 		if (kb.is_down(KEYCODE_W) && kb.is_down(KEYCODE_D)) return { 0.7071f ,-0.7071f };  //Normalised Diagonal Vector
 		if (kb.is_down(KEYCODE_W) && kb.is_down(KEYCODE_A)) return { -0.7071f ,-0.7071f };
@@ -99,6 +112,7 @@ namespace alpha {
 		aimVector_ = vector2(mousePosition - turretTransform_.position_).normalized();
 		return aimVector_;
 	}
+
 	void tank::preventCollision() {
 		transform_.position_ = previousPosition;
 		turretTransform_.position_ = transform_.position_;
@@ -118,15 +132,27 @@ namespace alpha {
 							vector2 pPos, 
 							float pAngle,
 							dynamic_array<vector2> bullets){
-		SetPosition(pPos);
 		SetAngle(pAngle);
 		SetActive(pAlive);
+		
+
+		vector2 lastPrediciton = vector2::zero();
+		if (predictedPositionOffsets_.size() > 0) {
+			lastPrediciton = predictedPositionOffsets_[predictedPositionOffsets_.size() - 1];
+		}
+		lastReceivedPosition_ = pPos + lastPrediciton;
+		SetPosition(vector2::Lerp(transform_.position_, lastReceivedPosition_, 0.9f));
+		predictedPositionOffsets_.clear();
 	}
 
 	void tank::SetPosition(vector2 pPos) {
 		transform_.set_position(pPos);
 		turretTransform_.position_ = transform_.position_;
 		setColliderPosition();
+	}
+
+	void tank::PredictPosition(vector2 pReceivedPos) {
+
 	}
 
 	void tank::SetAngle(float pAngle) {

@@ -145,6 +145,13 @@ namespace alpha {
 		vector2 normalized() { return vector2(x_ / magnitude(), y_ / magnitude()); };
 		float magnitude() { return sqrt(x_*x_ + y_*y_); };
 
+		static vector2 Lerp(vector2 firstVector, vector2 secondVector, float lerpDistance) {
+			vector2 distance = secondVector - firstVector;
+			return firstVector + (distance * lerpDistance);
+		}
+
+		static vector2 zero() { return vector2(0, 0); };
+
 		float x_;
 		float y_;
 	};
