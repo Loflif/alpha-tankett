@@ -290,11 +290,11 @@ namespace tankett {
 
 		ip_address remote;
 
+		while (!reader.eos()) {
 		if (!socket_.recv_from(remote, stream)) {
 			auto error = network_error::get_error();
 			return;
-		}
-		while (!reader.eos()) {
+		}		
 			type = (packet_type)reader.peek();
 			switch (type) {
 			case PACKET_TYPE_CONNECTION_CHALLENGE: {

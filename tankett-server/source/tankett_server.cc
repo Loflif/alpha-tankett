@@ -65,10 +65,10 @@ namespace tankett {
 		ip_address remote;
 		byte_stream stream(1024 * 4, dst_);
 		byte_stream_reader reader(stream);
+		while (!reader.eos()) {
 		if (!socket_.recv_from(remote, stream)) {
 			return;
-		}
-		while (!reader.eos()) {
+		}		
 			const uint8 type = reader.peek();
 
 			switch (type) {
