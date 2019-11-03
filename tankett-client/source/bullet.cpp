@@ -1,12 +1,12 @@
 #include <bullet.h>
-namespace alpha {
+namespace tankett {
 	bullet::bullet(sprite pSprite) {
 		sprite_ = pSprite;
 		size_ = pSprite.size_;
 		transform_.set_origin(vector2(size_ / 2));
 		collider_ = rectangle(0, 0, size_.x_, size_.y_);
 		isEnabled = false;
-		type_ = BULLET;
+		type_ = ENTITY_TYPE::BULLET;
 	}
 
 	bullet::~bullet() {
@@ -14,8 +14,8 @@ namespace alpha {
 	}
 
 	void bullet::update(keyboard kb, mouse ms, time dt) {
-		transform_.position_.x_ += direction_.x_ * SPEED_ * TILE_SIZE * dt.as_seconds();
-		transform_.position_.y_ += direction_.y_ * SPEED_ * TILE_SIZE * dt.as_seconds();
+		transform_.position_.x_ += direction_.x_ * SPEED_ * tankett::TILE_SIZE * dt.as_seconds();
+		transform_.position_.y_ += direction_.y_ * SPEED_ * tankett::TILE_SIZE * dt.as_seconds();
 		collider_.set_position(transform_.position_);
 	}
 
@@ -32,7 +32,7 @@ namespace alpha {
 	}
 
 	void bullet::onCollision(IEntity* collider) {
-		if (collider->type_ == WALL) {
+		if (collider->type_ == ENTITY_TYPE::WALL) {
 			isEnabled = false;
 		}
 	}

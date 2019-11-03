@@ -1,9 +1,8 @@
 #pragma once
-#include <alpha.h>
 #include "IEntity.h"
 #include "bullet.h"
 
-namespace alpha {
+namespace tankett {
 
 	class tank : public IEntity {
 	public:

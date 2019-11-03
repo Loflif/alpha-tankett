@@ -1,8 +1,6 @@
 #pragma once
-#include <alpha.h>
 #include "IEntity.h"
-namespace alpha {
-
+namespace tankett {
 	class tile : public IEntity {
 	public:
 		tile(sprite pSprite, float pPosx, float pPosY);

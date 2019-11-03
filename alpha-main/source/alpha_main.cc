@@ -10,6 +10,7 @@
 
 #include "alpha_audio_system_openal.h"
 #include "alpha_audio_system_openal.cc"
+#include "../../tankett-shared/include/tankett_shared.h"
 
 #if 1
 #include "alpha_render_system_opengl.h"
@@ -260,8 +261,8 @@ win32_set_title(const char *title) {
 }
 
 int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, int cmd_show) {
-   const int width =  (int)alpha::TILE_SIZE* 44;
-   const int height = (int)alpha::TILE_SIZE* 33;
+   const int width =  (int)tankett::TILE_SIZE* 44;
+   const int height = (int)tankett::TILE_SIZE* 33;
    alpha::string title = "alpha";
 
    const char *ident = "alphaTestClassName";

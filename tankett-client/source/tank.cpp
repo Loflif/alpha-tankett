@@ -1,7 +1,6 @@
 #include <tank.h>
 
-namespace alpha {
-
+namespace tankett {
 	tank::tank(sprite pSprite, sprite pTurretSprite, float pPosX, float pPosY, uint8 pID) {
 		sprite_ = pSprite;
 		size_ = pSprite.size_;
@@ -12,7 +11,7 @@ namespace alpha {
 		turretTransform_ = transform_;
 		collider_ = rectangle(0, 0, size_.x_, size_.y_);
 		setColliderPosition();
-		type_ = TANK;
+		type_ = ENTITY_TYPE::TANK;
 		id_ = pID;
 	}
 
@@ -44,17 +43,17 @@ namespace alpha {
 
 	void tank::onCollision(IEntity* collider) {
 		switch (collider->type_) {
-		case WALL: {
+		case ENTITY_TYPE::WALL: {
 			preventCollision();
 		}
 		break;
-		case BULLET: {
+		case ENTITY_TYPE::BULLET: {
 			if (!ownsBullet(collider)) {
 				isEnabled = false;
 			}
 		}
 		break;
-		case TANK: {
+		case ENTITY_TYPE::TANK: {
 			isEnabled = false;
 		}
 		break;

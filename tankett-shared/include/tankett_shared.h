@@ -1,5 +1,5 @@
 // tankett_shared.h
-
+#pragma once
 #ifndef TANKETT_SHARED_H_INCLUDED
 #define TANKETT_SHARED_H_INCLUDED
 
@@ -8,6 +8,57 @@
 using namespace alpha;
 
 namespace tankett {
+	static const float TILE_SIZE = 28;
+	static const float TANK_SIZE = 1.5f;
+	static const float BULLET_SIZE = 0.2f;
+
+	enum ENTITY_TYPE {
+		TANK,
+		WALL,
+		BULLET
+	};
+
+	enum TILE_TYPE {
+		W,
+		E
+	};
+
+	static const TILE_TYPE LEVEL[33][44]{
+	   {W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W}, //1
+	   {W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W}, //2
+	   {W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W}, //3
+	   {W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W}, //4
+	   {W,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,W}, //5
+	   {W,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,W}, //6
+	   {W,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,W}, //7
+	   {W,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,W}, //8
+	   {W,E,E,E,E,E,E,E,W,E,E,E,E,E,W,W,W,W,W,W,W,E,E,E,W,W,W,W,W,W,W,E,E,E,E,W,E,E,E,E,E,E,E,W}, //9
+	   {W,E,E,E,E,E,E,E,W,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,W,E,E,E,E,E,E,E,W}, //10
+	   {W,E,E,E,E,E,W,W,W,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,W,W,W,E,E,E,E,E,W}, //11
+	   {W,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,W}, //12
+	   {W,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,W}, //13
+	   {W,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,W}, //14
+	   {W,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,W}, //15
+	   {W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W}, //16
+	   {W,W,W,W,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,W,W,W,W}, //17
+	   {W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W}, //18
+	   {W,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,W}, //19
+	   {W,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,W}, //20
+	   {W,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,W}, //21
+	   {W,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,W}, //22
+	   {W,E,E,E,E,E,W,W,W,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,W,W,W,E,E,E,E,E,W}, //23
+	   {W,E,E,E,E,E,E,E,W,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,W,E,E,E,E,E,E,E,W}, //24
+	   {W,E,E,E,E,E,E,E,W,E,E,E,E,E,W,W,W,W,W,W,W,E,E,E,W,W,W,W,W,W,W,E,E,E,E,W,E,E,E,E,E,E,E,W}, //25
+	   {W,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,W}, //26
+	   {W,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,W}, //27
+	   {W,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,W}, //28
+	   {W,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,W}, //29
+	   {W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W}, //30
+	   {W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W}, //31
+	   {W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W}, //32
+	   {W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W}, //33
+	};
+	
    struct allocator {
       virtual ~allocator() = default;
       virtual void *allocate(uint64 size, uint64 align) = 0;
@@ -363,6 +414,7 @@ namespace tankett {
 	   {
 		   return serialize(reader);
 	   }
+	   
    };
 } // !tankett
 

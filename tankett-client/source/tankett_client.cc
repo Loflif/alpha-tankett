@@ -1,7 +1,6 @@
 // tankett_client.cc
 
 #include "tankett_client.h"
-#include "../../tankett-server/include/tankett_server.h"
 
 namespace alpha {
 	application* application::create(int& width, int& height, string& title) {
@@ -11,8 +10,6 @@ namespace alpha {
 } // !alpha
 
 namespace tankett {
-
-
 	client_app::client_app()
 		: client_key_(0)
 		, server_key_(0)
@@ -23,10 +20,10 @@ namespace tankett {
 		turretTexture_.create_from_file("assets/turret.png");
 		bulletTexture_.create_from_file("assets/bullet.png");
 
-		collisionPairs_.push_back(std::make_pair(TANK, WALL));
-		collisionPairs_.push_back(std::make_pair(TANK, BULLET));
-		collisionPairs_.push_back(std::make_pair(TANK, TANK));
-		collisionPairs_.push_back(std::make_pair(WALL, BULLET));
+		collisionPairs_.push_back(std::make_pair(ENTITY_TYPE::TANK, ENTITY_TYPE::WALL));
+		collisionPairs_.push_back(std::make_pair(ENTITY_TYPE::TANK, ENTITY_TYPE::BULLET));
+		collisionPairs_.push_back(std::make_pair(ENTITY_TYPE::TANK, ENTITY_TYPE::TANK));
+		collisionPairs_.push_back(std::make_pair(ENTITY_TYPE::WALL, ENTITY_TYPE::BULLET));
 	}
 
 	bool client_app::enter() {
@@ -63,19 +60,18 @@ namespace tankett {
 
 #pragma region Intialisation
 
-	void client_app::createTile(vector2 p_pos, TILE_TYPE p_type) {
-		if (p_type == tankett::W) {
-			sprite spr(wallTexture_, vector2(TILE_SIZE, TILE_SIZE));
-			entities_.push_back(new tile(spr, p_pos.x_, p_pos.y_));
-		}
+	void client_app::createTile(vector2 p_pos) {
+		sprite spr(wallTexture_, vector2(TILE_SIZE, TILE_SIZE));
+		entities_.push_back(new tile(spr, p_pos.x_, p_pos.y_));
 	}
 
 	void client_app::createLevel() {
-		int rows = std::extent<decltype(level), 0>::value; // Get the amount of rows
+		int rows = std::extent<decltype(LEVEL), 0>::value; // Get the amount of rows
 		for (size_t row = 0; row < rows; row++) {
 			int column = 0;
-			for (TILE_TYPE type : level[row]) {
-				createTile(vector2((float)column * TILE_SIZE, (float)row * TILE_SIZE), type);
+			for (TILE_TYPE type : LEVEL[row]) {
+				if (type == W)
+					createTile(vector2((float)column * TILE_SIZE, (float)row * TILE_SIZE));
 				column++;
 			}
 		}
@@ -129,7 +125,7 @@ namespace tankett {
 			manageCollisions();
 		}
 		render();
-		
+
 		return true;
 	}
 
@@ -193,7 +189,7 @@ namespace tankett {
 				crypt::xorinator xorinator(client_key_, server_key_);
 				xorinator_ = xorinator;
 				uint64 encryptedKeys = 0;
-				xorinator.encrypt(sizeof(uint64), (uint8*)& encryptedKeys);
+				xorinator.encrypt(sizeof(uint64), (uint8*)&encryptedKeys);
 				protocol_challenge_response challenge_response(encryptedKeys);
 				if (challenge_response.serialize(writer)) {
 					if (!socket_.send_to(server_ip_, stream)) {
@@ -208,7 +204,7 @@ namespace tankett {
 
 				pack_payload(payload);
 				//send_payload(payload);
-				
+
 				send_sequence_++;
 			}
 			}
@@ -269,7 +265,7 @@ namespace tankett {
 		if (!pPayload.serialize(writer)) {
 			return false;
 		}
-		
+
 		if (!socket_.send_to(server_ip_, stream)) {
 			auto err = network_error::get_error();
 
@@ -291,10 +287,10 @@ namespace tankett {
 		ip_address remote;
 
 		while (!reader.eos()) {
-		if (!socket_.recv_from(remote, stream)) {
-			auto error = network_error::get_error();
-			return;
-		}		
+			if (!socket_.recv_from(remote, stream)) {
+				auto error = network_error::get_error();
+				return;
+			}
 			type = (packet_type)reader.peek();
 			switch (type) {
 			case PACKET_TYPE_CONNECTION_CHALLENGE: {
@@ -354,7 +350,7 @@ namespace tankett {
 		switch (type) {
 		case tankett::NETWORK_MESSAGE_PING: {
 		}
-											break;
+										  break;
 		case tankett::NETWORK_MESSAGE_SERVER_TO_CLIENT: {
 			message_server_to_client message;
 			if (!message.serialize(reader)) {
@@ -364,11 +360,11 @@ namespace tankett {
 				parseServerMessage(message);
 			}
 		}
-														break;
+													  break;
 		case tankett::NETWORK_MESSAGE_COUNT: {
 
 		}
-											 break;
+										   break;
 		default:
 			break;
 		}
@@ -402,9 +398,9 @@ namespace tankett {
 		}
 
 		remoteTanks_[pID]->UpdateValues(pData.alive,
-			pData.position * TILE_SIZE,
-			pData.angle,
-			bulletPos);
+										pData.position * TILE_SIZE,
+										pData.angle,
+										bulletPos);
 	}
 
 	void client_app::UpdateLocalTank(server_to_client_data pData) {
@@ -418,9 +414,9 @@ namespace tankett {
 		}
 
 		playerTank_->UpdateValues(pData.alive,
-			pData.position * TILE_SIZE,
-			pData.angle,
-			bulletPos);
+								  pData.position * TILE_SIZE,
+								  pData.angle,
+								  bulletPos);
 	}
 
 #pragma endregion

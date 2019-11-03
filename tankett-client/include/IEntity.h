@@ -1,13 +1,8 @@
 #pragma once
 #include <alpha.h>
-namespace alpha {
+#include "tankett_shared.h"
 
-	enum ENTITY_TYPE {
-		TANK,
-		WALL,
-		BULLET
-	};
-
+namespace tankett {
 	class IEntity {
 	public:
 		virtual ~IEntity() {};
@@ -16,7 +11,7 @@ namespace alpha {
 		virtual void onCollision(IEntity* collider) = 0;
 		
 		rectangle collider_ = {0,0,0,0};
-		ENTITY_TYPE type_ = TANK;
+		ENTITY_TYPE type_ = ENTITY_TYPE::TANK;
 		bool isEnabled = true;
 	};
 }

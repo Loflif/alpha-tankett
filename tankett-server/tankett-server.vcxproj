@@ -92,10 +92,19 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="source\main.cc" />
+    <ClCompile Include="source\serverBullet.cpp" />
+    <ClCompile Include="source\serverEntityManager.cpp" />
+    <ClCompile Include="source\serverTank.cpp" />
+    <ClCompile Include="source\serverTile.cpp" />
     <ClCompile Include="source\tankett_debug.cc" />
     <ClCompile Include="source\tankett_server.cc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\IServerEntity.h" />
+    <ClInclude Include="include\serverBullet.h" />
+    <ClInclude Include="include\serverEntityManager.h" />
+    <ClInclude Include="include\serverTank.h" />
+    <ClInclude Include="include\serverTile.h" />
     <ClInclude Include="include\tankett_server.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

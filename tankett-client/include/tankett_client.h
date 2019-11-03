@@ -19,17 +19,11 @@ namespace tankett {
 		DISCONNECTED
 	};
 
-	enum TILE_TYPE {
-		W,
-		E
-	};
-
 	struct client_app : application {
 		client_app();
 
 		dynamic_array<std::pair<ENTITY_TYPE, ENTITY_TYPE>> collisionPairs_;
 
-		
 		virtual bool enter() final;
 		virtual void exit() final;
 		virtual bool tick() final;
@@ -37,9 +31,9 @@ namespace tankett {
 		void send(time dt);
 		bool pack_payload(protocol_payload& pPayload);
 		bool send_payload(protocol_payload& pPayload);
-		
+
 		void receive();
-		void createTile(vector2 pos, TILE_TYPE type);
+		void createTile(vector2 pos);
 		void createLevel();
 		tank* createTank(vector2 p_pos, uint8 pID);
 		void createBulletBuffer();
@@ -53,8 +47,6 @@ namespace tankett {
 		void UpdateRemoteTanks(server_to_client_data pData);
 		void UpdateRemoteTank(server_to_client_data pData, uint8 pID);
 
-		
-		
 		void update(time dt);
 		void render();
 
@@ -66,7 +58,7 @@ namespace tankett {
 		texture bulletTexture_;
 		texture tankTexture_;
 		texture turretTexture_;
-		
+
 		udp_socket socket_;
 		ip_address server_ip_;
 		ip_address send_all_ip_;
@@ -79,7 +71,7 @@ namespace tankett {
 		time send_accumulator;
 
 		uint32 send_sequence_ = 0;
-		
+
 		dynamic_array<IEntity*> entities_;
 		const int BULLET_MAX = 10;
 		dynamic_array<bullet*>bullets_;
@@ -89,45 +81,10 @@ namespace tankett {
 		crypt::xorinator xorinator_;
 
 		dynamic_array<network_message_header*> messages_;
-		
 		message_client_to_server currentMessage_;
 		//dynamic_array<network_message_header*>messages_;
-		
-		TILE_TYPE level[33][44] {
-			{W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W}, //1
-			{W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W}, //2
-			{W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W}, //3
-			{W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W}, //4
-			{W,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,W}, //5
-			{W,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,W}, //6
-			{W,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,W}, //7
-			{W,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,W}, //8
-			{W,E,E,E,E,E,E,E,W,E,E,E,E,E,W,W,W,W,W,W,W,E,E,E,W,W,W,W,W,W,W,E,E,E,E,W,E,E,E,E,E,E,E,W}, //9
-			{W,E,E,E,E,E,E,E,W,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,W,E,E,E,E,E,E,E,W}, //10
-			{W,E,E,E,E,E,W,W,W,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,W,W,W,E,E,E,E,E,W}, //11
-			{W,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,W}, //12
-			{W,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,W}, //13
-			{W,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,W}, //14
-			{W,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,W}, //15
-			{W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W}, //16
-			{W,W,W,W,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,W,W,W,W}, //17
-			{W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W}, //18
-			{W,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,W}, //19
-			{W,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,W}, //20
-			{W,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,W}, //21
-			{W,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,W}, //22
-			{W,E,E,E,E,E,W,W,W,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,W,W,W,E,E,E,E,E,W}, //23
-			{W,E,E,E,E,E,E,E,W,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,W,E,E,E,E,E,E,E,W}, //24
-			{W,E,E,E,E,E,E,E,W,E,E,E,E,E,W,W,W,W,W,W,W,E,E,E,W,W,W,W,W,W,W,E,E,E,E,W,E,E,E,E,E,E,E,W}, //25
-			{W,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,W}, //26
-			{W,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,W}, //27
-			{W,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,W}, //28
-			{W,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,W}, //29
-			{W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W}, //30
-			{W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W}, //31
-			{W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,E,W}, //32
-			{W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W}, //33
-		};
+
+
 	};
 } // !tankett
 
