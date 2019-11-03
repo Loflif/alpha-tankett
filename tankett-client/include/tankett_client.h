@@ -41,7 +41,7 @@ namespace tankett {
 		void receive();
 		void createTile(vector2 pos, TILE_TYPE type);
 		void createLevel();
-		tank* createTank(vector2 p_pos, uint8 pID);
+		tank* createTank(vector2 p_pos, uint8 pID, bool pIsLocal);
 		void createBulletBuffer();
 		void manageCollisions();
 		bool checkCollision(IEntity* firstEntity, IEntity* secondEntity);

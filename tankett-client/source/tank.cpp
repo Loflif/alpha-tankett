@@ -2,7 +2,7 @@
 
 namespace alpha {
 
-	tank::tank(sprite pSprite, sprite pTurretSprite, float pPosX, float pPosY, uint8 pID) {
+	tank::tank(sprite pSprite, sprite pTurretSprite, float pPosX, float pPosY, uint8 pID, bool isLocal) {
 		sprite_ = pSprite;
 		size_ = pSprite.size_;
 		turretSprite_ = pTurretSprite;
@@ -14,6 +14,8 @@ namespace alpha {
 		setColliderPosition();
 		type_ = TANK;
 		id_ = pID;
+		isLocal_ = isLocal;
+		timeOfLastMessage = time::now();
 	}
 
 	tank::~tank() {
@@ -26,7 +28,13 @@ namespace alpha {
 
 	void tank::update(keyboard kb, mouse ms, time dt) {
 		previousPosition = transform_.position_;
-		UpdatePosition(kb, dt);
+		if (isLocal_) {
+			UpdatePosition(kb, dt);
+		}
+		else {
+			//Entity Interpolation:
+			SetPosition(vector2::Lerp(transform_.position_, lastReceivedPosition_, dt.as_seconds() / messageDeltaTime_.as_seconds()));
+		}
 		//shootingCooldown_ -= dt.as_seconds();
 		//vector2 direction = targetMoveDirection(kb);
 		//transform_.set_rotation(targetRotation(kb));
@@ -136,13 +144,24 @@ namespace alpha {
 		SetActive(pAlive);
 		
 
-		vector2 lastPrediciton = vector2::zero();
-		if (predictedPositionOffsets_.size() > 0) {
-			lastPrediciton = predictedPositionOffsets_[predictedPositionOffsets_.size() - 1];
+		//Input Prediction:
+		if (isLocal_) {
+			vector2 lastPrediction = vector2::zero();
+			if (predictedPositionOffsets_.size() > 0) {
+				lastPrediction = predictedPositionOffsets_[predictedPositionOffsets_.size() - 1];
+			}
+			lastReceivedPosition_ = pPos + lastPrediction;
+			//SetPosition(vector2::Lerp(transform_.position_, lastReceivedPosition_, 0.9f));
+			predictedPositionOffsets_.clear();
 		}
-		lastReceivedPosition_ = pPos + lastPrediciton;
-		SetPosition(vector2::Lerp(transform_.position_, lastReceivedPosition_, 0.9f));
-		predictedPositionOffsets_.clear();
+		//Entity Interpolation:
+		else {
+			nextToLastReceivedPosition_ = lastReceivedPosition_;
+			lastReceivedPosition_ = pPos;
+			SetPosition(nextToLastReceivedPosition_);
+			messageDeltaTime_ = time::now() - timeOfLastMessage;
+			timeOfLastMessage = time::now();
+		}
 	}
 
 	void tank::SetPosition(vector2 pPos) {
