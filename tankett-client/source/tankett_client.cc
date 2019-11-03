@@ -10,6 +10,9 @@ namespace alpha {
 } // !alpha
 
 namespace tankett {
+
+#pragma region Intialisation
+
 	client_app::client_app()
 		: client_key_(0)
 		, server_key_(0)
@@ -25,6 +28,8 @@ namespace tankett {
 		collisionPairs_.push_back(std::make_pair(ENTITY_TYPE::TANK, ENTITY_TYPE::TANK));
 		collisionPairs_.push_back(std::make_pair(ENTITY_TYPE::WALL, ENTITY_TYPE::BULLET));
 	}
+
+
 
 	bool client_app::enter() {
 		current_ = time::now();
@@ -57,8 +62,6 @@ namespace tankett {
 
 		return true;
 	}
-
-#pragma region Intialisation
 
 	void client_app::createTile(vector2 p_pos) {
 		sprite spr(wallTexture_, vector2(TILE_SIZE, TILE_SIZE));
@@ -105,6 +108,7 @@ namespace tankett {
 			delete(e);
 		}
 	}
+#pragma region Update
 
 	bool client_app::tick() {
 		const time now = time::now();
@@ -127,6 +131,14 @@ namespace tankett {
 		render();
 
 		return true;
+	}
+
+	void client_app::update(time dt) {
+		for (IEntity* e : entities_) {
+			if (e->isEnabled) {
+				e->update(keyboard_, mouse_, dt);
+			}
+		}
 	}
 
 	void client_app::checkInput() {
@@ -161,6 +173,24 @@ namespace tankett {
 		msg->type_ = NETWORK_MESSAGE_CLIENT_TO_SERVER;
 		messages_.push_back(msg);
 	}
+
+	void client_app::fireBullet(tank* t) {
+		if (t->shootingCooldown_ > 0)
+			return;
+		for (bullet* b : bullets_) {
+			if (!b->isEnabled) {
+				vector2 tPos = t->transform_.position_;
+				b->fire(tPos.x_, tPos.y_, t->aimVector_);
+				t->bullets_.push_back(b);
+				t->shootingCooldown_ = t->FIRE_RATE_;
+				break;
+			}
+		}
+	}
+
+#pragma endregion
+
+#pragma region Send
 
 	void client_app::send(time dt) {
 		send_accumulator += dt;
@@ -210,6 +240,7 @@ namespace tankett {
 			}
 		}
 	}
+
 	bool client_app::pack_payload(protocol_payload& pPayload) {
 		/*byte_stream stream(sizeof(pPayload.payload_), pPayload.payload_);
 		byte_stream_writer writer(stream);*/
@@ -274,7 +305,9 @@ namespace tankett {
 
 		return true;
 	}
+#pragma endregion
 
+#pragma region Receive
 
 	void client_app::receive() {
 		uint8 buffer[2048];
@@ -336,9 +369,6 @@ namespace tankett {
 		}
 	}
 
-
-#pragma region ParseData
-
 	void client_app::parsePayload(protocol_payload pPayload) {
 		byte_stream stream(pPayload.length_, pPayload.payload_);
 		byte_stream_reader reader(stream);
@@ -375,7 +405,7 @@ namespace tankett {
 			if (i == pMessage.receiver_id - 1) {
 				UpdateLocalTank(pMessage.client_data[i]);
 			}
-			else {
+			else if (pMessage.client_data[i].client_id != 0) {
 				UpdateRemoteTanks(pMessage.client_data[i]);
 			}
 		}
@@ -420,14 +450,6 @@ namespace tankett {
 	}
 
 #pragma endregion
-
-	void client_app::update(time dt) {
-		for (IEntity* e : entities_) {
-			if (e->isEnabled) {
-				e->update(keyboard_, mouse_, dt);
-			}
-		}
-	}
 
 #pragma region CollisionHandling
 
@@ -482,20 +504,6 @@ namespace tankett {
 	}
 
 #pragma endregion
-
-	void client_app::fireBullet(tank* t) {
-		if (t->shootingCooldown_ > 0)
-			return;
-		for (bullet* b : bullets_) {
-			if (!b->isEnabled) {
-				vector2 tPos = t->transform_.position_;
-				b->fire(tPos.x_, tPos.y_, t->aimVector_);
-				t->bullets_.push_back(b);
-				t->shootingCooldown_ = t->FIRE_RATE_;
-				break;
-			}
-		}
-	}
 
 	void client_app::render() {
 		render_system_.clear(0xff0e1528); //Background Color
