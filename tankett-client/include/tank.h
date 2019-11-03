@@ -6,7 +6,7 @@ namespace tankett {
 
 	class tank : public IEntity {
 	public:
-		tank(sprite pSprite, sprite pTurretSprite, float pPosX, float pPosY, uint8 pID);
+		tank(sprite pSprite, sprite pTurretSprite, float pPosX, float pPosY, uint8 pID, bool isLocal);
 		~tank();
 
 		void render(render_system& pRenderSystem);
@@ -29,6 +29,8 @@ namespace tankett {
 		void SetPosition(vector2 pPos);
 		void SetAngle(float pAngle);
 		void SetActive(bool pIsActive);
+		void UpdatePosition(keyboard kb, time dt);
+		bool isLocal_;
 		//Also keep Constructor/Destructor, Render and Update, and only set aimvector when local
 
 		dynamic_array<vector2> bulletPositions_;
@@ -50,6 +52,15 @@ namespace tankett {
 		sprite turretSprite_;
 		transform turretTransform_;
 		vector2 previousPosition;
+
+		//For Prediciton:
+		void PredictPosition(vector2 pReceivedPos);
+		dynamic_array<vector2> predictedPositionOffsets_;
+		vector2 lastReceivedPosition_;
+		//For interpolation:
+		vector2 nextToLastReceivedPosition_;
+		time timeOfLastMessage;
+		time messageDeltaTime_;
 	};
 
 }

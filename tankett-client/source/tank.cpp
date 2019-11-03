@@ -1,7 +1,7 @@
 #include <tank.h>
 
 namespace tankett {
-	tank::tank(sprite pSprite, sprite pTurretSprite, float pPosX, float pPosY, uint8 pID) {
+	tank::tank(sprite pSprite, sprite pTurretSprite, float pPosX, float pPosY, uint8 pID, bool isLocal) {
 		sprite_ = pSprite;
 		size_ = pSprite.size_;
 		turretSprite_ = pTurretSprite;
@@ -13,6 +13,8 @@ namespace tankett {
 		setColliderPosition();
 		type_ = ENTITY_TYPE::TANK;
 		id_ = pID;
+		isLocal_ = isLocal;
+		timeOfLastMessage = time::now();
 	}
 
 	tank::~tank() {
@@ -25,6 +27,13 @@ namespace tankett {
 
 	void tank::update(keyboard kb, mouse ms, time dt) {
 		previousPosition = transform_.position_;
+		if (isLocal_) {
+			UpdatePosition(kb, dt);
+		}
+		else {
+			//Entity Interpolation:
+			SetPosition(vector2::Lerp(transform_.position_, lastReceivedPosition_, dt.as_seconds() / messageDeltaTime_.as_seconds()));
+		}
 		//shootingCooldown_ -= dt.as_seconds();
 		//vector2 direction = targetMoveDirection(kb);
 		//transform_.set_rotation(targetRotation(kb));
@@ -63,6 +72,18 @@ namespace tankett {
 		
 	}
 
+	void tank::UpdatePosition(keyboard kb, time dt) {
+		vector2 newOffset = targetMoveDirection(kb) * (SPEED_ * TILE_SIZE *dt.as_seconds());
+		predictedPositionOffsets_.push_back(newOffset);
+
+		vector2 destination = lastReceivedPosition_;
+		for (vector2 offset : predictedPositionOffsets_) {
+			destination += offset;
+		}
+
+		SetPosition(vector2::Lerp(transform_.position_, destination, 0.9f));
+	}
+
 	vector2 tank::targetMoveDirection(keyboard kb) {
 		if (kb.is_down(KEYCODE_W) && kb.is_down(KEYCODE_D)) return { 0.7071f ,-0.7071f };  //Normalised Diagonal Vector
 		if (kb.is_down(KEYCODE_W) && kb.is_down(KEYCODE_A)) return { -0.7071f ,-0.7071f };
@@ -98,6 +119,7 @@ namespace tankett {
 		aimVector_ = vector2(mousePosition - turretTransform_.position_).normalized();
 		return aimVector_;
 	}
+
 	void tank::preventCollision() {
 		transform_.position_ = previousPosition;
 		turretTransform_.position_ = transform_.position_;
@@ -117,15 +139,38 @@ namespace tankett {
 							vector2 pPos, 
 							float pAngle,
 							dynamic_array<vector2> bullets){
-		SetPosition(pPos);
 		SetAngle(pAngle);
 		SetActive(pAlive);
+		
+
+		//Input Prediction:
+		if (isLocal_) {
+			vector2 lastPrediction = vector2::zero();
+			if (predictedPositionOffsets_.size() > 0) {
+				lastPrediction = predictedPositionOffsets_[predictedPositionOffsets_.size() - 1];
+			}
+			lastReceivedPosition_ = pPos + lastPrediction;
+			//SetPosition(vector2::Lerp(transform_.position_, lastReceivedPosition_, 0.9f));
+			predictedPositionOffsets_.clear();
+		}
+		//Entity Interpolation:
+		else {
+			nextToLastReceivedPosition_ = lastReceivedPosition_;
+			lastReceivedPosition_ = pPos;
+			SetPosition(nextToLastReceivedPosition_);
+			messageDeltaTime_ = time::now() - timeOfLastMessage;
+			timeOfLastMessage = time::now();
+		}
 	}
 
 	void tank::SetPosition(vector2 pPos) {
 		transform_.set_position(pPos);
 		turretTransform_.position_ = transform_.position_;
 		setColliderPosition();
+	}
+
+	void tank::PredictPosition(vector2 pReceivedPos) {
+
 	}
 
 	void tank::SetAngle(float pAngle) {

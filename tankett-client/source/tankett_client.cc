@@ -77,10 +77,10 @@ namespace tankett {
 		}
 	}
 
-	tank* client_app::createTank(vector2 p_pos, uint8 pID) {
+	tank* client_app::createTank(vector2 p_pos, uint8 pID, bool pIsLocal) {
 		sprite spr(tankTexture_, vector2(TILE_SIZE * TANK_SIZE, TILE_SIZE * TANK_SIZE));
 		sprite turretSpr(turretTexture_, vector2(TILE_SIZE * TANK_SIZE, TILE_SIZE * TANK_SIZE));
-		tank* t = new tank(spr, turretSpr, p_pos.x_, p_pos.y_, pID);
+		tank* t = new tank(spr, turretSpr, p_pos.x_, p_pos.y_, pID, pIsLocal);
 		entities_.push_back(t);
 		return t;
 	}
@@ -388,7 +388,7 @@ namespace tankett {
 				return;
 			}
 		}
-		remoteTanks_.push_back(createTank(pData.position * TILE_SIZE, pData.client_id));
+		remoteTanks_.push_back(createTank(pData.position * TILE_SIZE, pData.client_id, false));
 	}
 
 	void client_app::UpdateRemoteTank(server_to_client_data pData, uint8 pID) {
@@ -405,7 +405,7 @@ namespace tankett {
 
 	void client_app::UpdateLocalTank(server_to_client_data pData) {
 		if (playerTank_ == nullptr) {
-			playerTank_ = createTank(pData.position * TILE_SIZE, pData.client_id);
+			playerTank_ = createTank(pData.position * TILE_SIZE, pData.client_id, true);
 			return;
 		}
 		dynamic_array<vector2> bulletPos;

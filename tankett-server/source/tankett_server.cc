@@ -60,6 +60,7 @@ namespace tankett {
 	void server::update(const time& dt) {
 
 	}
+
 #pragma region Receive
 	void server::receive(const time& dt) {
 		ip_address remote;
@@ -227,8 +228,8 @@ namespace tankett {
 #pragma region Send
 	void server::send(const time& dt) {
 		send_accumulator_ += dt;
-		if (send_accumulator_ > time(33)) {
-			send_accumulator_ -= time(33);
+		if (send_accumulator_ > time(100)) {
+			send_accumulator_ -= time(100);
 
 			for (client& client : clients_) {
 				switch (client.state_) {
@@ -379,6 +380,7 @@ namespace tankett {
 	void server::SpawnTank() {
 		for (int i = 0; i < 4; i++) {
 			if (!clientData[i].connected) {
+				clientData[i].client_id = connectedClientCount();
 				clientData[i].connected = true;
 				clientData[i].position = spawnPoints[i];
 				return;
