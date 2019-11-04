@@ -33,12 +33,10 @@ namespace tankett {
 		bool send_payload(protocol_payload& pPayload);
 
 		void receive();
+
 		void initializeUI();
 		void SetUIElement(UIElement &element, const char* pText, int32 pSize, vector2 pPos, uint32 color = 0xffffffff);
-		void manageCollisions();
-		bool checkCollision(IEntity* firstEntity, IEntity* secondEntity);
-		void fireBullet(tank* t);
-		bool isCollisionPair(IEntity* pFirstEntity, IEntity* pSecondEntity);
+
 		void parsePayload(protocol_payload pPayload);
 		void parseServerMessage(message_server_to_client pMessage);
 		void SetTimer(float pTime);

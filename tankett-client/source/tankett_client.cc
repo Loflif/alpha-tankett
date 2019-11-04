@@ -49,9 +49,6 @@ namespace tankett {
 		send_all_ip_ = client;
 		send_all_ip_.set_port(PROTOCOL_PORT);
 
-		createLevel();
-		createBulletBuffer();
-
 		return true;
 	}
 
@@ -66,42 +63,6 @@ namespace tankett {
 		element.text_.set_color(pColor);
 
 	}
-
-	void client_app::createTile(vector2 p_pos) {
-		sprite spr(wallTexture_, vector2(TILE_SIZE, TILE_SIZE));
-		entities_.push_back(new tile(spr, p_pos.x_, p_pos.y_));
-	}
-
-	//void client_app::createLevel() {
-	//	int rows = std::extent<decltype(LEVEL), 0>::value; // Get the amount of rows
-	//	for (size_t row = 0; row < rows; row++) {
-	//		int column = 0;
-	//		for (TILE_TYPE type : LEVEL[row]) {
-	//			if (type == W)
-	//				createTile(vector2((float)column * TILE_SIZE, (float)row * TILE_SIZE));
-	//			column++;
-	//		}
-	//	}
-	//}
-
-	/*tank* client_app::createTank(vector2 p_pos, uint8 pID, bool pIsLocal) {
-		sprite spr(tankTexture_, vector2(TILE_SIZE * TANK_SIZE, TILE_SIZE * TANK_SIZE));
-		sprite turretSpr(turretTexture_, vector2(TILE_SIZE * TANK_SIZE, TILE_SIZE * TANK_SIZE));
-		tank* t = new tank(spr, turretSpr, p_pos.x_, p_pos.y_, pID);
-		entities_.push_back(t);
-		return t;
-	}
-
-	void client_app::createBulletBuffer() {
-
-		sprite spr(bulletTexture_, vector2(TILE_SIZE * BULLET_SIZE, TILE_SIZE * BULLET_SIZE));
-
-		for (int i = 0; i < BULLET_MAX; i++) {
-			bullet* b = new bullet(spr);
-			bullets_.push_back(b);
-			entities_.push_back(b);
-		}
-	}*/
 
 #pragma endregion
 
@@ -139,38 +100,6 @@ namespace tankett {
 		return true;
 	}
 
-	void client_app::checkInput() {
-		message_client_to_server* msg = new message_client_to_server;
-		bool shoot = false;
-		bool right = false;
-		bool left = false;
-		bool down = false;
-		bool up = false;
-		if (mouse_.is_pressed(MOUSE_BUTTON_LEFT)) {
-			shoot = true;
-			//fireBullet(playerTank_);
-		}
-		if (keyboard_.is_down(KEYCODE_D)) {
-			right = true;
-		}
-		if (keyboard_.is_down(KEYCODE_A)) {
-			left = true;
-		}
-		if (keyboard_.is_down(KEYCODE_S)) {
-			down = true;
-		}
-		if (keyboard_.is_down(KEYCODE_W)) {
-			up = true;
-		}
-		msg->set_input(shoot, right, left, down, up);
-
-		vector2 mousePosition((float)mouse_.x_, (float)mouse_.y_);
-		vector2 aimVector = vector2(mousePosition - playerTank_->transform_.position_).normalized();
-
-		msg->turret_angle = atan2(aimVector.y_, aimVector.x_) * (180 / PI);
-		msg->type_ = NETWORK_MESSAGE_CLIENT_TO_SERVER;
-		messages_.push_back(msg);
-	}
 
 	void client_app::send(time dt) {
 		send_accumulator += dt;
@@ -407,90 +336,4 @@ namespace tankett {
 		timer.text_.set_text(timerText.c_str());
 	}
 #pragma endregion
-
-	void client_app::update(time dt) {
-		for (IEntity* e : entities_) {
-			if (e->isEnabled) {
-				e->update(keyboard_, mouse_, dt);
-			}
-		}
-	}
-
-#pragma region CollisionHandling
-
-	void client_app::manageCollisions() {
-		for (int i = 0; i < entities_.size(); i++) {
-			for (int j = 0; j < entities_.size(); j++) {
-				if (isCollisionPair(entities_[i], entities_[j])) {
-					if ((j != i) && (checkCollision(entities_[i], entities_[j]))) {
-						if (entities_[i]->isEnabled && entities_[j]->isEnabled) {
-							entities_[i]->onCollision(entities_[j]);
-							entities_[j]->onCollision(entities_[i]);
-						}
-					}
-				}
-			}
-		}
-	}
-
-	bool client_app::checkCollision(IEntity* firstEntity, IEntity* secondEntity) {
-		rectangle firstRectangle = firstEntity->collider_;
-		rectangle secondRectangle = secondEntity->collider_;
-
-		float firstTop, firstBottom, firstLeft, firstRight, secondTop, secondBottom, secondLeft, secondRight;
-
-		firstTop = firstRectangle.y_;
-		firstBottom = firstRectangle.y_ + firstRectangle.height_;
-		firstLeft = firstRectangle.x_;
-		firstRight = firstRectangle.x_ + firstRectangle.width_;
-
-		secondTop = secondRectangle.y_;
-		secondBottom = secondRectangle.y_ + secondRectangle.height_;
-		secondLeft = secondRectangle.x_;
-		secondRight = secondRectangle.x_ + secondRectangle.width_;
-
-
-		if (firstTop > secondBottom || firstBottom < secondTop || firstLeft > secondRight || firstRight < secondLeft) {
-			return false;
-		}
-		else {
-			return true;
-		}
-	}
-
-	bool client_app::isCollisionPair(IEntity* pFirstEntity, IEntity* pSecondEntity) {
-		for (unsigned int i = 0; i < collisionPairs_.size(); i++) {
-			if ((collisionPairs_[i].first == pFirstEntity->type_ && collisionPairs_[i].second == pSecondEntity->type_) ||
-				(collisionPairs_[i].first == pSecondEntity->type_ && collisionPairs_[i].second == pFirstEntity->type_)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-#pragma endregion
-
-	void client_app::fireBullet(tank* t) {
-		if (t->shootingCooldown_ > 0)
-			return;
-		for (bullet* b : bullets_) {
-			if (!b->isEnabled) {
-				vector2 tPos = t->transform_.position_;
-				b->fire(tPos.x_, tPos.y_, t->aimVector_);
-				t->bullets_.push_back(b);
-				t->shootingCooldown_ = t->FIRE_RATE_;
-				break;
-			}
-		}
-	}
-
-	void client_app::render() {
-		render_system_.clear(0xff0e1528); //Background Color
-		for (IEntity* e : entities_) {
-			if (e->isEnabled) {
-				e->render(render_system_);
-			}
-		}
-		render_system_.render(text_, transform_);
-	}
 } // !tankett
