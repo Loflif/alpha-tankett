@@ -4,7 +4,7 @@
 namespace tankett {
 	class serverBullet : public IServerEntity {
 	public:
-		serverBullet(vector2 pSpawnPos);
+		serverBullet();
 		~serverBullet();
 
 		void onCollision(IServerEntity* collider) override;

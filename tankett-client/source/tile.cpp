@@ -6,7 +6,8 @@ namespace tankett {
 		transform_.position_.x_ = pPosX;
 		transform_.position_.y_ = pPosY;
 		collider_ = rectangle(pPosX, pPosY, pSprite.size_.x_, pSprite.size_.y_);
-		type_ = ENTITY_TYPE::WALL;
+		type_ = WALL;
+		isEnabled = true;
 	}
 
 	tile::~tile() {

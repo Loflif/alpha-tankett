@@ -92,12 +92,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="source\bullet.cpp" />
+    <ClCompile Include="source\entityManager.cpp" />
     <ClCompile Include="source\tank.cpp" />
     <ClCompile Include="source\tankett_client.cc" />
-    <ClCompile Include="source\tile.cc" />
+    <ClCompile Include="source\tile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\bullet.h" />
+    <ClInclude Include="include\entityManager.h" />
     <ClInclude Include="include\IEntity.h" />
     <ClInclude Include="include\tank.h" />
     <ClInclude Include="include\tankett_client.h" />

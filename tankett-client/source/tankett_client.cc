@@ -13,17 +13,9 @@ namespace tankett {
 	client_app::client_app()
 		: client_key_(0)
 		, server_key_(0)
-		, state_(INIT) {
+		, state_(INIT)
+		, entityManager_(new entityManager()){
 
-		wallTexture_.create_from_file("assets/wallTile.png");
-		tankTexture_.create_from_file("assets/tank.png");
-		turretTexture_.create_from_file("assets/turret.png");
-		bulletTexture_.create_from_file("assets/bullet.png");
-
-		collisionPairs_.push_back(std::make_pair(ENTITY_TYPE::TANK, ENTITY_TYPE::WALL));
-		collisionPairs_.push_back(std::make_pair(ENTITY_TYPE::TANK, ENTITY_TYPE::BULLET));
-		collisionPairs_.push_back(std::make_pair(ENTITY_TYPE::TANK, ENTITY_TYPE::TANK));
-		collisionPairs_.push_back(std::make_pair(ENTITY_TYPE::WALL, ENTITY_TYPE::BULLET));
 	}
 
 	bool client_app::enter() {
@@ -52,35 +44,32 @@ namespace tankett {
 		send_all_ip_ = client;
 		send_all_ip_.set_port(PROTOCOL_PORT);
 
-		createLevel();
-		createBulletBuffer();
-
 		return true;
 	}
 
 #pragma region Intialisation
 
-	void client_app::createTile(vector2 p_pos) {
-		sprite spr(wallTexture_, vector2(TILE_SIZE, TILE_SIZE));
-		entities_.push_back(new tile(spr, p_pos.x_, p_pos.y_));
-	}
+	//void client_app::createTile(vector2 p_pos) {
+	//	sprite spr(wallTexture_, vector2(TILE_SIZE, TILE_SIZE));
+	//	entities_.push_back(new tile(spr, p_pos.x_, p_pos.y_));
+	//}
 
-	void client_app::createLevel() {
-		int rows = std::extent<decltype(LEVEL), 0>::value; // Get the amount of rows
-		for (size_t row = 0; row < rows; row++) {
-			int column = 0;
-			for (TILE_TYPE type : LEVEL[row]) {
-				if (type == W)
-					createTile(vector2((float)column * TILE_SIZE, (float)row * TILE_SIZE));
-				column++;
-			}
-		}
-	}
+	//void client_app::createLevel() {
+	//	int rows = std::extent<decltype(LEVEL), 0>::value; // Get the amount of rows
+	//	for (size_t row = 0; row < rows; row++) {
+	//		int column = 0;
+	//		for (TILE_TYPE type : LEVEL[row]) {
+	//			if (type == W)
+	//				createTile(vector2((float)column * TILE_SIZE, (float)row * TILE_SIZE));
+	//			column++;
+	//		}
+	//	}
+	//}
 
-	tank* client_app::createTank(vector2 p_pos, uint8 pID, bool pIsLocal) {
+	/*tank* client_app::createTank(vector2 p_pos, uint8 pID, bool pIsLocal) {
 		sprite spr(tankTexture_, vector2(TILE_SIZE * TANK_SIZE, TILE_SIZE * TANK_SIZE));
 		sprite turretSpr(turretTexture_, vector2(TILE_SIZE * TANK_SIZE, TILE_SIZE * TANK_SIZE));
-		tank* t = new tank(spr, turretSpr, p_pos.x_, p_pos.y_, pID, pIsLocal);
+		tank* t = new tank(spr, turretSpr, p_pos.x_, p_pos.y_, pID);
 		entities_.push_back(t);
 		return t;
 	}
@@ -94,16 +83,14 @@ namespace tankett {
 			bullets_.push_back(b);
 			entities_.push_back(b);
 		}
-	}
+	}*/
 
 #pragma endregion
 
 	void client_app::exit() {
 		network_shut();
 
-		for (IEntity* e : entities_) {
-			delete(e);
-		}
+		delete(entityManager_);
 	}
 
 	bool client_app::tick() {
@@ -120,46 +107,13 @@ namespace tankett {
 			receive();
 		}
 		if (state_ == CONNECTED) {
-			update(dt);
-			checkInput();
-			manageCollisions();
+			entityManager_->update(keyboard_, mouse_, dt);
+			messages_.push_back(entityManager_->checkInput(keyboard_, mouse_));
+			entityManager_->manageCollisions();
 		}
-		render();
+		entityManager_->render(render_system_);
 
 		return true;
-	}
-
-	void client_app::checkInput() {
-		message_client_to_server* msg = new message_client_to_server;
-		bool shoot = false;
-		bool right = false;
-		bool left = false;
-		bool down = false;
-		bool up = false;
-		if (mouse_.is_pressed(MOUSE_BUTTON_LEFT)) {
-			shoot = true;
-			//fireBullet(playerTank_);
-		}
-		if (keyboard_.is_down(KEYCODE_D)) {
-			right = true;
-		}
-		if (keyboard_.is_down(KEYCODE_A)) {
-			left = true;
-		}
-		if (keyboard_.is_down(KEYCODE_S)) {
-			down = true;
-		}
-		if (keyboard_.is_down(KEYCODE_W)) {
-			up = true;
-		}
-		msg->set_input(shoot, right, left, down, up);
-
-		vector2 mousePosition((float)mouse_.x_, (float)mouse_.y_);
-		vector2 aimVector = vector2(mousePosition - playerTank_->transform_.position_).normalized();
-
-		msg->turret_angle = atan2(aimVector.y_, aimVector.x_) * (180 / PI);
-		msg->type_ = NETWORK_MESSAGE_CLIENT_TO_SERVER;
-		messages_.push_back(msg);
 	}
 
 	void client_app::send(time dt) {
@@ -348,10 +302,10 @@ namespace tankett {
 		network_message_type type = (network_message_type)reader.peek();
 
 		switch (type) {
-		case tankett::NETWORK_MESSAGE_PING: {
+		case NETWORK_MESSAGE_PING: {
 		}
-										  break;
-		case tankett::NETWORK_MESSAGE_SERVER_TO_CLIENT: {
+		break;
+		case NETWORK_MESSAGE_SERVER_TO_CLIENT: {
 			message_server_to_client message;
 			if (!message.serialize(reader)) {
 				auto error = network_error::get_error();
@@ -360,11 +314,11 @@ namespace tankett {
 				parseServerMessage(message);
 			}
 		}
-													  break;
-		case tankett::NETWORK_MESSAGE_COUNT: {
+		break;
+		case NETWORK_MESSAGE_COUNT: {
 
 		}
-										   break;
+		break;
 		default:
 			break;
 		}
@@ -372,138 +326,16 @@ namespace tankett {
 
 	void client_app::parseServerMessage(message_server_to_client pMessage) {
 		for (int i = 0; i < pMessage.client_count; i++) {
-			if (i == pMessage.receiver_id - 1) {
-				UpdateLocalTank(pMessage.client_data[i]);
+			if (i == pMessage.receiver_id) {
+				if (entityManager_->getLocalTank() == 255)
+					entityManager_->setLocalTank(pMessage.receiver_id);
+				entityManager_->UpdateLocalTank(pMessage.client_data[i]);
 			}
 			else {
-				UpdateRemoteTanks(pMessage.client_data[i]);
+				entityManager_->UpdateRemoteTank(pMessage.client_data[i]);
 			}
 		}
-	}
-
-	void client_app::UpdateRemoteTanks(server_to_client_data pData) {
-		for (int j = 0; j < remoteTanks_.size(); j++) {
-			if (remoteTanks_[j]->id_ == pData.client_id) {
-				UpdateRemoteTank(pData, (uint8)j);
-				return;
-			}
-		}
-		remoteTanks_.push_back(createTank(pData.position * TILE_SIZE, pData.client_id, false));
-	}
-
-	void client_app::UpdateRemoteTank(server_to_client_data pData, uint8 pID) {
-		dynamic_array<vector2> bulletPos;
-		for (bullet_data b : pData.bullets) {
-			bulletPos.push_back(b.position * TILE_SIZE);
-		}
-
-		remoteTanks_[pID]->UpdateValues(pData.alive,
-										pData.position * TILE_SIZE,
-										pData.angle,
-										bulletPos);
-	}
-
-	void client_app::UpdateLocalTank(server_to_client_data pData) {
-		if (playerTank_ == nullptr) {
-			playerTank_ = createTank(pData.position * TILE_SIZE, pData.client_id, true);
-			return;
-		}
-		dynamic_array<vector2> bulletPos;
-		for (bullet_data b : pData.bullets) {
-			bulletPos.push_back(b.position * TILE_SIZE);
-		}
-
-		playerTank_->UpdateValues(pData.alive,
-								  pData.position * TILE_SIZE,
-								  pData.angle,
-								  bulletPos);
 	}
 
 #pragma endregion
-
-	void client_app::update(time dt) {
-		for (IEntity* e : entities_) {
-			if (e->isEnabled) {
-				e->update(keyboard_, mouse_, dt);
-			}
-		}
-	}
-
-#pragma region CollisionHandling
-
-	void client_app::manageCollisions() {
-		for (int i = 0; i < entities_.size(); i++) {
-			for (int j = 0; j < entities_.size(); j++) {
-				if (isCollisionPair(entities_[i], entities_[j])) {
-					if ((j != i) && (checkCollision(entities_[i], entities_[j]))) {
-						if (entities_[i]->isEnabled && entities_[j]->isEnabled) {
-							entities_[i]->onCollision(entities_[j]);
-							entities_[j]->onCollision(entities_[i]);
-						}
-					}
-				}
-			}
-		}
-	}
-
-	bool client_app::checkCollision(IEntity* firstEntity, IEntity* secondEntity) {
-		rectangle firstRectangle = firstEntity->collider_;
-		rectangle secondRectangle = secondEntity->collider_;
-
-		float firstTop, firstBottom, firstLeft, firstRight, secondTop, secondBottom, secondLeft, secondRight;
-
-		firstTop = firstRectangle.y_;
-		firstBottom = firstRectangle.y_ + firstRectangle.height_;
-		firstLeft = firstRectangle.x_;
-		firstRight = firstRectangle.x_ + firstRectangle.width_;
-
-		secondTop = secondRectangle.y_;
-		secondBottom = secondRectangle.y_ + secondRectangle.height_;
-		secondLeft = secondRectangle.x_;
-		secondRight = secondRectangle.x_ + secondRectangle.width_;
-
-
-		if (firstTop > secondBottom || firstBottom < secondTop || firstLeft > secondRight || firstRight < secondLeft) {
-			return false;
-		}
-		else {
-			return true;
-		}
-	}
-
-	bool client_app::isCollisionPair(IEntity* pFirstEntity, IEntity* pSecondEntity) {
-		for (unsigned int i = 0; i < collisionPairs_.size(); i++) {
-			if ((collisionPairs_[i].first == pFirstEntity->type_ && collisionPairs_[i].second == pSecondEntity->type_) ||
-				(collisionPairs_[i].first == pSecondEntity->type_ && collisionPairs_[i].second == pFirstEntity->type_)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-#pragma endregion
-
-	void client_app::fireBullet(tank* t) {
-		if (t->shootingCooldown_ > 0)
-			return;
-		for (bullet* b : bullets_) {
-			if (!b->isEnabled) {
-				vector2 tPos = t->transform_.position_;
-				b->fire(tPos.x_, tPos.y_, t->aimVector_);
-				t->bullets_.push_back(b);
-				t->shootingCooldown_ = t->FIRE_RATE_;
-				break;
-			}
-		}
-	}
-
-	void client_app::render() {
-		render_system_.clear(0xff0e1528); //Background Color
-		for (IEntity* e : entities_) {
-			if (e->isEnabled) {
-				e->render(render_system_);
-			}
-		}
-		render_system_.render(text_, transform_);
-	}
 } // !tankett

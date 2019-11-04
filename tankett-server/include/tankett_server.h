@@ -63,17 +63,9 @@ namespace tankett {
 
 		void challengeClient(client& client);
 
-		//void sendPayload(Client &client);
 		uint8 connectedClientCount();
 
 		void SpawnTank();
-
-		vector2 spawnPoints[4]{
-			vector2(4,4),
-			vector2(40,4),
-			vector2(4,29),
-			vector2(40,29),
-		};
 
 		server_to_client_data clientData[4];
 

@@ -6,7 +6,7 @@ namespace tankett {
 		transform_.set_origin(vector2(size_ / 2));
 		collider_ = rectangle(0, 0, size_.x_, size_.y_);
 		isEnabled = false;
-		type_ = ENTITY_TYPE::BULLET;
+		type_ = BULLET;
 	}
 
 	bullet::~bullet() {
@@ -32,7 +32,7 @@ namespace tankett {
 	}
 
 	void bullet::onCollision(IEntity* collider) {
-		if (collider->type_ == ENTITY_TYPE::WALL) {
+		if (collider->type_ == WALL) {
 			isEnabled = false;
 		}
 	}

@@ -1,7 +1,7 @@
 #include <tank.h>
 
 namespace tankett {
-	tank::tank(sprite pSprite, sprite pTurretSprite, float pPosX, float pPosY, uint8 pID, bool isLocal) {
+	tank::tank(sprite pSprite, sprite pTurretSprite, float pPosX, float pPosY, uint8 pID) {
 		sprite_ = pSprite;
 		size_ = pSprite.size_;
 		turretSprite_ = pTurretSprite;
@@ -11,10 +11,10 @@ namespace tankett {
 		turretTransform_ = transform_;
 		collider_ = rectangle(0, 0, size_.x_, size_.y_);
 		setColliderPosition();
-		type_ = ENTITY_TYPE::TANK;
+		type_ = TANK;
 		id_ = pID;
-		isLocal_ = isLocal;
 		timeOfLastMessage = time::now();
+		isEnabled = false;
 	}
 
 	tank::~tank() {
@@ -52,17 +52,17 @@ namespace tankett {
 
 	void tank::onCollision(IEntity* collider) {
 		switch (collider->type_) {
-		case ENTITY_TYPE::WALL: {
+		case WALL: {
 			preventCollision();
 		}
 		break;
-		case ENTITY_TYPE::BULLET: {
+		case BULLET: {
 			if (!ownsBullet(collider)) {
 				isEnabled = false;
 			}
 		}
 		break;
-		case ENTITY_TYPE::TANK: {
+		case TANK: {
 			isEnabled = false;
 		}
 		break;
@@ -82,6 +82,10 @@ namespace tankett {
 		}
 
 		SetPosition(vector2::Lerp(transform_.position_, destination, 0.9f));
+	}
+
+	void tank::SetLocal(bool pIsLocal) {
+		isLocal_ = pIsLocal;
 	}
 
 	vector2 tank::targetMoveDirection(keyboard kb) {

@@ -138,7 +138,7 @@ namespace tankett {
 					if (client.state_ != CONNECTED) {
 						client.state_ = CONNECTED;
 						debugf("[Info] Client connected: %s", client.address_.as_string());
-						client.id_ = connectedClientCount();
+						client.id_ = connectedClientCount() - 1;
 						SpawnTank();
 					}
 				}
@@ -161,10 +161,10 @@ namespace tankett {
 					network_message_type type = (network_message_type)reader.peek();
 
 					switch (type) {
-					case tankett::NETWORK_MESSAGE_PING: {
+					case NETWORK_MESSAGE_PING: {
 					}
-														break;
-					case tankett::NETWORK_MESSAGE_CLIENT_TO_SERVER: {
+					break;
+					case NETWORK_MESSAGE_CLIENT_TO_SERVER: {
 						message_client_to_server message;
 						if (!message.serialize(reader)) {
 							auto error = network_error::get_error();
@@ -174,11 +174,11 @@ namespace tankett {
 							parseClientMessage(message, client, deltaReceiveTime);
 						}
 					}
-																	break;
-					case tankett::NETWORK_MESSAGE_COUNT: {
+					break;
+					case NETWORK_MESSAGE_COUNT: {
 
 					}
-														 break;
+					break;
 					default:
 						break;
 					}
@@ -207,9 +207,12 @@ namespace tankett {
 #pragma region ParseInput
 	void server::parseClientMessage(message_client_to_server message, client& pClient, const time& pDeltaRecieveTime) {
 		vector2 targetDirection = targetMoveDirection(message);
+		if(targetDirection.x_ != 0
+		   && targetDirection.y_ != 0) {
+			int i = 0;
+		}
 		float speed = 4 * pDeltaRecieveTime.as_seconds();
-		clientData[pClient.id_-1].position += targetDirection * speed;
-		
+		clientData[pClient.id_].position += targetDirection * speed;
 	}
 
 	vector2 server::targetMoveDirection(message_client_to_server message) {
@@ -380,7 +383,7 @@ namespace tankett {
 	void server::SpawnTank() {
 		for (int i = 0; i < 4; i++) {
 			if (!clientData[i].connected) {
-				clientData[i].client_id = connectedClientCount();
+				clientData[i].client_id = connectedClientCount() - 1;
 				clientData[i].connected = true;
 				clientData[i].position = spawnPoints[i];
 				return;

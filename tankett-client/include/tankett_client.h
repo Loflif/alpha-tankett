@@ -7,6 +7,7 @@
 #include <tankett_shared.h>
 #include "tile.h"
 #include "tank.h"
+#include "entityManager.h"
 
 using namespace alpha;
 
@@ -22,42 +23,24 @@ namespace tankett {
 	struct client_app : application {
 		client_app();
 
-		dynamic_array<std::pair<ENTITY_TYPE, ENTITY_TYPE>> collisionPairs_;
-
 		virtual bool enter() final;
 		virtual void exit() final;
 		virtual bool tick() final;
-		void checkInput();
 		void send(time dt);
 		bool pack_payload(protocol_payload& pPayload);
 		bool send_payload(protocol_payload& pPayload);
 
 		void receive();
-		void createTile(vector2 pos);
-		void createLevel();
-		tank* createTank(vector2 p_pos, uint8 pID, bool pIsLocal);
-		void createBulletBuffer();
 		void manageCollisions();
 		bool checkCollision(IEntity* firstEntity, IEntity* secondEntity);
 		void fireBullet(tank* t);
 		bool isCollisionPair(IEntity* pFirstEntity, IEntity* pSecondEntity);
 		void parsePayload(protocol_payload pPayload);
 		void parseServerMessage(message_server_to_client pMessage);
-		void UpdateLocalTank(server_to_client_data pData);
-		void UpdateRemoteTanks(server_to_client_data pData);
-		void UpdateRemoteTank(server_to_client_data pData, uint8 pID);
-
-		void update(time dt);
-		void render();
 
 		time current_;
 		text text_;
 		transform transform_;
-
-		texture wallTexture_;
-		texture bulletTexture_;
-		texture tankTexture_;
-		texture turretTexture_;
 
 		udp_socket socket_;
 		ip_address server_ip_;
@@ -72,19 +55,11 @@ namespace tankett {
 
 		uint32 send_sequence_ = 0;
 
-		dynamic_array<IEntity*> entities_;
-		const int BULLET_MAX = 10;
-		dynamic_array<bullet*>bullets_;
-		tank* playerTank_ = nullptr;
-		dynamic_array<tank*>remoteTanks_;
-
 		crypt::xorinator xorinator_;
-
+		entityManager* entityManager_;
+		
 		dynamic_array<network_message_header*> messages_;
 		message_client_to_server currentMessage_;
-		//dynamic_array<network_message_header*>messages_;
-
-
 	};
 } // !tankett
 

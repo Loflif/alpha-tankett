@@ -12,6 +12,16 @@ namespace tankett {
 	static const float TANK_SIZE = 1.5f;
 	static const float BULLET_SIZE = 0.2f;
 
+	static const int BULLET_MAX_COUNT = 10;
+	static const int COLLISION_PAIR_COUNT = 4;
+
+	static const vector2 spawnPoints[4]{
+			vector2(4,4),
+			vector2(40,4),
+			vector2(4,29),
+			vector2(40,29),
+	};
+
 	enum ENTITY_TYPE {
 		TANK,
 		WALL,

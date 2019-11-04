@@ -11,7 +11,7 @@ namespace tankett {
 		virtual void onCollision(IEntity* collider) = 0;
 		
 		rectangle collider_ = {0,0,0,0};
-		ENTITY_TYPE type_ = ENTITY_TYPE::TANK;
-		bool isEnabled = true;
+		ENTITY_TYPE type_;
+		bool isEnabled = false;
 	};
 }
