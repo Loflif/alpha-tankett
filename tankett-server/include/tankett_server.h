@@ -63,7 +63,6 @@ namespace tankett {
 
 		void challengeClient(client& client);
 
-		//void sendPayload(Client &client);
 		uint8 connectedClientCount();
 
 		void SpawnTank();
@@ -87,13 +86,15 @@ namespace tankett {
 		udp_socket socket_;
 		uint8 dst_[2048] = { NULL };
 
-		// note: example below
 		void process_client_queues();
 		bool send_payload(const ip_address& remote, protocol_payload& packet);
 
 		uint32 server_sequence_{};
 
 		dynamic_array<client> clients_;
+
+		float currentRoundTime_ = ROUND_TIME;
+		GAME_STATE state_ = WAITING_FOR_PLAYER;
 	};
 } // !tankett
 

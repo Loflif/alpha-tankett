@@ -34,8 +34,8 @@ namespace tankett {
 	bool client_app::enter() {
 		current_ = time::now();
 
-		text_.set_text("IP: ...");
-		transform_.set_position({ 2, 2 });
+		debugText_.set_text("IP: ...");
+		debugTextTransform_.set_position({ 2, 2 });
 
 		network_init();
 
@@ -59,8 +59,21 @@ namespace tankett {
 
 		createLevel();
 		createBulletBuffer();
+		initializeUI();
 
 		return true;
+	}
+
+	void client_app::initializeUI() {
+		SetUIElement(timer, "00:00", 2, vector2(40 * TILE_SIZE, 32.2f * TILE_SIZE));
+	}
+
+	void client_app::SetUIElement(UIElement& element, const char* pText, int32 pSize, vector2 pPos, uint32 pColor) {
+		element.text_.set_text(pText);
+		element.text_.set_scale(pSize);
+		element.transform_.set_position(pPos);
+		element.text_.set_color(pColor);
+
 	}
 
 	void client_app::createTile(vector2 p_pos) {
@@ -101,6 +114,8 @@ namespace tankett {
 
 #pragma endregion
 
+#pragma region Termination
+
 	void client_app::exit() {
 		network_shut();
 
@@ -108,6 +123,8 @@ namespace tankett {
 			delete(e);
 		}
 	}
+#pragma endregion
+
 #pragma region Update
 
 	bool client_app::tick() {
@@ -344,7 +361,7 @@ namespace tankett {
 					auto error = network_error::get_error();
 				}
 				else {
-					text_.set_text("CONNECTED");
+					debugText_.set_text("CONNECTED");
 					state_ = CONNECTED;
 					parsePayload(payload);
 				}
@@ -357,7 +374,7 @@ namespace tankett {
 					auto error = network_error::get_error();
 				}
 				else {
-					text_.set_text("CONNECTION DENIED: %d", connection_denied.reason_);
+					debugText_.set_text("CONNECTION DENIED: %d", connection_denied.reason_);
 					state_ = DISCONNECTED;
 				}
 				break;
@@ -401,6 +418,7 @@ namespace tankett {
 	}
 
 	void client_app::parseServerMessage(message_server_to_client pMessage) {
+		SetTimer(pMessage.round_time);
 		for (int i = 0; i < pMessage.client_count; i++) {
 			if (i == pMessage.receiver_id - 1) {
 				UpdateLocalTank(pMessage.client_data[i]);
@@ -409,6 +427,19 @@ namespace tankett {
 				UpdateRemoteTanks(pMessage.client_data[i]);
 			}
 		}
+	}
+
+	void client_app::SetTimer(float pTime) {
+		int seconds, minutes;
+		minutes = (int)pTime / 60;
+		seconds = (int)pTime - minutes * 60;
+
+		string timerText;
+		if (minutes < 10) timerText += "0";
+		timerText += (std::to_string(minutes) + ":");
+		if (seconds < 10) timerText += "0";
+		timerText += std::to_string(seconds);
+		timer.text_.set_text(timerText.c_str());
 	}
 
 	void client_app::UpdateRemoteTanks(server_to_client_data pData) {
@@ -512,6 +543,10 @@ namespace tankett {
 				e->render(render_system_);
 			}
 		}
-		render_system_.render(text_, transform_);
+		render_system_.render(debugText_, debugTextTransform_);
+		renderUI(timer);
+	}
+	void client_app::renderUI(UIElement pUI) {
+		render_system_.render(pUI.text_, pUI.transform_);
 	}
 } // !tankett

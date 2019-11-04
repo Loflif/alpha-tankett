@@ -5,6 +5,8 @@
 
 #include <alpha.h>
 #include <tankett_shared.h>
+#include <iostream>
+#include <string>
 #include "tile.h"
 #include "tank.h"
 
@@ -33,6 +35,8 @@ namespace tankett {
 		bool send_payload(protocol_payload& pPayload);
 
 		void receive();
+		void initializeUI();
+		void SetUIElement(UIElement &element, const char* pText, int32 pSize, vector2 pPos, uint32 color = 0xffffffff);
 		void createTile(vector2 pos);
 		void createLevel();
 		tank* createTank(vector2 p_pos, uint8 pID, bool pIsLocal);
@@ -43,16 +47,18 @@ namespace tankett {
 		bool isCollisionPair(IEntity* pFirstEntity, IEntity* pSecondEntity);
 		void parsePayload(protocol_payload pPayload);
 		void parseServerMessage(message_server_to_client pMessage);
+		void SetTimer(float pTime);
 		void UpdateLocalTank(server_to_client_data pData);
 		void UpdateRemoteTanks(server_to_client_data pData);
 		void UpdateRemoteTank(server_to_client_data pData, uint8 pID);
 
 		void update(time dt);
 		void render();
+		void renderUI(UIElement pUI);
 
 		time current_;
-		text text_;
-		transform transform_;
+		text debugText_;
+		transform debugTextTransform_;
 
 		texture wallTexture_;
 		texture bulletTexture_;
@@ -82,8 +88,8 @@ namespace tankett {
 
 		dynamic_array<network_message_header*> messages_;
 		message_client_to_server currentMessage_;
-		//dynamic_array<network_message_header*>messages_;
 
+		UIElement timer;
 
 	};
 } // !tankett

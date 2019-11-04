@@ -11,6 +11,7 @@ namespace tankett {
 	static const float TILE_SIZE = 28;
 	static const float TANK_SIZE = 1.5f;
 	static const float BULLET_SIZE = 0.2f;
+	static const float ROUND_TIME = 90.0f;
 
 	enum ENTITY_TYPE {
 		TANK,
@@ -21,6 +22,11 @@ namespace tankett {
 	enum TILE_TYPE {
 		W,
 		E
+	};
+
+	struct UIElement {
+		text text_;
+		transform transform_;
 	};
 
 	static const TILE_TYPE LEVEL[33][44]{

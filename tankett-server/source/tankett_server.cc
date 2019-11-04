@@ -56,10 +56,30 @@ namespace tankett {
 			send(dt);
 		}
 	}
-
+#pragma region Update
 	void server::update(const time& dt) {
-
+		switch (state_) {
+		case tankett::ROUND_RUNNING: {
+			currentRoundTime_ -= dt.as_seconds();
+			if (currentRoundTime_ < 0) {
+				currentRoundTime_ = 0;
+				state_ = ROUND_END;
+			}
+		}
+			break;
+		case tankett::WAITING_FOR_PLAYER: {
+			if (connectedClientCount() >= 2) {
+				state_ = ROUND_RUNNING;
+			}
+		}
+			break;
+		case tankett::ROUND_END:
+			break;
+		default:
+			break;
+		}
 	}
+#pragma endregion
 
 #pragma region Receive
 	void server::receive(const time& dt) {
@@ -348,6 +368,8 @@ namespace tankett {
 		for (int i = 0; i < 4; i++) {
 			msg->client_data[i] = clientData[i];
 		}
+		msg->game_state = state_;
+		msg->round_time = currentRoundTime_;
 		msg->receiver_id = pClient.id_;
 		msg->type_ = NETWORK_MESSAGE_SERVER_TO_CLIENT;
 		pClient.messages_.push_back(msg);
