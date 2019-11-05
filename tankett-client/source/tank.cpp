@@ -26,7 +26,6 @@ namespace tankett {
 	}
 
 	void tank::update(keyboard kb, mouse ms, time dt) {
-		shootingCooldown_ -= dt.as_seconds();
 		previousPosition = transform_.position_;
 		if (isLocal_) {
 			UpdatePosition(kb, dt);

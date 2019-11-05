@@ -11,13 +11,15 @@ namespace tankett {
 		~entityManager();
 
 		void addEntity(IEntity& pEntity);
-		tank& getTank(int ID);
+		tank* getTank(int ID);
 		void setLocalTank(uint8 ID);
-		uint8 getLocalTank();
+		uint8 getLocalTankID();
 		void update(keyboard pKeyboard, mouse pMouse, time dt);
 		void render(render_system& pRenderSystem);
 		message_client_to_server* checkInput(keyboard pKeyboard, mouse pMouse);
 		
+		float shootingCooldown_ = 0.0f;
+
 		void manageCollisions();
 		void UpdateLocalTank(server_to_client_data pData);
 		void UpdateRemoteTank(server_to_client_data pData);

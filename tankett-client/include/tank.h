@@ -15,7 +15,6 @@ namespace tankett {
 		vector2 aimVector_;
 		transform transform_;
 
-		float shootingCooldown_ = 0.0f;
 		float turretRotation = 0.0f;
 
 		dynamic_array<bullet*> bullets_;

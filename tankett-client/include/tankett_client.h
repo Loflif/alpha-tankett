@@ -41,7 +41,7 @@ namespace tankett {
 		void parsePayload(protocol_payload pPayload);
 		void parseServerMessage(message_server_to_client pMessage);
 		void SetTimer(float pTime);
-
+		void SetCoolDownDisplay();
 		void renderUI(UIElement pUI);
 		time current_;
 		text debugText_;
@@ -68,6 +68,7 @@ namespace tankett {
 		//dynamic_array<network_message_header*>messages_;
 
 		UIElement timer_;
+		UIElement coolDown_;
 
 	};
 } // !tankett
