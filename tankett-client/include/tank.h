@@ -36,6 +36,8 @@ namespace tankett {
 		uint8 id_;
 
 	private:
+		void SetTurret(mouse ms);
+		void interpolateEntity(time dt);
 		vector2 targetMoveDirection(keyboard pKeyboard);
 		float targetRotation(keyboard pKeyboard);
 		float targetTurretRotation(mouse pMouse);

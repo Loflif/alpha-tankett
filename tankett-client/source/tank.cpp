@@ -27,18 +27,22 @@ namespace tankett {
 
 	void tank::update(keyboard kb, mouse ms, time dt) {
 		previousPosition = transform_.position_;
-		if (isLocal_) {
-			UpdatePosition(kb, dt);
-		}
-		else {
-			//Entity Interpolation:
-			SetPosition(vector2::Lerp(transform_.position_, lastReceivedPosition_, dt.as_seconds() / messageDeltaTime_.as_seconds()));
-		}
+		if (isLocal_)UpdatePosition(kb, dt);
+		else interpolateEntity(dt);
+
 		updateAimVector(ms);
 		//transform_.set_rotation(targetRotation(kb));
+		SetTurret(ms);
+		setColliderPosition();
+	}
+
+	void tank::SetTurret(mouse ms) {
 		turretTransform_.set_rotation(targetTurretRotation(ms));
 		turretTransform_.position_ = transform_.position_;
-		setColliderPosition();
+	}
+
+	void tank::interpolateEntity(time dt) {
+		SetPosition(vector2::Lerp(transform_.position_, lastReceivedPosition_, dt.as_seconds() / messageDeltaTime_.as_seconds()));
 	}
 
 	void tank::setColliderPosition() {
