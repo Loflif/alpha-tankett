@@ -17,7 +17,7 @@ namespace tankett {
 	static const int BULLET_MAX_COUNT = 10;
 	static const int COLLISION_PAIR_COUNT = 4;
 
-	static const vector2 spawnPoints[4]{
+	static const vector2 SPAWN_POINTS[4]{
 			vector2(4,4),
 			vector2(40,4),
 			vector2(4,29),

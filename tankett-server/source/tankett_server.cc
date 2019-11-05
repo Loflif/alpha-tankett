@@ -80,6 +80,16 @@ namespace tankett {
 		default:
 			break;
 		}
+		updateClientData();
+	}
+
+	void server::updateClientData() {
+		for (int i = 0; i < 4; i++) {
+			serverTank* t = entityManager_->getTank(i);
+			clientData[i].alive = t->isEnabled;
+			clientData[i].angle = t->transform_.rotation_;
+			clientData[i].position = t->transform_.position_;
+		}
 	}
 #pragma endregion
 
@@ -385,7 +395,8 @@ namespace tankett {
 			if (!clientData[i].connected) {
 				clientData[i].client_id = connectedClientCount() - 1;
 				clientData[i].connected = true;
-				clientData[i].position = spawnPoints[i];
+				clientData[i].position = SPAWN_POINTS[i];
+				entityManager_->spawnTank(i);
 				return;
 			}
 		}

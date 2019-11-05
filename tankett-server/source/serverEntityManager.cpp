@@ -29,8 +29,13 @@ namespace tankett {
 		entities_.push_back(&pEntity);
 	}
 
-	serverTank& serverEntityManager::getTank(int ID) {
-		return *tanks_[ID];
+	serverTank* serverEntityManager::getTank(int ID) {
+		return tanks_[ID];
+	}
+
+	void serverEntityManager::spawnTank(int id) {
+		tanks_[id]->isEnabled = true;
+		tanks_[id]->SetPosition(SPAWN_POINTS[id]);
 	}
 
 	void serverEntityManager::update(time dt) {
@@ -72,7 +77,7 @@ namespace tankett {
 
 	void serverEntityManager::createTankBuffer() {
 		for (int i = 0; i < 4; i++) {
-			serverTank* t = new serverTank(spawnPoints[i], (uint8)i);
+			serverTank* t = new serverTank(SPAWN_POINTS[i], (uint8)i);
 			entities_.push_back(t);
 			tanks_[i] = t;
 		}

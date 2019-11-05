@@ -38,7 +38,7 @@ namespace tankett {
 		for (int i = 0; i < 4; i++) {
 			sprite tankSprite(tankTexture_, vector2(TILE_SIZE * TANK_SIZE, TILE_SIZE * TANK_SIZE));
 			sprite turretSpr(turretTexture_, vector2(TILE_SIZE * TANK_SIZE, TILE_SIZE * TANK_SIZE));
-			tank* t = new tank(tankSprite, turretSpr, spawnPoints[i].x_, spawnPoints[i].y_, (uint8)i);
+			tank* t = new tank(tankSprite, turretSpr, SPAWN_POINTS[i].x_, SPAWN_POINTS[i].y_, (uint8)i);
 			entities_.push_back(t);
 			tanks_[i] = t;
 		}
