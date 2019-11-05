@@ -12,7 +12,13 @@ namespace tankett {
 	}
 
 	void serverEntityManager::parseClientMessage(message_client_to_server message, uint8 clientID, const time& pDeltaRecieveTime) {
-	
+		vector2 targetDirection = targetMoveDirection(message);
+		if (targetDirection.x_ != 0
+			&& targetDirection.y_ != 0) {
+			int i = 0;
+		}
+		float speed = 4 * pDeltaRecieveTime.as_seconds();
+		tanks_[clientID]->transform_.position_ += targetDirection * speed;
 	}
 
 	/*serverTile* serverEntityManager::createTile(vector2 pPosition) {
@@ -50,7 +56,15 @@ namespace tankett {
 	}
 
 	vector2 serverEntityManager::targetMoveDirection(message_client_to_server message) {
-		return vector2();
+		if (message.get_input(message_client_to_server::UP) && message.get_input(message_client_to_server::RIGHT)) return { 0.7071f ,-0.7071f };  //Normalised Diagonal Vector
+		if (message.get_input(message_client_to_server::UP) && message.get_input(message_client_to_server::LEFT)) return { -0.7071f ,-0.7071f };
+		if (message.get_input(message_client_to_server::DOWN) && message.get_input(message_client_to_server::LEFT)) return { -0.7071f ,0.7071f };
+		if (message.get_input(message_client_to_server::DOWN) && message.get_input(message_client_to_server::RIGHT)) return { 0.7071f ,0.7071f };
+		if (message.get_input(message_client_to_server::RIGHT))  return { 1.0f ,0 };
+		if (message.get_input(message_client_to_server::LEFT))  return { -1.0f,0 };
+		if (message.get_input(message_client_to_server::UP))	return { 0,-1.0f };
+		if (message.get_input(message_client_to_server::DOWN))	return { 0, 1.0f };
+		return { 0,0 };
 	}
 	
 	/*serverTank* serverEntityManager::createTank() {

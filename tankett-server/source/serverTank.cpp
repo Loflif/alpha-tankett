@@ -26,7 +26,8 @@ namespace tankett {
 		position_ = pNewPosition;
 		collider_.set_position(position_ - size_ / 2);
 	}
-}
+}
+
 
 
 
