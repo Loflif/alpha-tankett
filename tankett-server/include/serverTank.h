@@ -13,15 +13,15 @@ namespace tankett {
 		void Move(vector2 direction);
 
 		vector2 getAimVector();
-		
-		dynamic_array<vector2> bulletPositions_;
 
 		const float SPEED_ = 4.0f;
 		float turretRotation_ = 0.0f;
 		float shootingCooldown_ = 0.0f;
 		uint8 id_;
 		transform transform_;
+		dynamic_array<IServerEntity*> bullets_;
 	private:
+		void updateBulletList();
 		vector2 previousPosition_;
 	};
 }
