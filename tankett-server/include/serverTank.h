@@ -10,7 +10,6 @@ namespace tankett {
 
 		void onCollision(IServerEntity* collider) override;
 		void SetPosition(vector2 pNewPosition);
-		void Move(vector2 direction);
 
 		dynamic_array<vector2> bulletPositions_;
 
