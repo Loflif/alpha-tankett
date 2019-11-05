@@ -14,8 +14,16 @@ namespace tankett {
 	serverTank::~serverTank() {
 	}
 
+	void serverTank::update(time dt) {
+		//Set Collider Pos
+		vector2 targetPosition = transform_.position_ - size_ / 2;
+		collider_.set_position(targetPosition);
+	}
+
 	void serverTank::onCollision(IServerEntity* collider) {
-		
+		if (collider->type_ == WALL) {
+			transform_.position_ = previousPosition_;
+		}
 	}
 
 	void serverTank::SetPosition(vector2 pNewPosition) {

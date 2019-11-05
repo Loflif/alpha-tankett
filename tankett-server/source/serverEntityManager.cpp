@@ -18,7 +18,7 @@ namespace tankett {
 			int i = 0;
 		}
 		float speed = 4 * pDeltaRecieveTime.as_seconds();
-		tanks_[clientID]->transform_.position_ += targetDirection * speed;
+		tanks_[clientID]->SetPosition(tanks_[clientID]->transform_.position_ + targetDirection * speed);
 	}
 
 	/*serverTile* serverEntityManager::createTile(vector2 pPosition) {
@@ -71,9 +71,6 @@ namespace tankett {
 		if (message.get_input(message_client_to_server::DOWN))	return { 0, 1.0f };
 		return { 0,0 };
 	}
-	
-	/*serverTank* serverEntityManager::createTank() {
-	}*/
 
 	void serverEntityManager::createTankBuffer() {
 		for (int i = 0; i < 4; i++) {
@@ -98,6 +95,9 @@ namespace tankett {
 			for (int j = 0; j < entities_.size(); j++) {
 				if (isCollisionPair(entities_[i], entities_[j])) {
 					if ((j != i) && (checkCollision(entities_[i], entities_[j]))) {
+						if (entities_[i]->type_ == TANK || entities_[j]->type_ == TANK) {
+							int x = 0;
+						}
 						if (entities_[i]->isEnabled && entities_[j]->isEnabled) {
 							entities_[i]->onCollision(entities_[j]);
 							entities_[j]->onCollision(entities_[i]);

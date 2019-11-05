@@ -6,7 +6,7 @@ namespace tankett {
 	public:
 		serverTank(vector2 pSpawnPos, uint8 ID);
 		~serverTank();
-		void update(time dt) {};
+		void update(time dt);
 
 		void onCollision(IServerEntity* collider) override;
 		void SetPosition(vector2 pNewPosition);

@@ -8,6 +8,7 @@ namespace tankett {
 		size_ = { 1.0f, 1.0f };
 		collider_ = rectangle(0, 0, size_.x_, size_.y_);
 		collider_.set_position(transform_.position_ - size_ / 2);
+		isEnabled = true;
 	}
 
 	serverTile::~serverTile() {

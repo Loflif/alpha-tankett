@@ -80,6 +80,8 @@ namespace tankett {
 		default:
 			break;
 		}
+		entityManager_->update(dt);
+		entityManager_->manageCollisions();
 		updateClientData();
 	}
 
