@@ -33,6 +33,7 @@ namespace tankett {
 
 		uint8 localTankID_ = 255;
 		tank* tanks_[4];
+		tank* playerTank_;
 		bullet* bullets_[10];
 		dynamic_array<IEntity*> entities_;
 		const std::pair<ENTITY_TYPE, ENTITY_TYPE> collisionPairs_[COLLISION_PAIR_COUNT] {

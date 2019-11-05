@@ -15,7 +15,6 @@ namespace tankett {
 		vector2 aimVector_;
 		transform transform_;
 
-		const float FIRE_RATE_ = 1.0f;
 		float shootingCooldown_ = 0.0f;
 		float turretRotation = 0.0f;
 
@@ -44,7 +43,7 @@ namespace tankett {
 		void setColliderPosition();
 		void preventCollision();
 		bool ownsBullet(IEntity* pBullet);
-		vector2 getAimVector(mouse pMouse);
+		void updateAimVector(mouse pMouse);
 
 		const float SPEED_ = 4.0f;
 		vector2 size_ = { 0,0 };

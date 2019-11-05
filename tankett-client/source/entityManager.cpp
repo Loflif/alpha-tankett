@@ -146,7 +146,8 @@ namespace tankett {
 				vector2 tPos = t->transform_.position_;
 				b->fire(tPos.x_, tPos.y_, t->aimVector_);
 				t->bullets_.push_back(b);
-				t->shootingCooldown_ = t->FIRE_RATE_;
+				entities_.push_back(b);
+				t->shootingCooldown_ = FIRE_RATE;
 				break;
 			}
 		}
@@ -186,7 +187,7 @@ namespace tankett {
 		bool up = false;
 		if (pMouse.is_pressed(MOUSE_BUTTON_LEFT)) {
 			shoot = true;
-			//fireBullet(playerTank_);
+			fireBullet(tanks_[localTankID_]);
 		}
 		if (pKeyboard.is_down(KEYCODE_D)) {
 			right = true;

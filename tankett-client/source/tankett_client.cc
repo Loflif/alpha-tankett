@@ -109,6 +109,9 @@ namespace tankett {
 	void client_app::renderUI(UIElement pUI) {
 		render_system_.render(pUI.text_, pUI.transform_);
 	}
+#pragma endregion
+
+#pragma region send
 
 	void client_app::send(time dt) {
 		send_accumulator += dt;
