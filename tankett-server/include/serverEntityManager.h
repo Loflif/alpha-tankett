@@ -26,6 +26,8 @@ namespace tankett {
 
 		bool checkCollision(IServerEntity* firstEntity, IServerEntity* secondEntity);
 		bool isCollisionPair(IServerEntity* pFirstEntity, IServerEntity* pSecondEntity);
+
+		void fireBullet(serverTank* t);
 		
 		serverTank* tanks_[4];
 		serverBullet* bullets_[BULLET_MAX_COUNT * 4];

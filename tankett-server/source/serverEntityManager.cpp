@@ -140,5 +140,20 @@ namespace tankett {
 		}
 		return false;
 	}
+
+	void serverEntityManager::fireBullet(serverTank* t) {
+		if (t->shootingCooldown_ > 0)
+			return;
+		for(serverBullet* b : bullets_) {
+			if(!b->isEnabled) {
+				vector2 tPos = t->transform_.position_;
+				b->fire(tPos, t->getAimVector());
+				t->bulletPositions_.push_back(b->position_);
+				entities_.push_back(b);
+				t->shootingCooldown_ = FIRE_RATE;
+				break;
+			}
+		}
+	}
 #pragma endregion
 }
