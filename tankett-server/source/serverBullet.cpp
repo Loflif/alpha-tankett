@@ -27,9 +27,10 @@ namespace tankett {
 		collider_.set_position(transform_.position_ - size_ / 2);
 	}
 
-	void serverBullet::fire(vector2 pSpawnPos, vector2 pDirection) {
+	void serverBullet::fire(vector2 pSpawnPos, vector2 pDirection, uint8 pID) {
 		SetPosition(pSpawnPos);
 		direction_ = pDirection;
+		id_ = pID;
 		isEnabled = true;
 	}
 	
