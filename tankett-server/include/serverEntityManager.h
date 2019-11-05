@@ -14,6 +14,7 @@ namespace tankett {
 		serverTank& getTank(int ID);
 
 		void update(time dt);
+		void parseClientMessage(message_client_to_server message,uint8 clientID, const time& pDeltaRecieveTime);
 		
 		void manageCollisions();
 		void UpdateTank(uint8 pTankID);
@@ -21,6 +22,7 @@ namespace tankett {
 		void createLevel();
 		void createTankBuffer();
 		void createBulletBuffer();
+		vector2 targetMoveDirection(message_client_to_server message);
 
 		bool checkCollision(IServerEntity* firstEntity, IServerEntity* secondEntity);
 		bool isCollisionPair(IServerEntity* pFirstEntity, IServerEntity* pSecondEntity);

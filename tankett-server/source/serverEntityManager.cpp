@@ -11,6 +11,14 @@ namespace tankett {
 	serverEntityManager::~serverEntityManager() {
 	}
 
+	void serverEntityManager::parseClientMessage(message_client_to_server message, uint8 clientID, const time& pDeltaRecieveTime) {
+	
+	}
+
+	/*serverTile* serverEntityManager::createTile(vector2 pPosition) {
+		return new serverTile;
+	}*/
+	
 	void serverEntityManager::addEntity(IServerEntity& pEntity) {
 		entities_.push_back(&pEntity);
 	}
@@ -40,6 +48,13 @@ namespace tankett {
 			}
 		}
 	}
+
+	vector2 serverEntityManager::targetMoveDirection(message_client_to_server message) {
+		return vector2();
+	}
+	
+	/*serverTank* serverEntityManager::createTank() {
+	}*/
 
 	void serverEntityManager::createTankBuffer() {
 		for (int i = 0; i < 4; i++) {

@@ -54,8 +54,6 @@ namespace tankett {
 		void processDisconnect(ip_address remote, protocol_payload& msg);
 		void queueMessage(client& pClient);
 
-		void parseClientMessage(message_client_to_server message, client& pClient, const time& pDeltaRecieveTime);
-		vector2 targetMoveDirection(message_client_to_server message);
 
 		void challengeClient(client& client);
 
