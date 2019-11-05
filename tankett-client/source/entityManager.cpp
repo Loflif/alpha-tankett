@@ -116,27 +116,50 @@ namespace tankett {
 	
 	
 	void entityManager::UpdateLocalTank(server_to_client_data pData) {
-		dynamic_array<vector2> bulletPos;
-		for (bullet_data b : pData.bullets) {
-			bulletPos.push_back(b.position * TILE_SIZE);
+
+		//TODO: UPDATE BULLET POSITIONS
+		for (int i = 0; i < pData.bullet_count; i++) {
+			if (tanks_[localTankID_]->hasBulletWithID(pData.bullets[i].id)) {
+				tanks_[localTankID_]->getBulletWithID(pData.bullets[i].id)->transform_.set_position(pData.bullets[i].position * TILE_SIZE);
+			}
+			else {
+				for (bullet* b : bullets_) {
+					if (!b->isEnabled) {
+						vector2 tPos = tanks_[localTankID_]->transform_.position_;
+						b->fire(tPos.x_, tPos.y_, tanks_[localTankID_]->aimVector_, tanks_[localTankID_]->getUnusedBulletID());
+						tanks_[localTankID_]->bullets_.push_back(b);
+						break;
+					}
+				}
+			}
 		}
 
 		tanks_[localTankID_]->UpdateValues(pData.alive,
-								  pData.position * TILE_SIZE,
-								  pData.angle,
-								  bulletPos);
+								           pData.position * TILE_SIZE,
+								           pData.angle);
 	}
 
 	void entityManager::UpdateRemoteTank(server_to_client_data pData) {
-		dynamic_array<vector2> bulletPos;
-		for (bullet_data b : pData.bullets) {
-			bulletPos.push_back(b.position * TILE_SIZE);
+		//TODO: UPDATE BULLET POSITIONS
+		for (int i = 0; i < pData.bullet_count; i++) {
+			if (tanks_[pData.client_id]->hasBulletWithID(pData.bullets[i].id)) {
+				tanks_[pData.client_id]->getBulletWithID(pData.bullets[i].id)->transform_.set_position(pData.bullets[i].position * TILE_SIZE);
+			}
+			else {
+				for (bullet* b : bullets_) {
+					if (!b->isEnabled) {
+						vector2 tPos = tanks_[pData.client_id]->transform_.position_;
+						b->fire(tPos.x_, tPos.y_, tanks_[pData.client_id]->aimVector_, tanks_[pData.client_id]->getUnusedBulletID());
+						tanks_[pData.client_id]->bullets_.push_back(b);
+						break;
+					}
+				}
+			}
 		}
 
 		tanks_[pData.client_id]->UpdateValues(pData.alive,
-										pData.position * TILE_SIZE,
-										pData.angle,
-										bulletPos);
+										      pData.position * TILE_SIZE,
+										      pData.angle);
 	}
 #pragma endregion
 	void entityManager::fireBullet(tank* t) {

@@ -22,8 +22,7 @@ namespace tankett {
 		//Client-specific (keep these when refactoring later):
 		void UpdateValues(bool pAlive,
 						  vector2 pPos,
-						  float pAngle,
-						  dynamic_array<vector2> bullets);
+						  float pAngle);
 		void SetPosition(vector2 pPos);
 		void SetAngle(float pAngle);
 		void SetActive(bool pIsActive);
@@ -35,6 +34,7 @@ namespace tankett {
 
 		int getUnusedBulletID();
 		bool hasBulletWithID(uint8 pID);
+		bullet* getBulletWithID(uint8 pID);
 
 	private:
 		void SetTurret(mouse ms);

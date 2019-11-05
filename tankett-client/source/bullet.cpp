@@ -15,8 +15,8 @@ namespace tankett {
 	}
 
 	void bullet::update(keyboard kb, mouse ms, time dt) {
-		transform_.position_.x_ += direction_.x_ * SPEED_ * TILE_SIZE * dt.as_seconds();
-		transform_.position_.y_ += direction_.y_ * SPEED_ * TILE_SIZE * dt.as_seconds();
+		/*transform_.position_.x_ += direction_.x_ * SPEED_ * TILE_SIZE * dt.as_seconds();
+		transform_.position_.y_ += direction_.y_ * SPEED_ * TILE_SIZE * dt.as_seconds();*/
 		collider_.set_position(transform_.position_);
 	}
 

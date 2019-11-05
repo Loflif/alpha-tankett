@@ -13,10 +13,10 @@ namespace tankett {
 		void onCollision(IEntity* collider);
 
 		int id_;
+		transform transform_;
 	private:		
 		vector2 size_ = { 0,0 };
-		sprite sprite_;
-		transform transform_;
+		sprite sprite_;		
 		vector2 direction_;
 		const float SPEED_ = 8.0f;
 	};

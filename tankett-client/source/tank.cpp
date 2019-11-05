@@ -53,6 +53,13 @@ namespace tankett {
 		return false;
 	}
 
+	bullet* tank::getBulletWithID(uint8 pID) {
+		for (bullet* b : bullets_) {
+			if (b->id_ == pID) return b;
+		}
+		return nullptr;
+	}
+
 	void tank::SetTurret(mouse ms) {
 		turretTransform_.set_rotation(targetTurretRotation(ms));
 		turretTransform_.position_ = transform_.position_;
@@ -167,8 +174,7 @@ namespace tankett {
 
 	void tank::UpdateValues(bool pAlive,
 							vector2 pPos, 
-							float pAngle,
-							dynamic_array<vector2> bullets){
+							float pAngle){
 		SetAngle(pAngle);
 		SetActive(pAlive);
 		
