@@ -20,6 +20,8 @@ namespace tankett {
 		//Set Collider Pos
 		vector2 targetPosition = transform_.position_ - size_ / 2;
 		collider_.set_position(targetPosition);
+
+		updateBulletList();
 	}
 
 
@@ -27,6 +29,16 @@ namespace tankett {
 		float theta = turretRotation_ * PI / 180;
 		return vector2(cos(theta), sin(theta));
 
+	}
+
+	void serverTank::updateBulletList() {
+		dynamic_array<IServerEntity*> newBullets;
+		for (int i = 0; i < bullets_.size(); i++) {
+			if (bullets_[i]->isEnabled) {
+				newBullets.push_back(bullets_[i]);
+			}
+		}
+		bullets_ = newBullets;
 	}
 
 	void serverTank::onCollision(IServerEntity* collider) {
