@@ -4,7 +4,7 @@
 namespace tankett {
 	class serverTank : public IServerEntity {
 	public:
-		serverTank(vector2 pSpawnPos);
+		serverTank(vector2 pSpawnPos, uint8 ID);
 		~serverTank();
 
 		void onCollision(IServerEntity* collider) override;
@@ -15,6 +15,7 @@ namespace tankett {
 
 		const float SPEED_ = 4.0f;
 		float turretRotation_ = 0.0f;
+		uint8 id_;
 	private:
 		transform transform_;
 		vector2 previousPosition_;

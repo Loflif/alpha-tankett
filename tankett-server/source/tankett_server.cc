@@ -5,7 +5,8 @@
 
 namespace tankett {
 	server::server()
-		: running_(false) {
+		: running_(false)
+		, entityManager_(new serverEntityManager()) {
 
 		key = crypt::generator::random_key();
 	}
@@ -39,6 +40,7 @@ namespace tankett {
 	}
 
 	void server::shut() {
+		delete(entityManager_);
 		network_shut();
 	}
 

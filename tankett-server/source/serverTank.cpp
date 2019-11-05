@@ -1,12 +1,13 @@
 #include "serverTank.h"
 
 namespace tankett {
-	serverTank::serverTank(vector2 pSpawnPos) {
+	serverTank::serverTank(vector2 pSpawnPos, uint8 ID) {
 		position_ = pSpawnPos;
 		type_ = TANK;
 		size_ = { tankett::TANK_SIZE, tankett::TANK_SIZE };
 		collider_ = rectangle(0, 0, size_.x_, size_.y_);
 		collider_.set_position(position_ - size_ / 2);
+		id_ = ID;
 	}
 
 

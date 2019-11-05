@@ -8,9 +8,6 @@
 
 #include <alpha.h>
 #include <tankett_shared.h>
-#include "serverTank.h"
-#include "serverBullet.h"
-#include "serverTile.h"
 #include "serverEntityManager.h"
 
 using namespace alpha;
@@ -36,7 +33,6 @@ namespace tankett {
 		uint32 latest_received_sequence_{};
 		time latest_receive_time_;
 		dynamic_array<network_message_header*> messages_;
-		serverTank* tank_;
 	};
 
 	struct server {
@@ -69,6 +65,7 @@ namespace tankett {
 
 		server_to_client_data clientData[4];
 
+		serverEntityManager* entityManager_;
 		bool running_;
 		time send_accumulator_;
 		ip_address local_;

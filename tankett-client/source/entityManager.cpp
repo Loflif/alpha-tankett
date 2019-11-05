@@ -9,8 +9,8 @@ namespace tankett {
 		bulletTexture_.create_from_file("assets/bullet.png");
 
 		createLevel();
-		createTankBuffer();
 		createBulletBuffer();
+		createTankBuffer();
 	}
 
 	entityManager::~entityManager() {
