@@ -10,7 +10,6 @@ namespace tankett {
 
 		void onCollision(IServerEntity* collider) override;
 		void SetPosition(vector2 pNewPosition);
-		void update(time dt) override;
 		void Move(vector2 direction);
 
 		vector2 getAimVector();

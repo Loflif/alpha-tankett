@@ -17,7 +17,7 @@ namespace tankett {
 	
 
 	void serverBullet::update(time dt) {
-		vector2 newPosition = { position_.x_ += direction_.x_ * SPEED_ * dt.as_seconds(),position_.y_ += direction_.y_ * SPEED_ * dt.as_seconds() };
+		vector2 newPosition = { transform_.position_.x_ += direction_.x_ * SPEED_ * dt.as_seconds(),transform_.position_.y_ += direction_.y_ * SPEED_ * dt.as_seconds() };
 		SetPosition(newPosition);
 		
 	}

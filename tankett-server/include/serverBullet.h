@@ -6,10 +6,9 @@ namespace tankett {
 	public:
 		serverBullet();
 		~serverBullet();
-		void update(time dt) {};
+		void update(time dt);
 
 		void onCollision(IServerEntity* collider) override;
-		void update(time dt) override;
 		void SetPosition(vector2 pNewPosition);
 
 		void fire(vector2 pSpawnPos, vector2 pDirection);
