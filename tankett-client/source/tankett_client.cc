@@ -55,6 +55,7 @@ namespace tankett {
 
 	void client_app::initializeUI() {
 		SetUIElement(timer_, "00:00", 2, vector2(40 * TILE_SIZE, 32.2f * TILE_SIZE));
+		SetUIElement(coolDown_, "", 1, vector2(4 * TILE_SIZE, 4.5f * TILE_SIZE));
 	}
 
 	void client_app::SetUIElement(UIElement& element, const char* pText, int32 pSize, vector2 pPos, uint32 pColor) {
@@ -95,20 +96,39 @@ namespace tankett {
 			entityManager_->update(keyboard_, mouse_, dt);
 			messages_.push_back(entityManager_->checkInput(keyboard_, mouse_));
 			entityManager_->manageCollisions();
+			SetCoolDownDisplay();
 		}
+
+		
+
 		render();
 
 		return true;
 	}
 
+	void client_app::SetCoolDownDisplay() {
+		string text;
+		int coolDown = (int)(entityManager_->shootingCooldown_ *10);
+		if (coolDown < 0) text = "";
+		else text = std::to_string(coolDown);
+		vector2 targetPosition = entityManager_->getTank(entityManager_->getLocalTankID())->transform_.position_;
+		targetPosition += vector2(0 * TILE_SIZE, -1.7f * TILE_SIZE);
+		coolDown_.transform_.set_position(targetPosition);
+		coolDown_.text_.set_text(text.c_str());
+	}
+
 	void client_app::render() {
 		entityManager_->render(render_system_);
 		renderUI(timer_);
+		renderUI(coolDown_);
 	}
 
 	void client_app::renderUI(UIElement pUI) {
 		render_system_.render(pUI.text_, pUI.transform_);
 	}
+#pragma endregion
+
+#pragma region send
 
 	void client_app::send(time dt) {
 		send_accumulator += dt;
@@ -324,7 +344,7 @@ namespace tankett {
 		SetTimer(pMessage.round_time);
 		for (int i = 0; i < pMessage.client_count; i++) {
 			if (i == pMessage.receiver_id) {
-				if (entityManager_->getLocalTank() == 255)
+				if (entityManager_->getLocalTankID() == 255)
 					entityManager_->setLocalTank(pMessage.receiver_id);
 				entityManager_->UpdateLocalTank(pMessage.client_data[i]);
 			}

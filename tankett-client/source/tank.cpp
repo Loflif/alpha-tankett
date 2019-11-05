@@ -27,22 +27,22 @@ namespace tankett {
 
 	void tank::update(keyboard kb, mouse ms, time dt) {
 		previousPosition = transform_.position_;
-		if (isLocal_) {
-			UpdatePosition(kb, dt);
-		}
-		else {
-			//Entity Interpolation:
-			SetPosition(vector2::Lerp(transform_.position_, lastReceivedPosition_, dt.as_seconds() / messageDeltaTime_.as_seconds()));
-		}
-		//shootingCooldown_ -= dt.as_seconds();
-		//vector2 direction = targetMoveDirection(kb);
-		//transform_.set_rotation(targetRotation(kb));
-		//turretTransform_.set_rotation(targetTurretRotation(ms));
+		if (isLocal_)UpdatePosition(kb, dt);
+		else interpolateEntity(dt);
 
-		///*transform_.position_.x_ += direction.x_ * SPEED_ * TILE_SIZE * dt.as_seconds();
-		//transform_.position_.y_ += direction.y_ * SPEED_ * TILE_SIZE * dt.as_seconds();*/
-		//turretTransform_.position_ = transform_.position_;
-		//setColliderPosition();
+		updateAimVector(ms);
+		//transform_.set_rotation(targetRotation(kb));
+		SetTurret(ms);
+		setColliderPosition();
+	}
+
+	void tank::SetTurret(mouse ms) {
+		turretTransform_.set_rotation(targetTurretRotation(ms));
+		turretTransform_.position_ = transform_.position_;
+	}
+
+	void tank::interpolateEntity(time dt) {
+		SetPosition(vector2::Lerp(transform_.position_, lastReceivedPosition_, dt.as_seconds() / messageDeltaTime_.as_seconds()));
 	}
 
 	void tank::setColliderPosition() {
@@ -113,15 +113,14 @@ namespace tankett {
 	}
 
 	float tank::targetTurretRotation(mouse ms) {
-		vector2 aimVector = getAimVector(ms);
+		vector2 aimVector = aimVector_;
 		turretRotation = atan2(aimVector.y_, aimVector.x_) * (180 / PI);
 		return turretRotation;
 	}
 
-	vector2 tank::getAimVector(mouse ms) {
+	void tank::updateAimVector(mouse ms) {
 		vector2 mousePosition((float)ms.x_, (float)ms.y_);
 		aimVector_ = vector2(mousePosition - turretTransform_.position_).normalized();
-		return aimVector_;
 	}
 
 	void tank::preventCollision() {

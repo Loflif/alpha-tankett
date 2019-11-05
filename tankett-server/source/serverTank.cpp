@@ -19,7 +19,7 @@ namespace tankett {
 	}
 
 	void serverTank::onCollision(IServerEntity* collider) {
-
+		
 	}
 
 	void serverTank::SetPosition(vector2 pNewPosition) {

@@ -105,6 +105,7 @@ namespace tankett {
 	
 #pragma region Update
 	void entityManager::update(keyboard pKeyboard, mouse pMouse, time dt) {
+		shootingCooldown_ -= dt.as_seconds();
 		for (IEntity* e : entities_) {
 			if (e->isEnabled) {
 				e->update(pKeyboard, pMouse, dt);
@@ -139,14 +140,15 @@ namespace tankett {
 	}
 #pragma endregion
 	void entityManager::fireBullet(tank* t) {
-		if (t->shootingCooldown_ > 0)
+		if (shootingCooldown_ > 0)
 			return;
 		for (bullet* b : bullets_) {
 			if (!b->isEnabled) {
 				vector2 tPos = t->transform_.position_;
 				b->fire(tPos.x_, tPos.y_, t->aimVector_);
 				t->bullets_.push_back(b);
-				t->shootingCooldown_ = t->FIRE_RATE_;
+				entities_.push_back(b);
+				shootingCooldown_ = FIRE_RATE;
 				break;
 			}
 		}
@@ -155,8 +157,8 @@ namespace tankett {
 		entities_.push_back(&pEntity);
 	}
 
-	tank& entityManager::getTank(int ID) {
-		return *tanks_[ID];
+	tank* entityManager::getTank(int ID) {
+		return tanks_[ID];
 	}
 
 	void entityManager::setLocalTank(uint8 ID) {
@@ -164,7 +166,7 @@ namespace tankett {
 		localTankID_ = ID;
 	}
 
-	uint8 entityManager::getLocalTank() {
+	uint8 entityManager::getLocalTankID() {
 		return localTankID_;
 	}
 
@@ -186,7 +188,7 @@ namespace tankett {
 		bool up = false;
 		if (pMouse.is_pressed(MOUSE_BUTTON_LEFT)) {
 			shoot = true;
-			//fireBullet(playerTank_);
+			fireBullet(tanks_[localTankID_]);
 		}
 		if (pKeyboard.is_down(KEYCODE_D)) {
 			right = true;
