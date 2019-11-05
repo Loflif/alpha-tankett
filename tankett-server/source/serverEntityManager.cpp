@@ -12,6 +12,9 @@ namespace tankett {
 	}
 
 	void serverEntityManager::parseClientMessage(message_client_to_server message, uint8 clientID, const time& pDeltaRecieveTime) {
+		if (message.get_input(message_client_to_server::SHOOT)) {
+			fireBullet(tanks_[clientID]);
+		}
 		vector2 targetDirection = targetMoveDirection(message);
 		if (targetDirection.x_ != 0
 			&& targetDirection.y_ != 0) {
