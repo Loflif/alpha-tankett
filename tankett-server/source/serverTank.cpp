@@ -18,6 +18,11 @@ namespace tankett {
 		previousPosition_ = transform_.position_;
 	}
 
+	vector2 serverTank::getAimVector() {
+		float theta = turretRotation_ * PI / 180;
+		return vector2(cos(theta), sin(theta));
+	}
+
 	void serverTank::onCollision(IServerEntity* collider) {
 		
 	}
@@ -26,7 +31,8 @@ namespace tankett {
 		position_ = pNewPosition;
 		collider_.set_position(position_ - size_ / 2);
 	}
-}
 
-
-
+	void serverTank::update(time dt) {
+		shootingCooldown_ -= dt.as_seconds();
+	}
+}
