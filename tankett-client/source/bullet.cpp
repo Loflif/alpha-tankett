@@ -7,6 +7,7 @@ namespace tankett {
 		collider_ = rectangle(0, 0, size_.x_, size_.y_);
 		isEnabled = false;
 		type_ = BULLET;
+		id_ = -1;
 	}
 
 	bullet::~bullet() {
@@ -23,17 +24,19 @@ namespace tankett {
 		pRenderSystem.render(sprite_, transform_);
 	}
 
-	void bullet::fire(float pPosX, float pPosY, vector2 pDirection) {
+	void bullet::fire(float pPosX, float pPosY, vector2 pDirection, int pID) {
 		transform_.position_.x_ = pPosX;
 		transform_.position_.y_ = pPosY;
 		collider_.set_position(transform_.position_);
-		direction_ = pDirection;
+		direction_ = pDirection.normalized();
 		isEnabled = true;
+		id_ = pID;
 	}
 
 	void bullet::onCollision(IEntity* collider) {
 		if (collider->type_ == WALL) {
 			isEnabled = false;
+			id_ = -1;
 		}
 	}
 }

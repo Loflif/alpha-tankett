@@ -34,6 +34,23 @@ namespace tankett {
 		//transform_.set_rotation(targetRotation(kb));
 		SetTurret(ms);
 		setColliderPosition();
+		updateBulletList();
+	}
+
+
+
+	int tank::getUnusedBulletID() {
+		for (uint8 i = 0; i < 10; i++) {
+			if (!hasBulletWithID(i)) return i;
+		}
+		return -1;
+	}
+
+	bool tank::hasBulletWithID(uint8 pID) {
+		for (bullet* b : bullets_) {
+			if (b->id_ == pID) return true;
+		}
+		return false;
 	}
 
 	void tank::SetTurret(mouse ms) {
@@ -48,6 +65,16 @@ namespace tankett {
 	void tank::setColliderPosition() {
 		vector2 targetPosition = transform_.position_ - size_ / 2;
 		collider_.set_position(targetPosition);
+	}
+
+	void tank::updateBulletList() {
+		dynamic_array<bullet*> newBullets;
+		for (int i = 0; i < bullets_.size(); i++) {
+			if (bullets_[i]->isEnabled) {
+				newBullets.push_back(bullets_[i]);
+			}
+		}
+		bullets_ = newBullets;
 	}
 
 	void tank::onCollision(IEntity* collider) {

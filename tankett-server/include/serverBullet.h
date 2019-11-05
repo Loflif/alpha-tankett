@@ -11,7 +11,8 @@ namespace tankett {
 		void onCollision(IServerEntity* collider) override;
 		void SetPosition(vector2 pNewPosition);
 
-		void fire(vector2 pSpawnPos, vector2 pDirection);
+		void fire(vector2 pSpawnPos, vector2 pDirection, int pID);
+		int id_;
 	private:
 		vector2 direction_;
 		const float SPEED_ = 8.0f;

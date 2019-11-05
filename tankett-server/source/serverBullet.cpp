@@ -9,6 +9,7 @@ namespace tankett {
 		collider_ = rectangle(0, 0, size_.x_, size_.y_);
 		collider_.set_position(transform_.position_ - size_ / 2);
 		isEnabled = false;
+		id_ = -1;
 	}
 
 	serverBullet::~serverBullet() {
@@ -17,7 +18,10 @@ namespace tankett {
 	
 
 	void serverBullet::update(time dt) {
-		vector2 newPosition = { transform_.position_.x_ += direction_.x_ * SPEED_ * dt.as_seconds(),transform_.position_.y_ += direction_.y_ * SPEED_ * dt.as_seconds() };
+		vector2 newPosition = { 
+			transform_.position_.x_ + direction_.x_ * SPEED_ * dt.as_seconds(),
+			transform_.position_.y_ + direction_.y_ * SPEED_ * dt.as_seconds() 
+		};
 		SetPosition(newPosition);
 		
 	}
@@ -27,15 +31,17 @@ namespace tankett {
 		collider_.set_position(transform_.position_ - size_ / 2);
 	}
 
-	void serverBullet::fire(vector2 pSpawnPos, vector2 pDirection) {
+	void serverBullet::fire(vector2 pSpawnPos, vector2 pDirection, int pID) {
 		SetPosition(pSpawnPos);
-		direction_ = pDirection;
+		direction_ = pDirection.normalized();
 		isEnabled = true;
+		id_ = pID;
 	}
 	
 	void serverBullet::onCollision(IServerEntity* collider) {
 		if (collider->type_ == WALL) {
 			isEnabled = false;
+			id_ = -1;
 		}
 	}
 }

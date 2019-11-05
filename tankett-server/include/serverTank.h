@@ -1,5 +1,6 @@
 #pragma once
 #include "IServerEntity.h"
+#include "serverBullet.h"
 
 namespace tankett {
 	class serverTank : public IServerEntity {
@@ -10,17 +11,18 @@ namespace tankett {
 
 		void onCollision(IServerEntity* collider) override;
 		void SetPosition(vector2 pNewPosition);
-		void Move(vector2 direction);
 
 		vector2 getAimVector();
 
 		const float SPEED_ = 4.0f;
 		float turretRotation_ = 0.0f;
 		float shootingCooldown_ = 0.0f;
-		uint8 id_;
+		int id_;
 		transform transform_;
-		dynamic_array<IServerEntity*> bullets_;
+		dynamic_array<serverBullet*> bullets_;
+		int getUnusedBulletID();
 	private:
+		bool hasBulletWithID(uint8 pID);
 		void updateBulletList();
 		vector2 previousPosition_;
 	};

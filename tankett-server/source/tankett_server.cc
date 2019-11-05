@@ -92,11 +92,11 @@ namespace tankett {
 			clientData[i].angle = t->transform_.rotation_;
 			clientData[i].position = t->transform_.position_;
 			dynamic_array<bullet_data> bulletdata;
-			for (IServerEntity* b : t->bullets_) {
+			for (serverBullet* b : t->bullets_) {
 				if (b->isEnabled) {
 					bullet_data bd;
 					bd.position = b->transform_.position_;
-					//bd.id = b.ID  //TODO: Send Id here
+					bd.id = (uint8)b->id_;
 					bulletdata.push_back(bd);
 				}
 			}

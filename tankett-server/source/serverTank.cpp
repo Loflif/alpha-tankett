@@ -32,13 +32,27 @@ namespace tankett {
 	}
 
 	void serverTank::updateBulletList() {
-		dynamic_array<IServerEntity*> newBullets;
+		dynamic_array<serverBullet*> newBullets;
 		for (int i = 0; i < bullets_.size(); i++) {
 			if (bullets_[i]->isEnabled) {
 				newBullets.push_back(bullets_[i]);
 			}
 		}
 		bullets_ = newBullets;
+	}
+
+	int serverTank::getUnusedBulletID() {
+		for (uint8 i = 0; i < 10; i++) {
+			if (!hasBulletWithID(i)) return i;
+		}
+		return -1;
+	}
+
+	bool serverTank::hasBulletWithID(uint8 pID) {
+		for (serverBullet* b : bullets_) {
+			if (b->id_ == pID) return true;
+		}
+		return false;
 	}
 
 	void serverTank::onCollision(IServerEntity* collider) {

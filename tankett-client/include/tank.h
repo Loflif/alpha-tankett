@@ -31,9 +31,10 @@ namespace tankett {
 		void SetLocal(bool pIsLocal);
 		//Also keep Constructor/Destructor, Render and Update, and only set aimvector when local
 
-		dynamic_array<vector2> bulletPositions_;
-
 		uint8 id_;
+
+		int getUnusedBulletID();
+		bool hasBulletWithID(uint8 pID);
 
 	private:
 		void SetTurret(mouse ms);
@@ -45,6 +46,7 @@ namespace tankett {
 		void preventCollision();
 		bool ownsBullet(IEntity* pBullet);
 		void updateAimVector(mouse pMouse);
+		void updateBulletList();
 
 		const float SPEED_ = 4.0f;
 		vector2 size_ = { 0,0 };

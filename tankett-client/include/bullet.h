@@ -9,10 +9,11 @@ namespace tankett {
 
 		void update(keyboard kb, mouse ms, time dt);
 		void render(render_system& pRenderSystem);
-		void fire(float pPosX, float pPosY, vector2 pDirection);
+		void fire(float pPosX, float pPosY, vector2 pDirection, int pID);
 		void onCollision(IEntity* collider);
 
-	private:
+		int id_;
+	private:		
 		vector2 size_ = { 0,0 };
 		sprite sprite_;
 		transform transform_;
