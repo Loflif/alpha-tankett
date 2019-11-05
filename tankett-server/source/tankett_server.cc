@@ -232,7 +232,7 @@ namespace tankett {
 			int i = 0;
 		}
 		float speed = 4 * pDeltaRecieveTime.as_seconds();
-		clientData[pClient.id_].position += targetDirection * speed;
+		clientData[pClient.id_].position += targetDirection * speed; //HOW DO I GET THE TANK?
 	}
 
 	vector2 server::targetMoveDirection(message_client_to_server message) {

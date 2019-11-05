@@ -13,6 +13,10 @@ namespace tankett {
 	serverTank::~serverTank() {
 	}
 
+	void serverTank::Move(vector2 direction) {
+		previousPosition_ = transform_.position_;
+	}
+
 	void serverTank::onCollision(IServerEntity* collider) {
 
 	}
@@ -21,5 +25,7 @@ namespace tankett {
 		position_ = pNewPosition;
 		collider_.set_position(position_ - size_ / 2);
 	}
-}
+}
+
+
 
