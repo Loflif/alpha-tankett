@@ -48,14 +48,14 @@ namespace tankett {
 
 		bool hasAddress(ip_address addr);
 
+		void updateClientData();
+
 		void processConnectionRequest(ip_address remote, protocol_connection_request& msg);
 		void processChallengeResponse(ip_address remote, protocol_challenge_response& msg);
 		void processPayload(ip_address remote, protocol_payload& msg);
 		void processDisconnect(ip_address remote, protocol_payload& msg);
 		void queueMessage(client& pClient);
 
-		void parseClientMessage(message_client_to_server message, client& pClient, const time& pDeltaRecieveTime);
-		vector2 targetMoveDirection(message_client_to_server message);
 
 		void challengeClient(client& client);
 

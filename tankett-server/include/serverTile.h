@@ -6,6 +6,7 @@ namespace tankett {
 	public:
 		serverTile(vector2 pSpawnPos);
 		~serverTile();
+		void update(time dt) {};
 
 		void onCollision(IServerEntity* collider) override;
 	};

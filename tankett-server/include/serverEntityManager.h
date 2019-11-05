@@ -11,16 +11,18 @@ namespace tankett {
 		~serverEntityManager();
 
 		void addEntity(IServerEntity& pEntity);
-		serverTank& getTank(int ID);
+		serverTank* getTank(int ID);
+		void spawnTank(int id);
 
 		void update(time dt);
+		void parseClientMessage(message_client_to_server message,uint8 clientID, const time& pDeltaRecieveTime);
 		
 		void manageCollisions();
-		void UpdateTank(uint8 pTankID);
 	private:
 		void createLevel();
 		void createTankBuffer();
 		void createBulletBuffer();
+		vector2 targetMoveDirection(message_client_to_server message);
 
 		bool checkCollision(IServerEntity* firstEntity, IServerEntity* secondEntity);
 		bool isCollisionPair(IServerEntity* pFirstEntity, IServerEntity* pSecondEntity);

@@ -80,6 +80,16 @@ namespace tankett {
 		default:
 			break;
 		}
+		updateClientData();
+	}
+
+	void server::updateClientData() {
+		for (int i = 0; i < 4; i++) {
+			serverTank* t = entityManager_->getTank(i);
+			clientData[i].alive = t->isEnabled;
+			clientData[i].angle = t->transform_.rotation_;
+			clientData[i].position = t->transform_.position_;
+		}
 	}
 #pragma endregion
 
@@ -193,7 +203,7 @@ namespace tankett {
 						}
 						else {
 							time deltaReceiveTime = time::now() - client.latest_receive_time_;
-							parseClientMessage(message, client, deltaReceiveTime);
+							entityManager_->parseClientMessage(message, client.id_, deltaReceiveTime);
 						}
 					}
 					break;
@@ -223,30 +233,6 @@ namespace tankett {
 		if (iterator >= 0) {
 			clients_.erase(clients_.begin() + iterator);
 		}
-	}
-#pragma endregion
-
-#pragma region ParseInput
-	void server::parseClientMessage(message_client_to_server message, client& pClient, const time& pDeltaRecieveTime) {
-		vector2 targetDirection = targetMoveDirection(message);
-		if(targetDirection.x_ != 0
-		   && targetDirection.y_ != 0) {
-			int i = 0;
-		}
-		float speed = 4 * pDeltaRecieveTime.as_seconds();
-		clientData[pClient.id_].position += targetDirection * speed; //HOW DO I GET THE TANK?
-	}
-
-	vector2 server::targetMoveDirection(message_client_to_server message) {
-		if (message.get_input(message_client_to_server::UP) && message.get_input(message_client_to_server::RIGHT)) return { 0.7071f ,-0.7071f };  //Normalised Diagonal Vector
-		if (message.get_input(message_client_to_server::UP) && message.get_input(message_client_to_server::LEFT)) return { -0.7071f ,-0.7071f };
-		if (message.get_input(message_client_to_server::DOWN) && message.get_input(message_client_to_server::LEFT)) return { -0.7071f ,0.7071f };
-		if (message.get_input(message_client_to_server::DOWN) && message.get_input(message_client_to_server::RIGHT)) return { 0.7071f ,0.7071f };
-		if (message.get_input(message_client_to_server::RIGHT))  return { 1.0f ,0 };
-		if (message.get_input(message_client_to_server::LEFT))  return { -1.0f,0 };
-		if (message.get_input(message_client_to_server::UP))	return { 0,-1.0f };
-		if (message.get_input(message_client_to_server::DOWN))	return { 0, 1.0f };
-		return { 0,0 };
 	}
 #pragma endregion
 	
@@ -409,7 +395,8 @@ namespace tankett {
 			if (!clientData[i].connected) {
 				clientData[i].client_id = connectedClientCount() - 1;
 				clientData[i].connected = true;
-				clientData[i].position = spawnPoints[i];
+				clientData[i].position = SPAWN_POINTS[i];
+				entityManager_->spawnTank(i);
 				return;
 			}
 		}

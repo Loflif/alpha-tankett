@@ -6,6 +6,7 @@ namespace tankett {
 	public:
 		serverBullet();
 		~serverBullet();
+		void update(time dt) {};
 
 		void onCollision(IServerEntity* collider) override;
 		void update(time dt) override;

@@ -11,12 +11,31 @@ namespace tankett {
 	serverEntityManager::~serverEntityManager() {
 	}
 
+	void serverEntityManager::parseClientMessage(message_client_to_server message, uint8 clientID, const time& pDeltaRecieveTime) {
+		vector2 targetDirection = targetMoveDirection(message);
+		if (targetDirection.x_ != 0
+			&& targetDirection.y_ != 0) {
+			int i = 0;
+		}
+		float speed = 4 * pDeltaRecieveTime.as_seconds();
+		tanks_[clientID]->transform_.position_ += targetDirection * speed;
+	}
+
+	/*serverTile* serverEntityManager::createTile(vector2 pPosition) {
+		return new serverTile;
+	}*/
+	
 	void serverEntityManager::addEntity(IServerEntity& pEntity) {
 		entities_.push_back(&pEntity);
 	}
 
-	serverTank& serverEntityManager::getTank(int ID) {
-		return *tanks_[ID];
+	serverTank* serverEntityManager::getTank(int ID) {
+		return tanks_[ID];
+	}
+
+	void serverEntityManager::spawnTank(int id) {
+		tanks_[id]->isEnabled = true;
+		tanks_[id]->SetPosition(SPAWN_POINTS[id]);
 	}
 
 	void serverEntityManager::update(time dt) {
@@ -41,9 +60,24 @@ namespace tankett {
 		}
 	}
 
+	vector2 serverEntityManager::targetMoveDirection(message_client_to_server message) {
+		if (message.get_input(message_client_to_server::UP) && message.get_input(message_client_to_server::RIGHT)) return { 0.7071f ,-0.7071f };  //Normalised Diagonal Vector
+		if (message.get_input(message_client_to_server::UP) && message.get_input(message_client_to_server::LEFT)) return { -0.7071f ,-0.7071f };
+		if (message.get_input(message_client_to_server::DOWN) && message.get_input(message_client_to_server::LEFT)) return { -0.7071f ,0.7071f };
+		if (message.get_input(message_client_to_server::DOWN) && message.get_input(message_client_to_server::RIGHT)) return { 0.7071f ,0.7071f };
+		if (message.get_input(message_client_to_server::RIGHT))  return { 1.0f ,0 };
+		if (message.get_input(message_client_to_server::LEFT))  return { -1.0f,0 };
+		if (message.get_input(message_client_to_server::UP))	return { 0,-1.0f };
+		if (message.get_input(message_client_to_server::DOWN))	return { 0, 1.0f };
+		return { 0,0 };
+	}
+	
+	/*serverTank* serverEntityManager::createTank() {
+	}*/
+
 	void serverEntityManager::createTankBuffer() {
 		for (int i = 0; i < 4; i++) {
-			serverTank* t = new serverTank(spawnPoints[i], (uint8)i);
+			serverTank* t = new serverTank(SPAWN_POINTS[i], (uint8)i);
 			entities_.push_back(t);
 			tanks_[i] = t;
 		}
