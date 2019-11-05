@@ -149,7 +149,6 @@ namespace tankett {
 				vector2 tPos = t->transform_.position_;
 				b->fire(tPos, t->getAimVector(), t->getUnusedBulletID());
 				t->bullets_.push_back(b);
-				entities_.push_back(b);
 				t->shootingCooldown_ = FIRE_RATE;
 				break;
 			}

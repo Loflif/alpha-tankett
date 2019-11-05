@@ -9,8 +9,8 @@ namespace tankett {
 		bulletTexture_.create_from_file("assets/bullet.png");
 
 		createLevel();
-		createBulletBuffer();
 		createTankBuffer();
+		createBulletBuffer();
 	}
 
 	entityManager::~entityManager() {
@@ -47,7 +47,7 @@ namespace tankett {
 	void entityManager::createBulletBuffer() {
 		sprite spr(bulletTexture_, vector2(TILE_SIZE * BULLET_SIZE, TILE_SIZE * BULLET_SIZE));
 
-		for (int i = 0; i < BULLET_MAX_COUNT; i++) {
+		for (int i = 0; i < BULLET_MAX_COUNT * 4; i++) {
 			bullet* b = new bullet(spr);
 			bullets_[i] = b;
 			entities_.push_back(b);
@@ -148,7 +148,6 @@ namespace tankett {
 				b->fire(tPos.x_, tPos.y_, t->aimVector_, t->getUnusedBulletID());
 				assert(b->id_ >= 0);
 				t->bullets_.push_back(b);
-				entities_.push_back(b);
 				shootingCooldown_ = FIRE_RATE;
 				break;
 			}
