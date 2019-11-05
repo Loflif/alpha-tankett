@@ -48,12 +48,13 @@ namespace tankett {
 		client.host_ = client.host_ + 255;
 		send_all_ip_ = client;
 		send_all_ip_.set_port(PROTOCOL_PORT);
+		initializeUI();
 
 		return true;
 	}
 
 	void client_app::initializeUI() {
-		SetUIElement(timer, "00:00", 2, vector2(40 * TILE_SIZE, 32.2f * TILE_SIZE));
+		SetUIElement(timer_, "00:00", 2, vector2(40 * TILE_SIZE, 32.2f * TILE_SIZE));
 	}
 
 	void client_app::SetUIElement(UIElement& element, const char* pText, int32 pSize, vector2 pPos, uint32 pColor) {
@@ -95,11 +96,19 @@ namespace tankett {
 			messages_.push_back(entityManager_->checkInput(keyboard_, mouse_));
 			entityManager_->manageCollisions();
 		}
-		entityManager_->render(render_system_);
+		render();
 
 		return true;
 	}
 
+	void client_app::render() {
+		entityManager_->render(render_system_);
+		renderUI(timer_);
+	}
+
+	void client_app::renderUI(UIElement pUI) {
+		render_system_.render(pUI.text_, pUI.transform_);
+	}
 
 	void client_app::send(time dt) {
 		send_accumulator += dt;
@@ -214,6 +223,8 @@ namespace tankett {
 
 		return true;
 	}
+
+	
 #pragma endregion
 
 #pragma region Receive
@@ -333,7 +344,7 @@ namespace tankett {
 		timerText += (std::to_string(minutes) + ":");
 		if (seconds < 10) timerText += "0";
 		timerText += std::to_string(seconds);
-		timer.text_.set_text(timerText.c_str());
+		timer_.text_.set_text(timerText.c_str());
 	}
 #pragma endregion
 } // !tankett

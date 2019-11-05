@@ -28,6 +28,7 @@ namespace tankett {
 		virtual bool enter() final;
 		virtual void exit() final;
 		virtual bool tick() final;
+		void render();
 		void send(time dt);
 		bool pack_payload(protocol_payload& pPayload);
 		bool send_payload(protocol_payload& pPayload);
@@ -66,6 +67,7 @@ namespace tankett {
 		message_client_to_server currentMessage_;
 		//dynamic_array<network_message_header*>messages_;
 
+		UIElement timer_;
 
 	};
 } // !tankett
