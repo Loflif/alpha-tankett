@@ -2,6 +2,7 @@
 
 #include "tankett_server.h"
 #include <dos.h>
+#include "gameManager.h"
 
 namespace tankett {
 	server::server()
@@ -372,6 +373,7 @@ namespace tankett {
 		message_server_to_client* msg = new message_server_to_client;
 		msg->client_count = (uint8)clients_.size();
 		for (int i = 0; i < 4; i++) {
+			msg->client_data[i].eliminations = gameManager::score_[i];
 			msg->client_data[i] = clientData[i];
 		}
 		msg->game_state = state_;
