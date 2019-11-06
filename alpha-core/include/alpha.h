@@ -132,6 +132,9 @@ namespace alpha {
 		vector2& operator += (const vector2& v) { x_ += v.x_; y_ += v.y_; return *this; }
 		vector2& operator -= (const vector2& v) { x_ -= v.x_; y_ -= v.y_; return *this; }
 
+		bool operator == (const vector2& v) { if (x_ == v.x_ && y_ == v.y_) return true; return false; }
+		bool operator != (const vector2& v) { if (x_ == v.x_ && y_ == v.y_) return false; return true; }
+
 		const vector2 operator + (const vector2& v) const { vector2 r(*this); return r += v; }
 		const vector2 operator - (const vector2& v) const { vector2 r(*this); return r -= v; }
 

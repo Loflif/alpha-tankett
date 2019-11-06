@@ -78,7 +78,8 @@ namespace tankett {
 		dynamic_array<bullet*> newBullets;
 		for (int i = 0; i < bullets_.size(); i++) {
 			if (bullets_[i]->isEnabled) {
-				newBullets.push_back(bullets_[i]);
+				if (bullets_[i]->id_ != 255) newBullets.push_back(bullets_[i]);
+				else bullets_[i]->isEnabled = false;
 			}
 		}
 		bullets_ = newBullets;

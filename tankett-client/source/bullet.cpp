@@ -7,7 +7,7 @@ namespace tankett {
 		collider_ = rectangle(0, 0, size_.x_, size_.y_);
 		isEnabled = false;
 		type_ = BULLET;
-		id_ = -1;
+		id_ = 255;
 	}
 
 	bullet::~bullet() {
@@ -15,9 +15,12 @@ namespace tankett {
 	}
 
 	void bullet::update(keyboard kb, mouse ms, time dt) {
-		/*transform_.position_.x_ += direction_.x_ * SPEED_ * TILE_SIZE * dt.as_seconds();
-		transform_.position_.y_ += direction_.y_ * SPEED_ * TILE_SIZE * dt.as_seconds();*/
+		interpolateEntity(dt);
 		collider_.set_position(transform_.position_);
+	}
+
+	void bullet::interpolateEntity(time dt) {
+		transform_.set_position(vector2::Lerp(transform_.position_, lastReceivedPosition_, dt.as_seconds() / messageDeltaTime_.as_seconds()));
 	}
 
 	void bullet::render(render_system& pRenderSystem) {
@@ -31,12 +34,18 @@ namespace tankett {
 		direction_ = pDirection.normalized();
 		isEnabled = true;
 		id_ = pID;
+		nextToLastReceivedPosition_ = transform_.position_;
+		lastReceivedPosition_ = transform_.position_;
 	}
 
 	void bullet::onCollision(IEntity* collider) {
-		if (collider->type_ == WALL) {
-			isEnabled = false;
-			id_ = -1;
-		}
+	}
+
+	void bullet::UpdateData(vector2 pPos) {
+		nextToLastReceivedPosition_ = lastReceivedPosition_;
+		lastReceivedPosition_ = pPos;
+		transform_.set_position(nextToLastReceivedPosition_);
+		messageDeltaTime_ = time::now() - timeOfLastMessage;
+		timeOfLastMessage = time::now();
 	}
 }

@@ -346,11 +346,8 @@ namespace tankett {
 			if (i == pMessage.receiver_id) {
 				if (entityManager_->getLocalTankID() == 255)
 					entityManager_->setLocalTank(pMessage.receiver_id);
-				entityManager_->UpdateLocalTank(pMessage.client_data[i]);
 			}
-			else {
-				entityManager_->UpdateRemoteTank(pMessage.client_data[i]);
-			}
+			entityManager_->UpdateTank(pMessage.client_data[i]);
 		}
 	}
 

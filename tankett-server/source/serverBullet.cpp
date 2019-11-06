@@ -9,7 +9,7 @@ namespace tankett {
 		collider_ = rectangle(0, 0, size_.x_, size_.y_);
 		collider_.set_position(transform_.position_ - size_ / 2);
 		isEnabled = false;
-		id_ = -1;
+		id_ = 255;
 	}
 
 	serverBullet::~serverBullet() {
@@ -42,7 +42,7 @@ namespace tankett {
 	void serverBullet::onCollision(IServerEntity* collider) {
 		if (collider->type_ == WALL) {
 			isEnabled = false;
-			id_ = -1;
+			id_ = 255;
 		}
 		
 	}

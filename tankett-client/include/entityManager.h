@@ -22,7 +22,10 @@ namespace tankett {
 
 		void manageCollisions();
 		void UpdateLocalTank(server_to_client_data pData);
-		void UpdateRemoteTank(server_to_client_data pData);
+		void CompareBulletLists(server_to_client_data pData);
+		bool isBulletInList(server_to_client_data pData, uint8 pID);
+		void UpdateTank(server_to_client_data pData);
+		void UpdateBullets(server_to_client_data pData);
 	private:
 		void createLevel();
 		void createTankBuffer();
@@ -31,7 +34,7 @@ namespace tankett {
 		bool checkCollision(IEntity* firstEntity, IEntity* secondEntity);
 		bool isCollisionPair(IEntity* pFirstEntity, IEntity* pSecondEntity);
 
-		void fireBullet(tank* t);
+		void createBullet(tank* t);
 
 		uint8 localTankID_ = 255;
 		tank* tanks_[4];
