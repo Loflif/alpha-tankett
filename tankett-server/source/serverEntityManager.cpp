@@ -146,7 +146,8 @@ namespace tankett {
 	}
 
 	void serverEntityManager::fireBullet(serverTank* t) {
-		if (t->shootingCooldown_ > 0)
+		if (t->shootingCooldown_ > 0
+			|| !t->isEnabled)
 			return;
 		for(serverBullet* b : bullets_) {
 			if(!b->isEnabled) {
