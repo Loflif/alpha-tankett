@@ -3,11 +3,11 @@
 
 namespace tankett {
 	serverTank::serverTank(vector2 pSpawnPos, uint8 ID) {
-		transform_.position_ = pSpawnPos;
-		type_ = TANK;
-		size_ = { tankett::TANK_SIZE, tankett::TANK_SIZE };
+		transform_.set_origin(vector2(size_ / 2));
+		type_ = TANK;		
+		size_ = { TANK_SIZE, TANK_SIZE };		
 		collider_ = rectangle(0, 0, size_.x_, size_.y_);
-		collider_.set_position(transform_.position_ - size_ / 2);
+		SetPosition(pSpawnPos);
 		id_ = ID;
 	}
 
@@ -18,9 +18,6 @@ namespace tankett {
 
 	void serverTank::update(time dt) {
 		shootingCooldown_ -= dt.as_seconds();
-		//Set Collider Pos
-		vector2 targetPosition = transform_.position_ - size_ / 2;
-		collider_.set_position(targetPosition);
 
 		updateBulletList();
 	}
@@ -64,7 +61,7 @@ namespace tankett {
 
 	void serverTank::onCollision(IServerEntity* collider) {
 		if (collider->type_ == WALL) {
-			transform_.position_ = previousPosition_;
+			SetPosition(previousPosition_);
 		}
 		if (collider->type_ == BULLET) {
 			if(!ownsBullet(collider)) {
@@ -78,6 +75,7 @@ namespace tankett {
 	void serverTank::SetPosition(vector2 pNewPosition) {
 		previousPosition_ = transform_.position_;
 		transform_.position_ = pNewPosition;
-		collider_.set_position(transform_.position_ - size_ / 2);
+		vector2 targetPosition = transform_.position_ - size_/2;
+		collider_.set_position(targetPosition);
 	}
 }

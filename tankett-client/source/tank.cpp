@@ -159,9 +159,7 @@ namespace tankett {
 	}
 
 	void tank::preventCollision() {
-		transform_.position_ = previousPosition;
-		turretTransform_.position_ = transform_.position_;
-		collider_.set_position(previousPosition);
+		SetPosition(previousPosition);		
 	}
 
 	bool tank::ownsBullet(IEntity* pBullet) {

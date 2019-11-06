@@ -81,6 +81,8 @@ namespace tankett {
 		UIElement coolDown_;
 		UIElement p1Eliminations;
 		UIElement p2Eliminations;
+		UIElement p3Eliminations;
+		UIElement p4Eliminations;
 
 	};
 } // !tankett
