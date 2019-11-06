@@ -35,7 +35,7 @@ namespace tankett {
 		int getUnusedBulletID();
 		bool hasBulletWithID(uint8 pID);
 		bullet* getBulletWithID(uint8 pID);
-
+		bool isLocal_ = false;
 	private:
 		void SetTurret(mouse ms);
 		void interpolateEntity(time dt);
@@ -54,7 +54,7 @@ namespace tankett {
 		sprite turretSprite_;
 		transform turretTransform_;
 		vector2 previousPosition;
-		bool isLocal_ = false;
+		
 
 		//For Prediciton:
 		void PredictPosition(vector2 pReceivedPos);

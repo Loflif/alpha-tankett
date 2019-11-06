@@ -123,7 +123,7 @@ namespace tankett {
 		CompareBulletLists(pData);
 		for (int i = 0; i < pData.bullet_count; i++) {
 			if (tanks_[pData.client_id]->hasBulletWithID(pData.bullets[i].id)) {
-				tanks_[pData.client_id]->getBulletWithID(pData.bullets[i].id)->transform_.set_position(pData.bullets[i].position * TILE_SIZE);
+				tanks_[pData.client_id]->getBulletWithID(pData.bullets[i].id)->UpdateData(pData.bullets[i].position * TILE_SIZE);
 			}
 			else {
 				createBullet(tanks_[pData.client_id]);
@@ -149,7 +149,9 @@ namespace tankett {
 		for (bullet* b : bullets_) {
 			if (!b->isEnabled) {
 				vector2 tPos = t->transform_.position_;
-				b->fire(tPos.x_, tPos.y_, t->aimVector_, t->getUnusedBulletID());
+				vector2 direction = vector2::zero();
+				if (t->isLocal_) direction = t->aimVector_;
+				b->fire(tPos.x_, tPos.y_, direction, t->getUnusedBulletID());
 				t->bullets_.push_back(b);
 				break;
 			}
