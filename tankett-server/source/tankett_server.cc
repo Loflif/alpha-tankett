@@ -186,7 +186,6 @@ namespace tankett {
 						client.state_ = CONNECTED;
 						debugf("[Info] Client connected: %s", client.address_.as_string());
 						client.id_ = connectedClientCount() - 1;
-						clientData[client.id_].connected = true;
 						SpawnTank();
 					}
 				}
