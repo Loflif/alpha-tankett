@@ -61,6 +61,9 @@ namespace tankett {
 		SetUIElement(p3Eliminations, "P3: 0", 2, vector2(1 * TILE_SIZE, 31.4f * TILE_SIZE), 0xFF4F5E9C);
 		SetUIElement(p4Eliminations, "P4: 0", 2, vector2(40 * TILE_SIZE, 31.4f * TILE_SIZE), 0xFF4F5E9C);
 		SetUIElement(p1Ping, "0123456789", 1, vector2(1 * TILE_SIZE, 1.8f * TILE_SIZE), 0xFF4F5E9C);
+		SetUIElement(p2Ping, "0123456789", 1, vector2(40 * TILE_SIZE, 1.8f * TILE_SIZE), 0xFF4F5E9C);
+		SetUIElement(p3Ping, "0123456789", 1, vector2(1 * TILE_SIZE, 30.6f * TILE_SIZE), 0xFF4F5E9C);
+		SetUIElement(p4Ping, "0123456789", 1, vector2(40 * TILE_SIZE, 30.6f * TILE_SIZE), 0xFF4F5E9C);
 	}
 
 	void client_app::SetUIElement(UIElement& element, const char* pText, int32 pSize, vector2 pPos, uint32 pColor) {
@@ -107,6 +110,9 @@ namespace tankett {
 			SetPlayerUI(2, p3Eliminations);
 			SetPlayerUI(3, p4Eliminations);
 			p1Ping.text_.set_text(std::to_string(remoteClientData_[0].ping_).c_str());
+			p2Ping.text_.set_text(std::to_string(remoteClientData_[1].ping_).c_str());
+			p3Ping.text_.set_text(std::to_string(remoteClientData_[2].ping_).c_str());
+			p4Ping.text_.set_text(std::to_string(remoteClientData_[3].ping_).c_str());
 		}
 
 		
@@ -148,6 +154,9 @@ namespace tankett {
 		renderUI(p3Eliminations);
 		renderUI(p4Eliminations);
 		renderUI(p1Ping);
+		renderUI(p2Ping);
+		renderUI(p3Ping);
+		renderUI(p4Ping);
 	}
 
 	void client_app::renderUI(UIElement pUI) {
