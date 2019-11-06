@@ -209,6 +209,11 @@ namespace tankett {
 		bool left = false;
 		bool down = false;
 		bool up = false;
+		if (localTankID_ < 255) {
+			vector2 mousePosition((float)pMouse.x_, (float)pMouse.y_);
+			vector2 aimVector = vector2(mousePosition - tanks_[localTankID_]->transform_.position_).normalized();
+			msg->turret_angle = atan2(aimVector.y_, aimVector.x_) * (180 / PI);
+		}
 		if (pMouse.is_pressed(MOUSE_BUTTON_LEFT)) {
 			shoot = true;
 			fireBullet(tanks_[localTankID_]);
@@ -226,14 +231,7 @@ namespace tankett {
 			up = true;
 		}
 		msg->set_input(shoot, right, left, down, up);
-
-		if (localTankID_ < 255) {
-			vector2 mousePosition((float)pMouse.x_, (float)pMouse.y_);
-			vector2 aimVector = vector2(mousePosition - tanks_[localTankID_]->transform_.position_).normalized();
-
-			msg->turret_angle = atan2(aimVector.y_, aimVector.x_) * (180 / PI);
-			msg->type_ = NETWORK_MESSAGE_CLIENT_TO_SERVER;
-		}
+		msg->type_ = NETWORK_MESSAGE_CLIENT_TO_SERVER;
 		return msg;
 	}
 

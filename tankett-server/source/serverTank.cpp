@@ -28,7 +28,6 @@ namespace tankett {
 	vector2 serverTank::getAimVector() {
 		float theta = turretRotation_ * PI / 180;
 		return vector2(cos(theta), sin(theta));
-
 	}
 
 	void serverTank::updateBulletList() {

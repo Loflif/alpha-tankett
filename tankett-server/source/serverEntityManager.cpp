@@ -22,6 +22,7 @@ namespace tankett {
 		}
 		float speed = 4 * pDeltaRecieveTime.as_seconds();
 		tanks_[clientID]->SetPosition(tanks_[clientID]->transform_.position_ + targetDirection * speed);
+		tanks_[clientID]->turretRotation_ = message.turret_angle;
 	}
 
 	/*serverTile* serverEntityManager::createTile(vector2 pPosition) {
