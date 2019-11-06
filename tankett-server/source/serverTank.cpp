@@ -1,4 +1,5 @@
 #include "serverTank.h"
+#include "gameManager.h"
 
 namespace tankett {
 	serverTank::serverTank(vector2 pSpawnPos, uint8 ID) {
@@ -40,6 +41,13 @@ namespace tankett {
 		bullets_ = newBullets;
 	}
 
+	bool serverTank::ownsBullet(IServerEntity* pBullet) {
+		for (IServerEntity* b : bullets_) {
+			if (pBullet == b) return true;
+		}
+		return false;
+	}
+
 	int serverTank::getUnusedBulletID() {
 		for (uint8 i = 0; i < 10; i++) {
 			if (!hasBulletWithID(i)) return i;
@@ -57,6 +65,13 @@ namespace tankett {
 	void serverTank::onCollision(IServerEntity* collider) {
 		if (collider->type_ == WALL) {
 			transform_.position_ = previousPosition_;
+		}
+		if (collider->type_ == BULLET) {
+			if(!ownsBullet(collider)) {
+				gameManager::AddScore((uint8)collider->owner_);
+				collider->isEnabled = false;
+				isEnabled = false;
+			}
 		}
 	}
 

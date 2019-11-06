@@ -24,6 +24,7 @@ namespace tankett {
 	private:
 		bool hasBulletWithID(uint8 pID);
 		void updateBulletList();
+		bool ownsBullet(IServerEntity* pBullet);
 		vector2 previousPosition_;
 	};
 }
