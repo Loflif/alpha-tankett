@@ -57,7 +57,7 @@ namespace tankett {
 		SetUIElement(timer_, "00:00", 2, vector2(40 * TILE_SIZE, 32.2f * TILE_SIZE));
 		SetUIElement(coolDown_, "", 1, vector2(4 * TILE_SIZE, 4.5f * TILE_SIZE));
 		SetUIElement(p1Eliminations, "P1: 0", 2, vector2(1 * TILE_SIZE, 1 * TILE_SIZE));
-		SetUIElement(p2Eliminations, "P2: 0", 2, vector2(1 * TILE_SIZE, 40 * TILE_SIZE));
+		SetUIElement(p2Eliminations, "P2: 0", 2, vector2(1 * TILE_SIZE, 32.2f * TILE_SIZE));
 	}
 
 	void client_app::SetUIElement(UIElement& element, const char* pText, int32 pSize, vector2 pPos, uint32 pColor) {
