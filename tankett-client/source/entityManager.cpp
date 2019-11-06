@@ -163,7 +163,7 @@ namespace tankett {
 	}
 #pragma endregion
 	void entityManager::fireBullet(tank* t) {
-		if (shootingCooldown_ > 0)
+		/*if (shootingCooldown_ > 0)
 			return;
 		for (bullet* b : bullets_) {
 			if (!b->isEnabled) {
@@ -174,7 +174,7 @@ namespace tankett {
 				shootingCooldown_ = FIRE_RATE;
 				break;
 			}
-		}
+		}*/
 	}
 	void entityManager::addEntity(IEntity& pEntity) {
 		entities_.push_back(&pEntity);
