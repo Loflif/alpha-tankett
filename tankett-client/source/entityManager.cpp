@@ -113,68 +113,47 @@ namespace tankett {
 		}
 	}
 
-	
-	
-	void entityManager::UpdateLocalTank(server_to_client_data pData) {
-
-		//TODO: UPDATE BULLET POSITIONS
-		for (int i = 0; i < pData.bullet_count; i++) {
-			if (tanks_[localTankID_]->hasBulletWithID(pData.bullets[i].id)) {
-				tanks_[localTankID_]->getBulletWithID(pData.bullets[i].id)->transform_.set_position(pData.bullets[i].position * TILE_SIZE);
-			}
-			else {
-				for (bullet* b : bullets_) {
-					if (!b->isEnabled) {
-						vector2 tPos = tanks_[localTankID_]->transform_.position_;
-						b->fire(tPos.x_, tPos.y_, tanks_[localTankID_]->aimVector_, tanks_[localTankID_]->getUnusedBulletID());
-						tanks_[localTankID_]->bullets_.push_back(b);
-						break;
-					}
-				}
-			}
-		}
-
-		tanks_[localTankID_]->UpdateValues(pData.alive,
-								           pData.position * TILE_SIZE,
-								           pData.angle);
+	void entityManager::UpdateTank(server_to_client_data pData) {
+		tanks_[pData.client_id]->UpdateValues(pData.alive,
+										      pData.position * TILE_SIZE,
+										      pData.angle);
+		UpdateBullets(pData);
 	}
-
-	void entityManager::UpdateRemoteTank(server_to_client_data pData) {
-		//TODO: UPDATE BULLET POSITIONS
+	void entityManager::UpdateBullets(server_to_client_data pData) {
+		CompareBulletLists(pData);
 		for (int i = 0; i < pData.bullet_count; i++) {
 			if (tanks_[pData.client_id]->hasBulletWithID(pData.bullets[i].id)) {
 				tanks_[pData.client_id]->getBulletWithID(pData.bullets[i].id)->transform_.set_position(pData.bullets[i].position * TILE_SIZE);
 			}
 			else {
-				for (bullet* b : bullets_) {
-					if (!b->isEnabled) {
-						vector2 tPos = tanks_[pData.client_id]->transform_.position_;
-						b->fire(tPos.x_, tPos.y_, tanks_[pData.client_id]->aimVector_, tanks_[pData.client_id]->getUnusedBulletID());
-						tanks_[pData.client_id]->bullets_.push_back(b);
-						break;
-					}
-				}
+				createBullet(tanks_[pData.client_id]);
 			}
 		}
+	}
 
-		tanks_[pData.client_id]->UpdateValues(pData.alive,
-										      pData.position * TILE_SIZE,
-										      pData.angle);
+	void entityManager::CompareBulletLists(server_to_client_data pData) {
+		for (int i = 0; i < tanks_[pData.client_id]->bullets_.size(); i++) {
+			if (!isBulletInList(pData, (uint8)tanks_[pData.client_id]->bullets_[i]->id_)) {
+				tanks_[pData.client_id]->bullets_[i]->isEnabled = false;
+			}
+		}
+	}
+	bool entityManager::isBulletInList(server_to_client_data pData, uint8 pID) {
+		for (int i = 0; i < pData.bullet_count; i++) {
+			if (pData.bullets[i].id == pID) return true;
+		}
+		return false;
 	}
 #pragma endregion
-	void entityManager::fireBullet(tank* t) {
-		/*if (shootingCooldown_ > 0)
-			return;
+	void entityManager::createBullet(tank* t) {
 		for (bullet* b : bullets_) {
 			if (!b->isEnabled) {
 				vector2 tPos = t->transform_.position_;
 				b->fire(tPos.x_, tPos.y_, t->aimVector_, t->getUnusedBulletID());
-				assert(b->id_ >= 0);
 				t->bullets_.push_back(b);
-				shootingCooldown_ = FIRE_RATE;
 				break;
 			}
-		}*/
+		}
 	}
 	void entityManager::addEntity(IEntity& pEntity) {
 		entities_.push_back(&pEntity);
@@ -211,7 +190,6 @@ namespace tankett {
 		bool up = false;
 		if (pMouse.is_pressed(MOUSE_BUTTON_LEFT)) {
 			shoot = true;
-			fireBullet(tanks_[localTankID_]);
 		}
 		if (pKeyboard.is_down(KEYCODE_D)) {
 			right = true;

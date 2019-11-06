@@ -7,7 +7,7 @@ namespace tankett {
 		collider_ = rectangle(0, 0, size_.x_, size_.y_);
 		isEnabled = false;
 		type_ = BULLET;
-		id_ = -1;
+		id_ = 255;
 	}
 
 	bullet::~bullet() {
@@ -36,7 +36,14 @@ namespace tankett {
 	void bullet::onCollision(IEntity* collider) {
 		if (collider->type_ == WALL) {
 			isEnabled = false;
-			id_ = -1;
+			id_ = 255;
 		}
+	}
+
+	void bullet::SetPosition(vector2 pPos) {
+		previousPosition = transform_.position_;
+		transform_.position_ = pPos;
+		collider_.set_position(pPos);
+
 	}
 }

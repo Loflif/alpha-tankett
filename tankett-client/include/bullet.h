@@ -14,10 +14,12 @@ namespace tankett {
 
 		int id_;
 		transform transform_;
+		void SetPosition(vector2 pPos);
 	private:		
 		vector2 size_ = { 0,0 };
 		sprite sprite_;		
 		vector2 direction_;
 		const float SPEED_ = 8.0f;
+		vector2 previousPosition;
 	};
 }
