@@ -376,7 +376,7 @@ namespace tankett {
 		msg->client_count = (uint8)clients_.size();
 		for (int i = 0; i < 4; i++) {
 			clientData[i].eliminations = gameManager::score_[i];
-			clientData[i].ping = clients_[i].ping_.as_milliseconds();
+			//clientData[i].ping = (uint32)clients_[i].ping_.as_milliseconds();
 			msg->client_data[i] = clientData[i];
 		}
 		msg->game_state = state_;
