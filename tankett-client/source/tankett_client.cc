@@ -57,7 +57,7 @@ namespace tankett {
 		SetUIElement(timer_, "00:00", 2, vector2(40 * TILE_SIZE, 32.2f * TILE_SIZE));
 		SetUIElement(coolDown_, "", 1, vector2(4 * TILE_SIZE, 4.5f * TILE_SIZE));
 		SetUIElement(p1Eliminations, "P1: 0", 2, vector2(1 * TILE_SIZE, 1 * TILE_SIZE));
-		SetUIElement(p2Eliminations, "P2: 0", 2, vector2(1 * TILE_SIZE, 32.2f * TILE_SIZE));
+		SetUIElement(p2Eliminations, "P2: 0", 2, vector2(40 * TILE_SIZE, 1 * TILE_SIZE));
 	}
 
 	void client_app::SetUIElement(UIElement& element, const char* pText, int32 pSize, vector2 pPos, uint32 pColor) {
@@ -110,10 +110,13 @@ namespace tankett {
 		return true;
 	}
 
-	void client_app::SetPlayerUI(int pID, UIElement ui) {
+	void client_app::SetPlayerUI(int pID, UIElement &ui) {
+		if (remoteClientData_[1].connected_) {
+			int coolShitHappensHere = 0;
+		}
 		string eliminationText;
 		if (remoteClientData_[pID].connected_) {
-			eliminationText = "P" + std::to_string(pID-1) + ": " + std::to_string(remoteClientData_[pID].eliminations_);			
+			eliminationText = "P" + std::to_string(pID+1) + ": " + std::to_string(remoteClientData_[pID].eliminations_);			
 		}
 		else {
 			eliminationText = "";
@@ -137,6 +140,7 @@ namespace tankett {
 		renderUI(timer_);
 		renderUI(coolDown_);
 		renderUI(p1Eliminations);
+		renderUI(p2Eliminations);
 	}
 
 	void client_app::renderUI(UIElement pUI) {
