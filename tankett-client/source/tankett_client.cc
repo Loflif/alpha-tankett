@@ -56,6 +56,8 @@ namespace tankett {
 	void client_app::initializeUI() {
 		SetUIElement(timer_, "00:00", 2, vector2(40 * TILE_SIZE, 32.2f * TILE_SIZE));
 		SetUIElement(coolDown_, "", 1, vector2(4 * TILE_SIZE, 4.5f * TILE_SIZE));
+		SetUIElement(p1Eliminations, "P1: 0", 2, vector2(1 * TILE_SIZE, 1 * TILE_SIZE));
+		SetUIElement(p2Eliminations, "P2: 0", 2, vector2(1 * TILE_SIZE, 40 * TILE_SIZE));
 	}
 
 	void client_app::SetUIElement(UIElement& element, const char* pText, int32 pSize, vector2 pPos, uint32 pColor) {
@@ -97,6 +99,8 @@ namespace tankett {
 			messages_.push_back(entityManager_->checkInput(keyboard_, mouse_));
 			entityManager_->manageCollisions();
 			SetCoolDownDisplay();
+			SetPlayerUI(0, p1Eliminations);
+			SetPlayerUI(1, p2Eliminations);
 		}
 
 		
@@ -104,6 +108,17 @@ namespace tankett {
 		render();
 
 		return true;
+	}
+
+	void client_app::SetPlayerUI(int pID, UIElement ui) {
+		string eliminationText;
+		if (remoteClientData_[pID].connected_) {
+			eliminationText = "P" + std::to_string(pID-1) + ": " + std::to_string(remoteClientData_[pID].eliminations_);			
+		}
+		else {
+			eliminationText = "";
+		}
+		ui.text_.set_text(eliminationText.c_str());
 	}
 
 	void client_app::SetCoolDownDisplay() {
@@ -121,6 +136,7 @@ namespace tankett {
 		entityManager_->render(render_system_);
 		renderUI(timer_);
 		renderUI(coolDown_);
+		renderUI(p1Eliminations);
 	}
 
 	void client_app::renderUI(UIElement pUI) {
@@ -347,6 +363,8 @@ namespace tankett {
 				if (entityManager_->getLocalTankID() == 255)
 					entityManager_->setLocalTank(pMessage.receiver_id);
 			}
+			remoteClientData_[i].eliminations_ = pMessage.client_data[i].eliminations;
+			remoteClientData_[i].connected_ = pMessage.client_data[i].connected;
 			entityManager_->UpdateTank(pMessage.client_data[i]);
 		}
 	}

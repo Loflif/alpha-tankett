@@ -23,6 +23,15 @@ namespace tankett {
 	};
 
 	struct client_app : application {
+
+		struct RemoteClientData {
+			bool connected_ = false;
+			uint32 ping_ = 0;
+			uint8 eliminations_ = 0;
+		};
+
+		RemoteClientData remoteClientData_[4];
+
 		client_app();
 
 		virtual bool enter() final;
@@ -40,6 +49,7 @@ namespace tankett {
 
 		void parsePayload(protocol_payload pPayload);
 		void parseServerMessage(message_server_to_client pMessage);
+		void SetPlayerUI(int pID, UIElement ui);
 		void SetTimer(float pTime);
 		void SetCoolDownDisplay();
 		void renderUI(UIElement pUI);
@@ -69,6 +79,8 @@ namespace tankett {
 
 		UIElement timer_;
 		UIElement coolDown_;
+		UIElement p1Eliminations;
+		UIElement p2Eliminations;
 
 	};
 } // !tankett
