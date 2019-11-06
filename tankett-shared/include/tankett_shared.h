@@ -383,7 +383,7 @@ namespace tankett {
 			   bit_field |= (currentData.connected << 1);
 			   result &= stream.serialize(bit_field);
 			   currentData.alive = bit_field & 1;
-			   //currentData.connected = (bit_field >> 1) & 1;
+			   currentData.connected = (bit_field >> 1) & 1;
 
 			   result &= stream.serialize(currentData.position.x_);
 			   result &= stream.serialize(currentData.position.y_);
