@@ -175,7 +175,6 @@ namespace tankett {
 	}
 
 	void entityManager::render(render_system& pRenderSystem) {
-		pRenderSystem.clear(0xff0e1528); //Background Color
 		for (IEntity* e : entities_) {
 			if (e->isEnabled) {
 				e->render(pRenderSystem);

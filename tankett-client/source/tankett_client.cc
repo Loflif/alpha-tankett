@@ -54,12 +54,13 @@ namespace tankett {
 	}
 
 	void client_app::initializeUI() {
-		SetUIElement(timer_, "00:00", 2, vector2(40 * TILE_SIZE, 32.2f * TILE_SIZE));
+		SetUIElement(timer_, "00:00", 2, vector2(21.2f * TILE_SIZE, 0.25f * TILE_SIZE));
 		SetUIElement(coolDown_, "", 1, vector2(4 * TILE_SIZE, 4.5f * TILE_SIZE));
-		SetUIElement(p1Eliminations, "P1: 0", 2, vector2(1 * TILE_SIZE, 1 * TILE_SIZE));
-		SetUIElement(p2Eliminations, "P2: 0", 2, vector2(40 * TILE_SIZE, 1 * TILE_SIZE));
-		SetUIElement(p3Eliminations, "P3: 0", 2, vector2(40 * TILE_SIZE, 1 * TILE_SIZE));
-		SetUIElement(p4Eliminations, "P4: 0", 2, vector2(40 * TILE_SIZE, 1 * TILE_SIZE));
+		SetUIElement(p1Eliminations, "P1: 0", 2, vector2(1 * TILE_SIZE, 1 * TILE_SIZE), 0xFF4F5E9C);
+		SetUIElement(p2Eliminations, "P2: 0", 2, vector2(40 * TILE_SIZE, 1 * TILE_SIZE), 0xFF4F5E9C);
+		SetUIElement(p3Eliminations, "P3: 0", 2, vector2(1 * TILE_SIZE, 31.4f * TILE_SIZE), 0xFF4F5E9C);
+		SetUIElement(p4Eliminations, "P4: 0", 2, vector2(40 * TILE_SIZE, 31.4f * TILE_SIZE), 0xFF4F5E9C);
+		SetUIElement(p1Ping, "0123456789", 1, vector2(1 * TILE_SIZE, 1.8f * TILE_SIZE), 0xFF4F5E9C);
 	}
 
 	void client_app::SetUIElement(UIElement& element, const char* pText, int32 pSize, vector2 pPos, uint32 pColor) {
@@ -103,6 +104,9 @@ namespace tankett {
 			SetCoolDownDisplay();
 			SetPlayerUI(0, p1Eliminations);
 			SetPlayerUI(1, p2Eliminations);
+			SetPlayerUI(2, p3Eliminations);
+			SetPlayerUI(3, p4Eliminations);
+			p1Ping.text_.set_text(std::to_string(remoteClientData_[0].ping_).c_str());
 		}
 
 		
@@ -113,11 +117,8 @@ namespace tankett {
 	}
 
 	void client_app::SetPlayerUI(int pID, UIElement &ui) {
-		if (remoteClientData_[1].connected_) {
-			int coolShitHappensHere = 0;
-		}
 		string eliminationText;
-		if (remoteClientData_[pID].connected_) {
+		if (/*remoteClientData_[pID].connected_*/true) {
 			eliminationText = "P" + std::to_string(pID+1) + ": " + std::to_string(remoteClientData_[pID].eliminations_);			
 		}
 		else {
@@ -138,11 +139,15 @@ namespace tankett {
 	}
 
 	void client_app::render() {
+		render_system_.clear(0xff0e1528); //Background Color
 		entityManager_->render(render_system_);
 		renderUI(timer_);
 		renderUI(coolDown_);
 		renderUI(p1Eliminations);
 		renderUI(p2Eliminations);
+		renderUI(p3Eliminations);
+		renderUI(p4Eliminations);
+		renderUI(p1Ping);
 	}
 
 	void client_app::renderUI(UIElement pUI) {
@@ -370,6 +375,7 @@ namespace tankett {
 					entityManager_->setLocalTank(pMessage.receiver_id);
 			}
 			remoteClientData_[i].eliminations_ = pMessage.client_data[i].eliminations;
+			remoteClientData_[i].ping_ = pMessage.client_data[i].ping;
 			remoteClientData_[i].connected_ = pMessage.client_data[i].connected;
 			entityManager_->UpdateTank(pMessage.client_data[i]);
 		}

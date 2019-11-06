@@ -83,6 +83,10 @@ namespace tankett {
 		UIElement p2Eliminations;
 		UIElement p3Eliminations;
 		UIElement p4Eliminations;
+		UIElement p1Ping;
+		UIElement p2Ping;
+		UIElement p3Ping;
+		UIElement p4Ping;
 
 	};
 } // !tankett
