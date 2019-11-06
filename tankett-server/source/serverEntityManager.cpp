@@ -151,7 +151,7 @@ namespace tankett {
 		for(serverBullet* b : bullets_) {
 			if(!b->isEnabled) {
 				vector2 tPos = t->transform_.position_;
-				b->fire(tPos, t->getAimVector(), t->getUnusedBulletID());
+				b->fire(tPos, t->getAimVector(), t->getUnusedBulletID(), t->id_);
 				t->bullets_.push_back(b);
 				t->shootingCooldown_ = FIRE_RATE;
 				break;

@@ -31,11 +31,12 @@ namespace tankett {
 		collider_.set_position(transform_.position_ - size_ / 2);
 	}
 
-	void serverBullet::fire(vector2 pSpawnPos, vector2 pDirection, int pID) {
+	void serverBullet::fire(vector2 pSpawnPos, vector2 pDirection, int pID, int pTankID) {
 		SetPosition(pSpawnPos);
 		direction_ = pDirection.normalized();
 		isEnabled = true;
 		id_ = pID;
+		owner_= pTankID;
 	}
 	
 	void serverBullet::onCollision(IServerEntity* collider) {
@@ -43,6 +44,7 @@ namespace tankett {
 			isEnabled = false;
 			id_ = -1;
 		}
+		
 	}
 }
 

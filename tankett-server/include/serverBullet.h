@@ -11,7 +11,7 @@ namespace tankett {
 		void onCollision(IServerEntity* collider) override;
 		void SetPosition(vector2 pNewPosition);
 
-		void fire(vector2 pSpawnPos, vector2 pDirection, int pID);
+		void fire(vector2 pSpawnPos, vector2 pDirection, int pID, int pTankID);
 		int id_;
 	private:
 		vector2 direction_;
