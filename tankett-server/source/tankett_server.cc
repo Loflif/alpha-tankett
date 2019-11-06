@@ -208,6 +208,8 @@ namespace tankett {
 					client.xorinator_.decrypt(msg.length_, msg.payload_);
 					network_message_type type = (network_message_type)reader.peek();
 
+					client.ping_ = time::now() - client.latest_receive_time_;
+					
 					switch (type) {
 					case NETWORK_MESSAGE_PING: {
 					}
@@ -373,7 +375,8 @@ namespace tankett {
 		message_server_to_client* msg = new message_server_to_client;
 		msg->client_count = (uint8)clients_.size();
 		for (int i = 0; i < 4; i++) {
-			msg->client_data[i].eliminations = gameManager::score_[i];
+			clientData[i].eliminations = gameManager::score_[i];
+			clientData[i].ping = clients_[i].ping_.as_milliseconds();
 			msg->client_data[i] = clientData[i];
 		}
 		msg->game_state = state_;

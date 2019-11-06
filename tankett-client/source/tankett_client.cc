@@ -254,7 +254,7 @@ namespace tankett {
 	}
 
 	bool client_app::send_payload(protocol_payload& pPayload) {
-		uint8 buffer[2048] = {};
+		uint8 buffer[1024] = {};
 		byte_stream stream(sizeof(buffer), buffer);
 		byte_stream_writer writer(stream);
 

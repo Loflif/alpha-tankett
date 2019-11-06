@@ -25,7 +25,7 @@ namespace tankett {
 	struct client {
 		ClientState state_;
 		ip_address address_;
-		time connection_time_;
+		time ping_;
 		uint64 client_key_{};
 		uint64 server_key_{};
 		uint8 id_;
