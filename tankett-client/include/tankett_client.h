@@ -99,8 +99,6 @@ namespace tankett {
 		UIElement quitButton;
 		UIElement connectButton;
 
-		bool isDisconnected = false;
-
 	};
 } // !tankett
 
