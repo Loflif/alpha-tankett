@@ -54,6 +54,7 @@ namespace tankett {
 				if (t->respawnTime.as_milliseconds() < 0) {
 					t->SetPosition(SPAWN_POINTS[t->id_]);
 					t->isEnabled = true;
+					t->isAlive = true;
 					t->respawnTime = time(RESPAWN_MILLISECONDS);
 				}
 			}
