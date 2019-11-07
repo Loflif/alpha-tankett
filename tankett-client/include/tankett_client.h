@@ -99,6 +99,7 @@ namespace tankett {
 		UIElement p4Ping;
 		UIElement quitButton;
 		UIElement connectButton;
+		UIElement disconnected;
 
 	};
 } // !tankett

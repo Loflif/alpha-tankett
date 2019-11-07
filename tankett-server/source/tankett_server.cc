@@ -263,6 +263,8 @@ namespace tankett {
 		}
 		if (iterator >= 0) {
 			clients_.erase(clients_.begin() + iterator);
+			//ResetTank(uint8 clientID); function in Entitymanager?
+			//TODO: Make people disabled
 		}
 	}
 #pragma endregion

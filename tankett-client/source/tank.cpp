@@ -104,22 +104,7 @@ namespace tankett {
 	}
 
 	void tank::onCollision(IEntity* collider) {
-		switch (collider->type_) {
-		case WALL: {
-			preventCollision();
-		}
-		break;
-		case BULLET: {
-		}
-		break;
-		case TANK: {
-			isEnabled = false;
-		}
-		break;
-		default:
-			break;
-		}
-		
+		if (collider->type_ == WALL) preventCollision();
 	}
 
 	void tank::UpdatePosition(keyboard kb, time dt) {

@@ -66,6 +66,8 @@ namespace tankett {
 		SetUIElement(p4Ping, "0123456789", 1, vector2(40 * TILE_SIZE, 30.6f * TILE_SIZE), 0xFF4F5E9C);
 		SetUIElement(quitButton, "QUIT", 2, vector2(41 * TILE_SIZE, 0.25f * TILE_SIZE));
 		SetUIElement(connectButton, "DISCONNECT", 2, vector2(34 * TILE_SIZE, 0.25f * TILE_SIZE));
+		SetUIElement(disconnected, "DISCONNECTED", 4, vector2(16 * TILE_SIZE, 16 * TILE_SIZE), 0xFF4F5E9C);
+		
 	}
 
 	void client_app::SetUIElement(UIElement& element, const char* pText, int32 pSize, vector2 pPos, uint32 pColor) {
@@ -148,20 +150,23 @@ namespace tankett {
 		}
 		if (state_ == DISCONNECTED) {
 			connectButton.text_.set_text("CONNECT");
+			disconnected.text_.text_ = "DISCONNECTED";
 			if (DetectMouseClick(connectButton)) Reconnect();
 		}
 		else {
 			connectButton.text_.set_text("DISCONNECT");
+			disconnected.text_.text_ = "";
 			if (DetectMouseClick(connectButton)) Disconnect();
 		}
 	}
 
 	void client_app::Disconnect() {
+		send_disconnect();
 		state_ = DISCONNECTED;
 	}
 
 	void client_app::Reconnect() {
-		state_ = CONNECTED;
+		state_ = INIT;
 	}
 
 	bool client_app::DetectMouseHover(UIElement ui) {
@@ -231,6 +236,7 @@ namespace tankett {
 		renderUI(p4Ping);
 		renderUI(quitButton);
 		renderUI(connectButton);
+		renderUI(disconnected);
 	}
 
 	void client_app::renderUI(UIElement pUI) {
