@@ -61,6 +61,12 @@ namespace tankett {
 		}
 	}
 
+	void serverEntityManager::resetTank(int ID) {
+		tanks_[ID]->isEnabled = false;
+		tanks_[ID]->SetPosition(SPAWN_POINTS[ID]);
+		tanks_[ID]->isAlive = true;
+	}
+
 #pragma region Initialisation
 	void serverEntityManager::createLevel() {
 		int rows = std::extent<decltype(LEVEL), 0>::value; // Get the amount of rows
