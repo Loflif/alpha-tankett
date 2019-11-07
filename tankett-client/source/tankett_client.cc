@@ -17,7 +17,7 @@ namespace tankett {
 		: client_key_(0)
 		, server_key_(0)
 		, state_(INIT)
-		, entityManager_(new entityManager()){
+		, entityManager_(new entityManager()) {
 
 	}
 
@@ -64,6 +64,8 @@ namespace tankett {
 		SetUIElement(p2Ping, "0123456789", 1, vector2(40 * TILE_SIZE, 1.8f * TILE_SIZE), 0xFF4F5E9C);
 		SetUIElement(p3Ping, "0123456789", 1, vector2(1 * TILE_SIZE, 30.6f * TILE_SIZE), 0xFF4F5E9C);
 		SetUIElement(p4Ping, "0123456789", 1, vector2(40 * TILE_SIZE, 30.6f * TILE_SIZE), 0xFF4F5E9C);
+		SetUIElement(quitButton, "QUIT", 2, vector2(41 * TILE_SIZE, 0.25f * TILE_SIZE));
+		SetUIElement(connectButton, "DISCONNECT", 2, vector2(34 * TILE_SIZE, 0.25f * TILE_SIZE));
 	}
 
 	void client_app::SetUIElement(UIElement& element, const char* pText, int32 pSize, vector2 pPos, uint32 pColor) {
@@ -107,10 +109,10 @@ namespace tankett {
 			SetCoolDownDisplay();
 		}
 		SetUI();
-
+		bool doesContinue = HandleQuitButton();
 		render();
 
-		return true;
+		return doesContinue;
 	}
 
 
@@ -123,12 +125,68 @@ namespace tankett {
 		SetPingUI(1, p2Ping);
 		SetPingUI(2, p3Ping);
 		SetPingUI(3, p4Ping);
+		HandleConnectButton();
 	}
 
-	void client_app::SetEliminationUI(int pID, UIElement &ui) {
+	bool client_app::HandleQuitButton() {
+		if (DetectMouseHover(quitButton)) {
+			quitButton.text_.set_color(0xFFE0EE9F);
+		}
+		else {
+			quitButton.text_.set_color(0xffffffff);
+		}
+		if (DetectMouseClick(quitButton)) return false;
+		return true;
+	}
+
+	void client_app::HandleConnectButton() {
+		if (DetectMouseHover(connectButton)) {
+			connectButton.text_.set_color(0xFFE0EE9F);
+		}
+		else {
+			connectButton.text_.set_color(0xffffffff);
+		}
+		if (state_ == DISCONNECTED) {
+			connectButton.text_.set_text("CONNECT");
+			if (DetectMouseClick(connectButton)) Reconnect();
+		}
+		else {
+			connectButton.text_.set_text("DISCONNECT");
+			if (DetectMouseClick(connectButton)) Disconnect();
+		}
+	}
+
+	void client_app::Disconnect() {
+		state_ = DISCONNECTED;
+	}
+
+	void client_app::Reconnect() {
+		state_ = CONNECTED;
+	}
+
+	bool client_app::DetectMouseHover(UIElement ui) {
+		float w = (float)ui.text_.scale_ * 8 * ui.text_.text_.length();
+		float h = (float)ui.text_.scale_ * 16;
+		float x = ui.transform_.position_.x_;
+		float y = ui.transform_.position_.y_;
+		if (mouse_.x_ > x && mouse_.x_ < x + w &&
+			mouse_.y_ > y && mouse_.y_ < y + h) {
+			return true;
+		}
+		return false;
+	}
+
+	bool client_app::DetectMouseClick(UIElement ui) {
+		if (DetectMouseHover(ui) && mouse_.is_pressed(MOUSE_BUTTON_LEFT)) {
+			return true;
+		}
+		return false;
+	}
+
+	void client_app::SetEliminationUI(int pID, UIElement& ui) {
 		string eliminationText;
 		if (remoteClientData_[pID].connected_) {
-			eliminationText = "P" + std::to_string(pID+1) + ": " + std::to_string(remoteClientData_[pID].eliminations_);			
+			eliminationText = "P" + std::to_string(pID + 1) + ": " + std::to_string(remoteClientData_[pID].eliminations_);
 		}
 		else {
 			eliminationText = "";
@@ -149,7 +207,7 @@ namespace tankett {
 
 	void client_app::SetCoolDownDisplay() {
 		string text;
-		int coolDown = (int)(entityManager_->shootingCooldown_ *10);
+		int coolDown = (int)(entityManager_->shootingCooldown_ * 10);
 		if (coolDown < 0) text = "";
 		else text = std::to_string(coolDown);
 		vector2 targetPosition = entityManager_->getTank(entityManager_->getLocalTankID())->transform_.position_;
@@ -171,6 +229,8 @@ namespace tankett {
 		renderUI(p2Ping);
 		renderUI(p3Ping);
 		renderUI(p4Ping);
+		renderUI(quitButton);
+		renderUI(connectButton);
 	}
 
 	void client_app::renderUI(UIElement pUI) {
@@ -207,7 +267,7 @@ namespace tankett {
 				crypt::xorinator xorinator(client_key_, server_key_);
 				xorinator_ = xorinator;
 				uint64 encryptedKeys = 0;
-				xorinator.encrypt(sizeof(uint64), (uint8*)&encryptedKeys);
+				xorinator.encrypt(sizeof(uint64), (uint8*)& encryptedKeys);
 				protocol_challenge_response challenge_response(encryptedKeys);
 				if (challenge_response.serialize(writer)) {
 					if (!socket_.send_to(server_ip_, stream)) {
@@ -282,8 +342,8 @@ namespace tankett {
 			//       - delete messages sent
 			//       - remove them from client message queue
 			for (int remove_message_index = 0;
-				 remove_message_index < messages_packed;
-				 remove_message_index++) {
+				remove_message_index < messages_packed;
+				remove_message_index++) {
 				delete messages_.at(remove_message_index);
 			}
 
@@ -310,7 +370,7 @@ namespace tankett {
 		return true;
 	}
 
-	
+
 #pragma endregion
 
 #pragma region Receive
@@ -376,12 +436,12 @@ namespace tankett {
 	}
 
 	void client_app::parsePayload(protocol_payload pPayload) {
-		if(pPayload.is_newer(latest_receive_sequence_)) {
+		if (pPayload.is_newer(latest_receive_sequence_)) {
 			byte_stream stream(pPayload.length_, pPayload.payload_);
 			byte_stream_reader reader(stream);
 
 			latest_receive_sequence_ = pPayload.sequence_;
-			
+
 			xorinator_.decrypt(pPayload.length_, pPayload.payload_);
 
 			network_message_type type = (network_message_type)reader.peek();
@@ -389,7 +449,7 @@ namespace tankett {
 			switch (type) {
 			case NETWORK_MESSAGE_PING: {
 			}
-			break;
+									   break;
 			case NETWORK_MESSAGE_SERVER_TO_CLIENT: {
 				message_server_to_client message;
 				if (!message.serialize(reader)) {
@@ -399,11 +459,11 @@ namespace tankett {
 					parseServerMessage(message);
 				}
 			}
-			break;
+												   break;
 			case NETWORK_MESSAGE_COUNT: {
 
 			}
-			break;
+										break;
 			default:
 				break;
 			}

@@ -50,6 +50,12 @@ namespace tankett {
 
 		void parsePayload(protocol_payload pPayload);
 		void parseServerMessage(message_server_to_client pMessage);
+		bool HandleQuitButton();
+		void HandleConnectButton();
+		void Disconnect();
+		void Reconnect();
+		bool DetectMouseHover(UIElement ui);
+		bool DetectMouseClick(UIElement ui);
 		void SetUI();
 		void SetEliminationUI(int pID, UIElement &ui);
 		void SetPingUI(int pID, UIElement& ui);
@@ -91,6 +97,8 @@ namespace tankett {
 		UIElement p2Ping;
 		UIElement p3Ping;
 		UIElement p4Ping;
+		UIElement quitButton;
+		UIElement connectButton;
 
 	};
 } // !tankett
