@@ -48,6 +48,20 @@ namespace tankett {
 				e->update(dt);
 			}
 		}
+		respawnTanks(dt);
+	}
+
+	void serverEntityManager::respawnTanks(time dt) {
+		for (serverTank* t : tanks_) {
+			if (!t->isAlive) {
+				t->respawnTime -= dt;
+				if (t->respawnTime.as_milliseconds() < 0) {
+					t->SetPosition(SPAWN_POINTS[t->id_]);
+					t->isEnabled = true;
+					t->respawnTime = time(RESPAWN_MILLISECONDS);
+				}
+			}
+		}
 	}
 
 #pragma region Initialisation

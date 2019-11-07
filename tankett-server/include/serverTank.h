@@ -21,6 +21,8 @@ namespace tankett {
 		transform transform_;
 		dynamic_array<serverBullet*> bullets_;
 		int getUnusedBulletID();
+		bool isAlive;
+		time respawnTime;
 	private:
 		bool hasBulletWithID(uint8 pID);
 		void updateBulletList();

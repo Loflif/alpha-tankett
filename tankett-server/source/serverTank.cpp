@@ -9,6 +9,8 @@ namespace tankett {
 		collider_ = rectangle(0, 0, size_.x_, size_.y_);
 		SetPosition(pSpawnPos);
 		id_ = ID;
+		isAlive = true;
+		respawnTime = time(RESPAWN_MILLISECONDS);
 	}
 
 
@@ -68,6 +70,7 @@ namespace tankett {
 				gameManager::AddScore((uint8)collider->owner_);
 				collider->isEnabled = false;
 				isEnabled = false;
+				isAlive = false;
 			}
 		}
 	}

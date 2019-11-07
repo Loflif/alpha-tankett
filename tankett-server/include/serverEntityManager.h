@@ -15,6 +15,7 @@ namespace tankett {
 		void spawnTank(int id);
 
 		void update(time dt);
+		void respawnTanks(time dt);
 		void parseClientMessage(message_client_to_server message,uint8 clientID, const time& pDeltaRecieveTime);
 		
 		void manageCollisions();
