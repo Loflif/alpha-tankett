@@ -205,6 +205,8 @@ namespace tankett {
 					byte_stream stream(msg.length_, msg.payload_);
 					byte_stream_reader reader(stream);
 
+					client.latest_received_sequence_ = msg.sequence_;
+					
 					client.xorinator_.decrypt(msg.length_, msg.payload_);
 					network_message_type type = (network_message_type)reader.peek();
 

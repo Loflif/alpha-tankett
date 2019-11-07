@@ -71,6 +71,7 @@ namespace tankett {
 		time send_accumulator;
 
 		uint32 send_sequence_ = 0;
+		uint32 latest_receive_sequence_ = 0;
 
 		crypt::xorinator xorinator_;
 		entityManager* entityManager_;
