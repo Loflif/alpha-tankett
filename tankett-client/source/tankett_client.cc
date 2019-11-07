@@ -106,7 +106,15 @@ namespace tankett {
 			entityManager_->manageCollisions();
 			SetCoolDownDisplay();
 		}
+		SetUI();
 
+		render();
+
+		return true;
+	}
+
+
+	void client_app::SetUI() {
 		SetEliminationUI(0, p1Eliminations);
 		SetEliminationUI(1, p2Eliminations);
 		SetEliminationUI(2, p3Eliminations);
@@ -115,12 +123,6 @@ namespace tankett {
 		SetPingUI(1, p2Ping);
 		SetPingUI(2, p3Ping);
 		SetPingUI(3, p4Ping);
-
-		
-
-		render();
-
-		return true;
 	}
 
 	void client_app::SetEliminationUI(int pID, UIElement &ui) {
