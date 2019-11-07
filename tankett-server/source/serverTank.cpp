@@ -80,8 +80,11 @@ namespace tankett {
 		}
 	}
 
-	void serverTank::SetPosition(vector2 pNewPosition) {
+	void serverTank::SetPreviousPosition() {
 		previousPosition_ = transform_.position_;
+	}
+
+	void serverTank::SetPosition(vector2 pNewPosition) {
 		transform_.position_ = pNewPosition;
 		vector2 targetPosition = transform_.position_ - size_/2;
 		collider_.set_position(targetPosition);

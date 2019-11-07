@@ -10,6 +10,7 @@ namespace tankett {
 		void update(time dt);
 
 		void onCollision(IServerEntity* collider) override;
+		void SetPreviousPosition();
 		void SetPosition(vector2 pNewPosition);
 
 		vector2 getAimVector();
@@ -18,7 +19,6 @@ namespace tankett {
 		float turretRotation_ = 0.0f;
 		float shootingCooldown_ = 0.0f;
 		int id_;
-		transform transform_;
 		dynamic_array<serverBullet*> bullets_;
 		int getUnusedBulletID();
 		bool isAlive;

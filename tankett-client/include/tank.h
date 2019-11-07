@@ -21,8 +21,8 @@ namespace tankett {
 
 		//Client-specific (keep these when refactoring later):
 		void UpdateValues(bool pAlive,
-						  vector2 pPos,
-						  float pAngle);
+			vector2 pPos,
+			float pAngle);
 		void SetPosition(vector2 pPos);
 		void SetAngle(float pAngle);
 		void SetActive(bool pIsActive);

@@ -14,6 +14,7 @@ namespace tankett {
 	static const float ROUND_TIME = 90.0f;
 	static const float FIRE_RATE = 1.0f;
 	static const int RESPAWN_MILLISECONDS = 3000;
+	static const float ROUNDENDTIME = 30.0f;
 
 	static const int BULLET_MAX_COUNT = 10;
 	static const int COLLISION_PAIR_COUNT = 4;

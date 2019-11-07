@@ -65,8 +65,8 @@ namespace tankett {
 		case ROUND_RUNNING: {
 			currentRoundTime_ -= dt.as_seconds();
 			if (currentRoundTime_ < 0) {
-				currentRoundTime_ = 0;
 				state_ = ROUND_END;
+				currentRoundTime_ = ROUNDENDTIME;
 			}
 		}
 			break;
@@ -76,7 +76,13 @@ namespace tankett {
 			}
 		}
 			break;
-		case ROUND_END:
+		case ROUND_END: {			
+			currentRoundTime_ -= dt.as_seconds();
+			if (currentRoundTime_ < 0) {
+				state_ = ROUND_RUNNING;
+				currentRoundTime_ = ROUND_TIME;
+			}
+		}
 			break;
 		default:
 			break;
@@ -220,6 +226,7 @@ namespace tankett {
 					
 					client.xorinator_.decrypt(msg.length_, msg.payload_);
 
+					entityManager_->getTank(client.id_)->SetPreviousPosition();
 					while (!reader.eos()) {
 						network_message_type type = (network_message_type)reader.peek();
 
