@@ -49,6 +49,8 @@ namespace tankett {
 		texture wallTexture_;
 		texture bulletTexture_;
 		texture tankTexture_;
+		texture remotetankTexture_;
 		texture turretTexture_;
+		texture remoteturretTexture_;
 	};
 }

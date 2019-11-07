@@ -1,8 +1,10 @@
 #include <tank.h>
 
 namespace tankett {
-	tank::tank(sprite pSprite, sprite pTurretSprite, float pPosX, float pPosY, uint8 pID) {
+	tank::tank(sprite pSprite, sprite pTurretSprite, sprite pRemoteSprite, sprite pRemoteTurretSprite, float pPosX, float pPosY, uint8 pID) {
 		sprite_ = pSprite;
+		remoteSprite_ = pRemoteSprite;
+		remoteTurretSprite_ = pRemoteTurretSprite;
 		size_ = pSprite.size_;
 		turretSprite_ = pTurretSprite;
 		transform_.set_origin(vector2(size_ / 2));
@@ -21,8 +23,15 @@ namespace tankett {
 	}
 
 	void tank::render(render_system& pRenderSystem) {
-		pRenderSystem.render(sprite_, transform_);
-		pRenderSystem.render(turretSprite_, turretTransform_);
+		if (isLocal_) {
+			pRenderSystem.render(sprite_, transform_);
+			pRenderSystem.render(turretSprite_, turretTransform_);
+		}
+		else {
+			pRenderSystem.render(remoteSprite_, transform_);
+			pRenderSystem.render(remoteTurretSprite_, turretTransform_);
+		}
+
 	}
 
 	void tank::update(keyboard kb, mouse ms, time dt) {

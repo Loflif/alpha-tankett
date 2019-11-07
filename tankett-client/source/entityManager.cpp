@@ -5,7 +5,9 @@ namespace tankett {
 	entityManager::entityManager() {
 		wallTexture_.create_from_file("assets/wallTile.png");
 		tankTexture_.create_from_file("assets/tank.png");
-		turretTexture_.create_from_file("assets/turret.png");
+		turretTexture_.create_from_file("assets/Turret.png");
+		remotetankTexture_.create_from_file("assets/remoteTank.png");
+		remoteturretTexture_.create_from_file("assets/remoteTurret.png");
 		bulletTexture_.create_from_file("assets/bullet.png");
 
 		createLevel();
@@ -36,9 +38,11 @@ namespace tankett {
 
 	void entityManager::createTankBuffer() {
 		for (int i = 0; i < 4; i++) {
-			sprite tankSprite(tankTexture_, vector2(TILE_SIZE * TANK_SIZE, TILE_SIZE * TANK_SIZE));
+			sprite tankSpr(tankTexture_, vector2(TILE_SIZE * TANK_SIZE, TILE_SIZE * TANK_SIZE));
 			sprite turretSpr(turretTexture_, vector2(TILE_SIZE * TANK_SIZE, TILE_SIZE * TANK_SIZE));
-			tank* t = new tank(tankSprite, turretSpr, SPAWN_POINTS[i].x_ * TILE_SIZE, SPAWN_POINTS[i].y_ * TILE_SIZE, (uint8)i);
+			sprite remotetankSpr(remotetankTexture_, vector2(TILE_SIZE * TANK_SIZE, TILE_SIZE * TANK_SIZE));
+			sprite remoteturretSpr(remoteturretTexture_, vector2(TILE_SIZE * TANK_SIZE, TILE_SIZE * TANK_SIZE));
+			tank* t = new tank(tankSpr, turretSpr, remotetankSpr, remoteturretSpr, SPAWN_POINTS[i].x_ * TILE_SIZE, SPAWN_POINTS[i].y_ * TILE_SIZE, (uint8)i);
 			entities_.push_back(t);
 			tanks_[i] = t;
 		}

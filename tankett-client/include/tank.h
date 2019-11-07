@@ -6,7 +6,7 @@ namespace tankett {
 
 	class tank : public IEntity {
 	public:
-		tank(sprite pSprite, sprite pTurretSprite, float pPosX, float pPosY, uint8 pID);
+		tank(sprite pSprite, sprite pTurretSprite, sprite pRemoteSprite, sprite pRemoteTurretSprite, float pPosX, float pPosY, uint8 pID);
 		~tank();
 
 		void render(render_system& pRenderSystem);
@@ -52,6 +52,8 @@ namespace tankett {
 		vector2 size_ = { 0,0 };
 		sprite sprite_;
 		sprite turretSprite_;
+		sprite remoteSprite_;
+		sprite remoteTurretSprite_;
 		transform turretTransform_;
 		vector2 previousPosition;
 		
