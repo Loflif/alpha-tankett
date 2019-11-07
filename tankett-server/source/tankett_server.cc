@@ -267,6 +267,7 @@ namespace tankett {
 		for (int i = 0; i < clients_.size(); i++) {
 			if (clients_[i].address_ == remote) {
 				iterator = i;
+				entityManager_->resetTank(i);
 			}
 		}
 		if (iterator >= 0) {
