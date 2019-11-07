@@ -61,8 +61,9 @@ namespace tankett {
 	}
 
 	void tank::SetTurret(mouse ms) {
-		turretTransform_.set_rotation(targetTurretRotation(ms));
-		turretTransform_.position_ = transform_.position_;
+		targetTurretRotation(ms);
+		/*turretTransform_.set_rotation(targetTurretRotation(ms));
+		turretTransform_.position_ = transform_.position_;*/
 	}
 
 	void tank::interpolateEntity(time dt) {
