@@ -49,7 +49,8 @@ namespace tankett {
 
 		void parsePayload(protocol_payload pPayload);
 		void parseServerMessage(message_server_to_client pMessage);
-		void SetPlayerUI(int pID, UIElement &ui);
+		void SetEliminationUI(int pID, UIElement &ui);
+		void SetPingUI(int pID, UIElement& ui);
 		void SetTimer(float pTime);
 		void SetCoolDownDisplay();
 		void renderUI(UIElement pUI);

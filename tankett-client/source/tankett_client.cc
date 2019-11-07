@@ -105,15 +105,16 @@ namespace tankett {
 			messages_.push_back(entityManager_->checkInput(keyboard_, mouse_));
 			entityManager_->manageCollisions();
 			SetCoolDownDisplay();
-			SetPlayerUI(0, p1Eliminations);
-			SetPlayerUI(1, p2Eliminations);
-			SetPlayerUI(2, p3Eliminations);
-			SetPlayerUI(3, p4Eliminations);
-			p1Ping.text_.set_text(std::to_string(remoteClientData_[0].ping_).c_str());
-			p2Ping.text_.set_text(std::to_string(remoteClientData_[1].ping_).c_str());
-			p3Ping.text_.set_text(std::to_string(remoteClientData_[2].ping_).c_str());
-			p4Ping.text_.set_text(std::to_string(remoteClientData_[3].ping_).c_str());
 		}
+
+		SetEliminationUI(0, p1Eliminations);
+		SetEliminationUI(1, p2Eliminations);
+		SetEliminationUI(2, p3Eliminations);
+		SetEliminationUI(3, p4Eliminations);
+		SetPingUI(0, p1Ping);
+		SetPingUI(1, p2Ping);
+		SetPingUI(2, p3Ping);
+		SetPingUI(3, p4Ping);
 
 		
 
@@ -122,15 +123,26 @@ namespace tankett {
 		return true;
 	}
 
-	void client_app::SetPlayerUI(int pID, UIElement &ui) {
+	void client_app::SetEliminationUI(int pID, UIElement &ui) {
 		string eliminationText;
-		if (/*remoteClientData_[pID].connected_*/true) {
+		if (remoteClientData_[pID].connected_) {
 			eliminationText = "P" + std::to_string(pID+1) + ": " + std::to_string(remoteClientData_[pID].eliminations_);			
 		}
 		else {
 			eliminationText = "";
 		}
 		ui.text_.set_text(eliminationText.c_str());
+	}
+
+	void client_app::SetPingUI(int pID, UIElement& ui) {
+		string pingText;
+		if (remoteClientData_[pID].connected_) {
+			pingText = std::to_string(remoteClientData_[pID].ping_);
+		}
+		else {
+			pingText = "";
+		}
+		ui.text_.set_text(pingText.c_str());
 	}
 
 	void client_app::SetCoolDownDisplay() {
