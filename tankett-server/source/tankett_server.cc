@@ -219,7 +219,6 @@ namespace tankett {
 					client.latest_received_sequence_ = msg.sequence_;
 					
 					client.xorinator_.decrypt(msg.length_, msg.payload_);
-					client.ping_ = time::now() - client.latest_receive_time_;
 
 					while (!reader.eos()) {
 						network_message_type type = (network_message_type)reader.peek();
@@ -277,13 +276,15 @@ namespace tankett {
 		}
 	}
 	void server::parsePingMessage(network_message_ping message, uint8 clientID) {
-		int it;
+		int it = 0;
 		for (std::pair<uint8, time> pair : clients_[clientID].pings_) {
 			if (pair.first == message.sequence_) {
-
+				clients_[clientID].ping_ = time::now() - pair.second;
+				break;
 			}
 			it++;
 		}
+		clients_[clientID].pings_.erase(clients_[clientID].pings_.begin() + it);
 	}
 #pragma endregion
 	
