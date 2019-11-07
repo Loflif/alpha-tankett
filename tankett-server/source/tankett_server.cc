@@ -376,6 +376,7 @@ namespace tankett {
 		msg->client_count = (uint8)clients_.size();
 		for (int i = 0; i < 4; i++) {
 			clientData[i].eliminations = gameManager::score_[i];
+			clientData[i].angle = entityManager_->getTank(i)->turretRotation_;
 			msg->client_data[i] = clientData[i];
 		}
 		for(int i = 0; i < clients_.size(); i++) {

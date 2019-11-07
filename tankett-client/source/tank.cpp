@@ -210,7 +210,7 @@ namespace tankett {
 	}
 
 	void tank::SetAngle(float pAngle) {
-		transform_.set_rotation(pAngle);
+		turretTransform_.set_rotation(pAngle);
 	}
 
 	void tank::SetActive(bool pIsActive) {
