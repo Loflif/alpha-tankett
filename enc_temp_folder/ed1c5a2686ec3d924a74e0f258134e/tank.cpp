@@ -44,11 +44,10 @@ namespace tankett {
 		}
 		else {
 			interpolateEntity(dt);
-			if (nextToLastReceivedPosition_ != lastReceivedPosition_) {
-				vector2 direction = nextToLastReceivedPosition_ - lastReceivedPosition_;
-				float angle = atan2(direction.y_, direction.x_) * (180 / PI);
-				transform_.set_rotation(angle);
-			}
+			vector2 direction = nextToLastReceivedPosition_ - lastReceivedPosition_;
+			if (direction !=)
+			float angle = atan2(direction.y_, direction.x_) * (180 / PI);
+			transform_.set_rotation(angle);
 		}
 
 
