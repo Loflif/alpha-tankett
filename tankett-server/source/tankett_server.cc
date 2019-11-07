@@ -62,7 +62,7 @@ namespace tankett {
 #pragma region Update
 	void server::update(const time& dt) {
 		switch (state_) {
-		case tankett::ROUND_RUNNING: {
+		case ROUND_RUNNING: {
 			currentRoundTime_ -= dt.as_seconds();
 			if (currentRoundTime_ < 0) {
 				currentRoundTime_ = 0;
@@ -70,13 +70,13 @@ namespace tankett {
 			}
 		}
 			break;
-		case tankett::WAITING_FOR_PLAYER: {
+		case WAITING_FOR_PLAYER: {
 			if (connectedClientCount() >= 2) {
 				state_ = ROUND_RUNNING;
 			}
 		}
 			break;
-		case tankett::ROUND_END:
+		case ROUND_END:
 			break;
 		default:
 			break;
@@ -119,6 +119,9 @@ namespace tankett {
 			return;
 		}		
 			const uint8 type = reader.peek();
+			if(type != PACKET_TYPE_PAYLOAD) {
+				int i = 0;
+			}
 
 			switch (type) {
 			case PACKET_TYPE_CONNECTION_REQUEST: {
@@ -142,12 +145,20 @@ namespace tankett {
 			case PACKET_TYPE_PAYLOAD: {
 				protocol_payload msg;
 				if (!msg.serialize(reader)) {
-					debugf("[Warning] Tried to serialize challenge response but it didnt work for some reason.");
+					debugf("[Warning] Tried to serialize payload but it didnt work for some reason.");
 					break;
 				}
 				processPayload(remote, msg);
 			}
 									break;
+			case PACKET_TYPE_DISCONNECT: {
+				protocol_disconnect msg;
+				if (!msg.serialize(reader)) {
+					debugf("[Warning] Tried to serialize disconnect message but it didnt work for some reason.");
+					break;
+				}
+				processDisconnect(remote);
+			}
 			default:
 				return;
 				break;
@@ -243,7 +254,7 @@ namespace tankett {
 	}
 
 
-	void server::processDisconnect(ip_address remote, protocol_payload& msg) { //TODO: TEST!
+	void server::processDisconnect(ip_address remote) {
 		int iterator = -1;
 		for (int i = 0; i < clients_.size(); i++) {
 			if (clients_[i].address_ == remote) {

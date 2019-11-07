@@ -79,8 +79,8 @@ namespace tankett {
 #pragma region Termination
 
 	void client_app::exit() {
+		send_disconnect();
 		network_shut();
-
 		delete(entityManager_);
 	}
 #pragma endregion
@@ -225,6 +225,22 @@ namespace tankett {
 
 				send_sequence_++;
 			}
+			}
+		}
+	}
+
+	void client_app::send_disconnect() {
+		uint8 buffer[2048];
+
+		byte_stream stream(sizeof(buffer), buffer);
+		byte_stream_writer writer(stream);
+
+		uint64 encryptedKeys = 0;
+		xorinator_.encrypt(sizeof(uint64), (uint8*)&encryptedKeys);
+		protocol_disconnect disconnect(encryptedKeys);
+		if(disconnect.serialize(writer)) {
+			if (!socket_.send_to(server_ip_, stream)) {
+				auto error = network_error::get_error();
 			}
 		}
 	}

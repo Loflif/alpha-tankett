@@ -39,6 +39,7 @@ namespace tankett {
 		virtual bool tick() final;
 		void render();
 		void send(time dt);
+		void send_disconnect();
 		bool pack_payload(protocol_payload& pPayload);
 		bool send_payload(protocol_payload& pPayload);
 
