@@ -146,7 +146,7 @@ namespace tankett {
 		else {
 			connectButton.text_.set_color(0xffffffff);
 		}
-		if (isDisconnected) {
+		if (state_ == DISCONNECTED) {
 			connectButton.text_.set_text("CONNECT");
 			if (DetectMouseClick(connectButton)) Reconnect();
 		}
@@ -157,11 +157,11 @@ namespace tankett {
 	}
 
 	void client_app::Disconnect() {
-		isDisconnected = true;
+		state_ = DISCONNECTED;
 	}
 
 	void client_app::Reconnect() {
-		isDisconnected = false;
+		state_ = CONNECTED;
 	}
 
 	bool client_app::DetectMouseHover(UIElement ui) {
