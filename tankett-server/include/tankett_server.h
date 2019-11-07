@@ -32,6 +32,8 @@ namespace tankett {
 		crypt::xorinator xorinator_;
 		uint32 latest_received_sequence_{};
 		time latest_receive_time_;
+		dynamic_array<std::pair<uint8, time>> pings_;
+		uint8 pingSequence_ = 0;
 		dynamic_array<network_message_header*> messages_;
 	};
 
@@ -54,7 +56,9 @@ namespace tankett {
 		void processChallengeResponse(ip_address remote, protocol_challenge_response& msg);
 		void processPayload(ip_address remote, protocol_payload& msg);
 		void processDisconnect(ip_address remote);
+		void parsePingMessage(network_message_ping message, uint8 clientID);
 		void queueMessage(client& pClient);
+		void queuePing(client& pClient);
 
 
 		void challengeClient(client& client);

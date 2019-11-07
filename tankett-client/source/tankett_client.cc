@@ -166,7 +166,7 @@ namespace tankett {
 	}
 
 	void client_app::Reconnect() {
-		state_ = INIT;
+		state_ = CONNECTION_REQUEST;
 	}
 
 	bool client_app::DetectMouseHover(UIElement ui) {
@@ -390,7 +390,6 @@ namespace tankett {
 		packet_type type;
 
 		ip_address remote;
-
 		while (!reader.eos()) {
 			if (!socket_.recv_from(remote, stream)) {
 				auto error = network_error::get_error();
@@ -450,29 +449,42 @@ namespace tankett {
 
 			xorinator_.decrypt(pPayload.length_, pPayload.payload_);
 
-			network_message_type type = (network_message_type)reader.peek();
+			while (!reader.eos()) {
+				network_message_type type = (network_message_type)reader.peek();
 
-			switch (type) {
-			case NETWORK_MESSAGE_PING: {
-			}
-									   break;
-			case NETWORK_MESSAGE_SERVER_TO_CLIENT: {
-				message_server_to_client message;
-				if (!message.serialize(reader)) {
-					auto error = network_error::get_error();
+				switch (type) {
+				case NETWORK_MESSAGE_PING: {
+					network_message_ping message;
+					if (!message.serialize(reader)) {
+						auto error = network_error::get_error();
+					}
+					else {
+						network_message_ping* msg = new network_message_ping;
+						msg->sequence_ = message.sequence_;
+						messages_.push_back(msg);
+					}
 				}
-				else {
-					parseServerMessage(message);
-				}
-			}
-												   break;
-			case NETWORK_MESSAGE_COUNT: {
-
-			}
-										break;
-			default:
 				break;
-			}
+				case NETWORK_MESSAGE_SERVER_TO_CLIENT: {
+					message_server_to_client message;
+					if (!message.serialize(reader)) {
+						auto error = network_error::get_error();
+					}
+					else {
+						parseServerMessage(message);
+					}
+				}
+				break;
+				case NETWORK_MESSAGE_COUNT: {
+
+				}
+				break;
+				default: {
+
+				}
+				break;
+				}
+			}			
 		}
 	}
 

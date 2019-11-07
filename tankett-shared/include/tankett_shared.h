@@ -206,7 +206,7 @@ namespace tankett {
          result &= stream.serialize(type_);
          result &= stream.serialize(sequence_);
          result &= stream.serialize(length_);
-         assert(length_ < sizeof(payload_));
+         assert(length_ <= sizeof(payload_));
          result &= stream.serialize(length_, payload_);
          return result;
       }
@@ -251,11 +251,23 @@ namespace tankett {
 
    struct network_message_ping : network_message_header {
       network_message_ping();
+	  uint8 sequence_;
+
+	  virtual bool write(byte_stream_writer& writer) final {
+		  return serialize(writer);
+	  }
+	  virtual bool write(byte_stream_evaluator& evaluator) final {
+		  return serialize(evaluator);
+	  }
+	  virtual bool read(byte_stream_reader& reader) final {
+		  return serialize(reader);
+	  }
 
       template <typename T>
       bool serialize(T &stream) {
          bool result = true;
          result &= stream.serialize(type_);
+		 result &= stream.serialize(sequence_);
          return result;
       }
    };

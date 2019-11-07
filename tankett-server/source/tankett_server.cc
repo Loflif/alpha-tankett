@@ -219,35 +219,44 @@ namespace tankett {
 					client.latest_received_sequence_ = msg.sequence_;
 					
 					client.xorinator_.decrypt(msg.length_, msg.payload_);
-					network_message_type type = (network_message_type)reader.peek();
-
 					client.ping_ = time::now() - client.latest_receive_time_;
-					
-					switch (type) {
-					case NETWORK_MESSAGE_PING: {
-					}
-					break;
-					case NETWORK_MESSAGE_CLIENT_TO_SERVER: {
-						message_client_to_server message;
-						if (!message.serialize(reader)) {
-							auto error = network_error::get_error();
-						}
-						else {
-							time deltaReceiveTime = time::now() - client.latest_receive_time_;
-							entityManager_->parseClientMessage(message, client.id_, deltaReceiveTime);
-						}
-					}
-					break;
-					case NETWORK_MESSAGE_COUNT: {
 
-					}
-					break;
-					default:
-						break;
-					}
+					while (!reader.eos()) {
+						network_message_type type = (network_message_type)reader.peek();
 
+						switch (type) {
+						case NETWORK_MESSAGE_PING: {
+							network_message_ping message;
+							if (!message.serialize(reader)) {
+								auto error = network_error::get_error();
+							}
+							else {
+								parsePingMessage(message, client.id_);
+							}
+						}
+												   break;
+						case NETWORK_MESSAGE_CLIENT_TO_SERVER: {
+							message_client_to_server message;
+							if (!message.serialize(reader)) {
+								auto error = network_error::get_error();
+							}
+							else {
+								time deltaReceiveTime = time::now() - client.latest_receive_time_;
+								entityManager_->parseClientMessage(message, client.id_, deltaReceiveTime);
+							}
+						}
+															   break;
+						case NETWORK_MESSAGE_COUNT: {
+
+						}
+													break;
+						default: {
+
+						}
+							break;
+						}
+					}
 					client.latest_receive_time_ = time::now();
-					
 				}
 			}
 		}
@@ -267,6 +276,15 @@ namespace tankett {
 			//TODO: Make people disabled
 		}
 	}
+	void server::parsePingMessage(network_message_ping message, uint8 clientID) {
+		int it;
+		for (std::pair<uint8, time> pair : clients_[clientID].pings_) {
+			if (pair.first == message.sequence_) {
+
+			}
+			it++;
+		}
+	}
 #pragma endregion
 	
 #pragma region Send
@@ -282,6 +300,9 @@ namespace tankett {
 					break;
 				case CONNECTED:
 					queueMessage(client);
+					queuePing(client);
+					
+					
 					break;
 				default:
 					break;
@@ -402,6 +423,14 @@ namespace tankett {
 		msg->receiver_id = pClient.id_;
 		msg->type_ = NETWORK_MESSAGE_SERVER_TO_CLIENT;
 		pClient.messages_.push_back(msg);
+	}
+
+	void server::queuePing(client& pClient) {
+		network_message_ping* msg = new network_message_ping;
+		msg->sequence_ = pClient.pingSequence_;
+		pClient.messages_.push_back(msg);
+		pClient.pings_.push_back(std::make_pair(pClient.pingSequence_, time::now()));
+		pClient.pingSequence_++;
 	}
 
 	void server::challengeClient(client& client) {
