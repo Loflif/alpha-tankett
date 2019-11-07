@@ -73,6 +73,11 @@ namespace tankett {
 				isAlive = false;
 			}
 		}
+		if(collider->type_ == TANK) {
+			isEnabled = false;
+			isAlive = false;
+			gameManager::AddScore((uint8)id_);
+		}
 	}
 
 	void serverTank::SetPosition(vector2 pNewPosition) {
