@@ -154,7 +154,10 @@ namespace tankett {
 			if (!b->isEnabled) {
 				vector2 tPos = t->transform_.position_;
 				vector2 direction = vector2::zero();
-				if (t->isLocal_) direction = t->aimVector_;
+				if (t->isLocal_) {
+					direction = t->aimVector_;
+					shootingCooldown_ = FIRE_RATE;
+				}
 				b->fire(tPos.x_, tPos.y_, direction, t->getUnusedBulletID());
 				t->bullets_.push_back(b);
 				break;
