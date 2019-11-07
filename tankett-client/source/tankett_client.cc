@@ -360,33 +360,37 @@ namespace tankett {
 	}
 
 	void client_app::parsePayload(protocol_payload pPayload) {
-		byte_stream stream(pPayload.length_, pPayload.payload_);
-		byte_stream_reader reader(stream);
+		if(pPayload.is_newer(latest_receive_sequence_)) {
+			byte_stream stream(pPayload.length_, pPayload.payload_);
+			byte_stream_reader reader(stream);
 
-		xorinator_.decrypt(pPayload.length_, pPayload.payload_);
+			latest_receive_sequence_ = pPayload.sequence_;
+			
+			xorinator_.decrypt(pPayload.length_, pPayload.payload_);
 
-		network_message_type type = (network_message_type)reader.peek();
+			network_message_type type = (network_message_type)reader.peek();
 
-		switch (type) {
-		case NETWORK_MESSAGE_PING: {
-		}
-		break;
-		case NETWORK_MESSAGE_SERVER_TO_CLIENT: {
-			message_server_to_client message;
-			if (!message.serialize(reader)) {
-				auto error = network_error::get_error();
+			switch (type) {
+			case NETWORK_MESSAGE_PING: {
 			}
-			else {
-				parseServerMessage(message);
-			}
-		}
-		break;
-		case NETWORK_MESSAGE_COUNT: {
-
-		}
-		break;
-		default:
 			break;
+			case NETWORK_MESSAGE_SERVER_TO_CLIENT: {
+				message_server_to_client message;
+				if (!message.serialize(reader)) {
+					auto error = network_error::get_error();
+				}
+				else {
+					parseServerMessage(message);
+				}
+			}
+			break;
+			case NETWORK_MESSAGE_COUNT: {
+
+			}
+			break;
+			default:
+				break;
+			}
 		}
 	}
 
