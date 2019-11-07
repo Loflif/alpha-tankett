@@ -27,6 +27,10 @@ namespace alpha {
 	template <typename K, typename V>
 	using hashmap = std::unordered_map<K, V>;
 
+	static float lerp(float a, float b, float f) {
+		return a + f * (b - a);
+	}
+
 	struct time {
 		static time now();
 

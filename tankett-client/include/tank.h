@@ -59,9 +59,12 @@ namespace tankett {
 		//For Prediciton:
 		void PredictPosition(vector2 pReceivedPos);
 		dynamic_array<vector2> predictedPositionOffsets_;
+		float lastPredictedAngle;
 		vector2 lastReceivedPosition_;
+		float lastReceivedAngle_;
 		//For interpolation:
 		vector2 nextToLastReceivedPosition_;
+		float nextToLastReceivedAngle_;
 		time timeOfLastMessage;
 		time messageDeltaTime_;
 	};

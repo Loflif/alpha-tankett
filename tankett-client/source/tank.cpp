@@ -30,9 +30,10 @@ namespace tankett {
 		if (isLocal_)UpdatePosition(kb, dt);
 		else interpolateEntity(dt);
 
+		lastPredictedAngle = targetTurretRotation(ms) - turretTransform_.rotation_;
+		SetAngle(lerp(turretTransform_.rotation_, targetTurretRotation(ms), 0.9f));
+
 		updateAimVector(ms);
-		//transform_.set_rotation(targetRotation(kb));
-		SetTurret(ms);
 		setColliderPosition();
 		updateBulletList();
 	}
@@ -67,7 +68,9 @@ namespace tankett {
 	}
 
 	void tank::interpolateEntity(time dt) {
-		SetPosition(vector2::Lerp(transform_.position_, lastReceivedPosition_, dt.as_seconds() / messageDeltaTime_.as_seconds()));
+		float lerpDistance = dt.as_seconds() / messageDeltaTime_.as_seconds();
+		SetPosition(vector2::Lerp(transform_.position_, lastReceivedPosition_, lerpDistance));
+		SetAngle(lerp(turretTransform_.rotation_, lastReceivedAngle_, lerpDistance));
 	}
 
 	void tank::setColliderPosition() {
@@ -93,9 +96,6 @@ namespace tankett {
 		}
 		break;
 		case BULLET: {
-			if (!ownsBullet(collider)) {
-				isEnabled = false;
-			}
 		}
 		break;
 		case TANK: {
@@ -175,7 +175,7 @@ namespace tankett {
 	void tank::UpdateValues(bool pAlive,
 							vector2 pPos, 
 							float pAngle){
-		SetAngle(pAngle);
+		//SetAngle(pAngle);
 		SetActive(pAlive);
 		
 
@@ -186,7 +186,8 @@ namespace tankett {
 				lastPrediction = predictedPositionOffsets_[predictedPositionOffsets_.size() - 1];
 			}
 			lastReceivedPosition_ = pPos + lastPrediction;
-			//SetPosition(vector2::Lerp(transform_.position_, lastReceivedPosition_, 0.9f));
+			lastReceivedAngle_ = pAngle + lastPredictedAngle;
+			SetAngle(lerp(turretTransform_.rotation_, lastReceivedAngle_, 0.9f));
 			predictedPositionOffsets_.clear();
 		}
 		//Entity Interpolation:
@@ -194,6 +195,11 @@ namespace tankett {
 			nextToLastReceivedPosition_ = lastReceivedPosition_;
 			lastReceivedPosition_ = pPos;
 			SetPosition(nextToLastReceivedPosition_);
+
+			nextToLastReceivedAngle_ = lastReceivedAngle_;
+			lastReceivedAngle_ = pAngle;
+			SetAngle(lastReceivedAngle_);
+
 			messageDeltaTime_ = time::now() - timeOfLastMessage;
 			timeOfLastMessage = time::now();
 		}
