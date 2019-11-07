@@ -20,6 +20,7 @@ namespace tankett {
 		void parseClientMessage(message_client_to_server message,uint8 clientID, const time& pDeltaRecieveTime);
 		
 		void manageCollisions();
+		void disableAllTanks();
 	private:
 		void createLevel();
 		void createTankBuffer();

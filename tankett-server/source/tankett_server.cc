@@ -67,6 +67,15 @@ namespace tankett {
 			if (currentRoundTime_ < 0) {
 				state_ = ROUND_END;
 				currentRoundTime_ = ROUNDENDTIME;
+				entityManager_->disableAllTanks();
+			}
+			else if (connectedClientCount() < 2) {
+				state_ = WAITING_FOR_PLAYER;
+				currentRoundTime_ = ROUND_TIME;
+				for (int i = 0; i < connectedClientCount(); i++) {
+					entityManager_->getTank(clients_[i].id_)->isEnabled = false;
+					entityManager_->getTank(clients_[i].id_)->SetPosition(SPAWN_POINTS[clients_[i].id_]);
+				}
 			}
 		}
 			break;
@@ -78,9 +87,21 @@ namespace tankett {
 			break;
 		case ROUND_END: {			
 			currentRoundTime_ -= dt.as_seconds();
-			if (currentRoundTime_ < 0) {
+			if (connectedClientCount() < 2) {
+				state_ = WAITING_FOR_PLAYER;
+				currentRoundTime_ = ROUND_TIME;
+				for (int i = 0; i < connectedClientCount(); i++) {
+					entityManager_->getTank(clients_[i].id_)->isEnabled = false;
+					entityManager_->getTank(clients_[i].id_)->SetPosition(SPAWN_POINTS[clients_[i].id_]);
+				}
+			}
+			else if (currentRoundTime_ < 0) {
 				state_ = ROUND_RUNNING;
 				currentRoundTime_ = ROUND_TIME;
+				for (int i = 0; i < connectedClientCount(); i++) {
+					entityManager_->getTank(clients_[i].id_)->isEnabled = true;
+					entityManager_->getTank(clients_[i].id_)->SetPosition(SPAWN_POINTS[clients_[i].id_]);
+				}				
 			}
 		}
 			break;

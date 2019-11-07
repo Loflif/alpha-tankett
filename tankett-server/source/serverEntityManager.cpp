@@ -129,6 +129,13 @@ namespace tankett {
 		}
 	}
 
+	void serverEntityManager::disableAllTanks() {
+		for (serverTank* t : tanks_) {
+			t->isAlive = true;
+			t->isEnabled = false;
+		}
+	}
+
 	bool serverEntityManager::checkCollision(IServerEntity* firstEntity, IServerEntity* secondEntity) {
 		const rectangle firstRectangle = firstEntity->collider_;
 		const rectangle secondRectangle = secondEntity->collider_;
