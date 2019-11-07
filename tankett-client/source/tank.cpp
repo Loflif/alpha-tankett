@@ -27,11 +27,14 @@ namespace tankett {
 
 	void tank::update(keyboard kb, mouse ms, time dt) {
 		previousPosition = transform_.position_;
-		if (isLocal_)UpdatePosition(kb, dt);
+		if (isLocal_) {
+			UpdatePosition(kb, dt);
+			lastPredictedAngle = targetTurretRotation(ms) - turretTransform_.rotation_;
+			SetAngle(lerp(turretTransform_.rotation_, targetTurretRotation(ms), 0.9f));
+		}
 		else interpolateEntity(dt);
 
-		lastPredictedAngle = targetTurretRotation(ms) - turretTransform_.rotation_;
-		SetAngle(lerp(turretTransform_.rotation_, targetTurretRotation(ms), 0.9f));
+
 
 		updateAimVector(ms);
 		setColliderPosition();
@@ -59,12 +62,6 @@ namespace tankett {
 			if (b->id_ == pID) return b;
 		}
 		return nullptr;
-	}
-
-	void tank::SetTurret(mouse ms) {
-		targetTurretRotation(ms);
-		/*turretTransform_.set_rotation(targetTurretRotation(ms));
-		turretTransform_.position_ = transform_.position_;*/
 	}
 
 	void tank::interpolateEntity(time dt) {
