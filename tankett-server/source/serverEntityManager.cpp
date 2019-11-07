@@ -25,10 +25,6 @@ namespace tankett {
 		tanks_[clientID]->turretRotation_ = message.turret_angle;
 	}
 
-	/*serverTile* serverEntityManager::createTile(vector2 pPosition) {
-		return new serverTile;
-	}*/
-	
 	void serverEntityManager::addEntity(IServerEntity& pEntity) {
 		entities_.push_back(&pEntity);
 	}
