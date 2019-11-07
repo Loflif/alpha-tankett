@@ -64,7 +64,8 @@ namespace tankett {
 		SetUIElement(p2Ping, "0123456789", 1, vector2(40 * TILE_SIZE, 1.8f * TILE_SIZE), 0xFF4F5E9C);
 		SetUIElement(p3Ping, "0123456789", 1, vector2(1 * TILE_SIZE, 30.6f * TILE_SIZE), 0xFF4F5E9C);
 		SetUIElement(p4Ping, "0123456789", 1, vector2(40 * TILE_SIZE, 30.6f * TILE_SIZE), 0xFF4F5E9C);
-		SetUIElement(quitButton, "QUIT", 2, vector2(40 * TILE_SIZE, 0.25f * TILE_SIZE));
+		SetUIElement(quitButton, "QUIT", 2, vector2(41 * TILE_SIZE, 0.25f * TILE_SIZE));
+		SetUIElement(connectButton, "DISCONNECT", 2, vector2(34 * TILE_SIZE, 0.25f * TILE_SIZE));
 	}
 
 	void client_app::SetUIElement(UIElement& element, const char* pText, int32 pSize, vector2 pPos, uint32 pColor) {
@@ -108,10 +109,10 @@ namespace tankett {
 			SetCoolDownDisplay();
 		}
 		SetUI();
-		bool quitButtonNotPressed = HandleQuitButton();
+		bool doesContinue = HandleQuitButton();
 		render();
 
-		return quitButtonNotPressed;
+		return doesContinue;
 	}
 
 
@@ -124,7 +125,7 @@ namespace tankett {
 		SetPingUI(1, p2Ping);
 		SetPingUI(2, p3Ping);
 		SetPingUI(3, p4Ping);
-		HandleQuitButton();
+		HandleConnectButton();
 	}
 
 	bool client_app::HandleQuitButton() {
@@ -138,11 +139,36 @@ namespace tankett {
 		return true;
 	}
 
+	void client_app::HandleConnectButton() {
+		if (DetectMouseHover(connectButton)) {
+			connectButton.text_.set_color(0xFFE0EE9F);
+		}
+		else {
+			connectButton.text_.set_color(0xffffffff);
+		}
+		if (isDisconnected) {
+			connectButton.text_.set_text("CONNECT");
+			if (DetectMouseClick(connectButton)) Reconnect();
+		}
+		else {
+			connectButton.text_.set_text("DISCONNECT");
+			if (DetectMouseClick(connectButton)) Disconnect();
+		}
+	}
+
+	void client_app::Disconnect() {
+		isDisconnected = true;
+	}
+
+	void client_app::Reconnect() {
+		isDisconnected = false;
+	}
+
 	bool client_app::DetectMouseHover(UIElement ui) {
-		float w = (float)quitButton.text_.scale_ * 8 * quitButton.text_.text_.length();
-		float h = (float)quitButton.text_.scale_ * 16;
-		float x = quitButton.transform_.position_.x_;
-		float y = quitButton.transform_.position_.y_;
+		float w = (float)ui.text_.scale_ * 8 * ui.text_.text_.length();
+		float h = (float)ui.text_.scale_ * 16;
+		float x = ui.transform_.position_.x_;
+		float y = ui.transform_.position_.y_;
 		if (mouse_.x_ > x && mouse_.x_ < x + w &&
 			mouse_.y_ > y && mouse_.y_ < y + h) {
 			return true;
@@ -204,6 +230,7 @@ namespace tankett {
 		renderUI(p3Ping);
 		renderUI(p4Ping);
 		renderUI(quitButton);
+		renderUI(connectButton);
 	}
 
 	void client_app::renderUI(UIElement pUI) {
