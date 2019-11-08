@@ -16,8 +16,8 @@ namespace tankett {
 	}
 
 	void gameManager::ResetScore() {
-		for (uint8 i : score_) {
-			score_[i] = 0;
+		for (uint8 s : score_) {
+			s = 0;
 		}
 	}
 	
