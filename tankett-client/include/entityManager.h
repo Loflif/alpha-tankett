@@ -21,7 +21,6 @@ namespace tankett {
 		float shootingCooldown_ = 0.0f;
 
 		void manageCollisions();
-		void UpdateLocalTank(server_to_client_data pData);
 		void CompareBulletLists(server_to_client_data pData);
 		bool isBulletInList(server_to_client_data pData, uint8 pID);
 		void UpdateTank(server_to_client_data pData);
