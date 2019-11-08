@@ -135,6 +135,12 @@ namespace tankett {
 		}
 	}
 
+	void entityManager::ResetTanks() {
+		for (tank* t : tanks_) {
+			t->isEnabled = false;
+		}
+	}
+
 	void entityManager::CompareBulletLists(server_to_client_data pData) {
 		for (int i = 0; i < tanks_[pData.client_id]->bullets_.size(); i++) {
 			if (!isBulletInList(pData, (uint8)tanks_[pData.client_id]->bullets_[i]->id_)) {

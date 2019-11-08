@@ -28,7 +28,7 @@ namespace tankett {
 		time ping_;
 		uint64 client_key_{};
 		uint64 server_key_{};
-		uint8 id_;
+		uint8 id_ = 0;
 		crypt::xorinator xorinator_;
 		uint32 latest_received_sequence_{};
 		time latest_receive_time_;

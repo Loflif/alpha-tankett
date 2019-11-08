@@ -58,6 +58,7 @@ namespace tankett {
 			update(dt);
 			send(dt);
 		}
+		int x = 0;
 	}
 #pragma region Update
 	void server::update(const time& dt) {
@@ -248,7 +249,9 @@ namespace tankett {
 					client.xorinator_.decrypt(msg.length_, msg.payload_);
 
 					entityManager_->getTank(client.id_)->SetPreviousPosition();
-					while (!reader.eos()) {
+
+					bool invalidMessageReceived = false;
+					while (!reader.eos() && !invalidMessageReceived) {
 						network_message_type type = (network_message_type)reader.peek();
 
 						switch (type) {
@@ -277,10 +280,9 @@ namespace tankett {
 
 						}
 													break;
-						default: {
-
-						}
-							break;
+						default:
+							invalidMessageReceived = true;
+						break;
 						}
 					}
 					client.latest_receive_time_ = time::now();
@@ -300,20 +302,23 @@ namespace tankett {
 		}
 		if (iterator >= 0) {
 			clients_.erase(clients_.begin() + iterator);
+			clientData[iterator].connected = false;
 			//ResetTank(uint8 clientID); function in Entitymanager?
 			//TODO: Make people disabled
 		}
 	}
 	void server::parsePingMessage(network_message_ping message, uint8 clientID) {
 		int it = 0;
+		bool hasPing = false;
 		for (std::pair<uint8, time> pair : clients_[clientID].pings_) {
 			if (pair.first == message.sequence_) {
 				clients_[clientID].ping_ = time::now() - pair.second;
+				hasPing = true;
 				break;
 			}
 			it++;
 		}
-		clients_[clientID].pings_.erase(clients_[clientID].pings_.begin() + it);
+		if (hasPing) clients_[clientID].pings_.erase(clients_[clientID].pings_.begin() + it);
 	}
 #pragma endregion
 	
