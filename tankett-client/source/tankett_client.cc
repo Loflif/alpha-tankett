@@ -449,7 +449,8 @@ namespace tankett {
 
 			xorinator_.decrypt(pPayload.length_, pPayload.payload_);
 
-			while (!reader.eos()) {
+			bool invalidMessageReceived = false;
+			while (!reader.eos() && !invalidMessageReceived) {
 				network_message_type type = (network_message_type)reader.peek();
 
 				switch (type) {
@@ -480,7 +481,7 @@ namespace tankett {
 				}
 				break;
 				default: {
-
+					invalidMessageReceived = true;
 				}
 				break;
 				}
