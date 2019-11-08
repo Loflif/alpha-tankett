@@ -119,6 +119,7 @@ namespace tankett {
 	}
 	void server::StartRound() {
 		state_ = ROUND_RUNNING;
+		gameManager::ResetScore();
 		for (int i = 0; i < connectedClientCount(); i++) {
 			entityManager_->getTank(clients_[i].id_)->isEnabled = true;
 			entityManager_->getTank(clients_[i].id_)->SetPosition(SPAWN_POINTS[clients_[i].id_]);
@@ -482,7 +483,14 @@ namespace tankett {
 		network_message_ping* msg = new network_message_ping;
 		msg->sequence_ = pClient.pingSequence_;
 		pClient.messages_.push_back(msg);
-		pClient.pings_.push_back(std::make_pair(pClient.pingSequence_, time::now()));
+		bool hasSequence = false;
+		for (std::pair<uint8,time> pair : pClient.pings_) {
+			if (pair.first == pClient.pingSequence_) {
+				pair.second = time::now();
+				hasSequence = true;
+			}
+		}
+		if (!hasSequence) pClient.pings_.push_back(std::make_pair(pClient.pingSequence_, time::now()));
 		pClient.pingSequence_++;
 	}
 
