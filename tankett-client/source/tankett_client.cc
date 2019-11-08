@@ -204,7 +204,7 @@ namespace tankett {
 	}
 
 	void client_app::Disconnect() {
-		send_disconnect();
+		//send_disconnect();
 		entityManager_->Reset();
 		state_ = DISCONNECTED;
 	}

@@ -91,11 +91,13 @@ namespace tankett {
 			break;
 		}
 		int it = 0;
+		bool erase = false;
 		for(int i = 0; i < clients_.size(); i++) {
 			if (time::now().as_seconds() - clients_[i].latest_receive_time_.as_seconds() > TIME_OUT_THRESHOLD_SECONDS)
 				it = i;
+			erase = true;
 		}
-		clients_.erase(clients_.begin() + it);
+		if (erase) clients_.erase(clients_.begin() + it);
 		clientData[it].connected = false;
 		clientData[it].client_id = 255;
 		entityManager_->update(dt);
