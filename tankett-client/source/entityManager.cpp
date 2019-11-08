@@ -135,9 +135,11 @@ namespace tankett {
 		}
 	}
 
-	void entityManager::ResetTanks() {
-		for (tank* t : tanks_) {
-			t->isEnabled = false;
+	void entityManager::Reset() {
+		for (IEntity* e : entities_) {
+			if (e->type_ == TANK || e->type_ == BULLET) {
+				e->isEnabled = false;
+			}
 		}
 	}
 

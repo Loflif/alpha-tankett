@@ -26,7 +26,7 @@ namespace tankett {
 		bool isBulletInList(server_to_client_data pData, uint8 pID);
 		void UpdateTank(server_to_client_data pData);
 		void UpdateBullets(server_to_client_data pData);
-		void ResetTanks();
+		void Reset();
 	private:
 		void createLevel();
 		void createTankBuffer();

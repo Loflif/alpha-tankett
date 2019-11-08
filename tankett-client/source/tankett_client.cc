@@ -162,6 +162,7 @@ namespace tankett {
 
 	void client_app::Disconnect() {
 		send_disconnect();
+		entityManager_->Reset();
 		state_ = DISCONNECTED;
 	}
 
@@ -190,7 +191,7 @@ namespace tankett {
 
 	void client_app::SetEliminationUI(int pID, UIElement& ui) {
 		string eliminationText;
-		if (remoteClientData_[pID].connected_) {
+		if (remoteClientData_[pID].connected_ && state_ == CONNECTED) {
 			eliminationText = "P" + std::to_string(pID + 1) + ": " + std::to_string(remoteClientData_[pID].eliminations_);
 		}
 		else {
@@ -201,7 +202,7 @@ namespace tankett {
 
 	void client_app::SetPingUI(int pID, UIElement& ui) {
 		string pingText;
-		if (remoteClientData_[pID].connected_) {
+		if (remoteClientData_[pID].connected_ && state_ == CONNECTED) {
 			pingText = std::to_string(remoteClientData_[pID].ping_);
 		}
 		else {
