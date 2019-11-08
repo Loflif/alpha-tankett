@@ -57,6 +57,8 @@ namespace tankett {
 		bool DetectMouseHover(UIElement ui);
 		bool DetectMouseClick(UIElement ui);
 		void SetUI();
+		void SetGamestateUI();
+		string GetWinner();
 		void SetEliminationUI(int pID, UIElement &ui);
 		void SetPingUI(int pID, UIElement& ui);
 		void SetTimer(float pTime);
@@ -74,6 +76,7 @@ namespace tankett {
 		uint64 server_key_;
 
 		CLIENT_STATE state_;
+		GAME_STATE gameState_ = WAITING_FOR_PLAYER;
 
 		time send_accumulator;
 
@@ -99,7 +102,7 @@ namespace tankett {
 		UIElement p4Ping;
 		UIElement quitButton;
 		UIElement connectButton;
-		UIElement disconnected;
+		UIElement gameStateUI;
 
 	};
 } // !tankett

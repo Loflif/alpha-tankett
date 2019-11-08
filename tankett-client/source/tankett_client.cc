@@ -66,7 +66,7 @@ namespace tankett {
 		SetUIElement(p4Ping, "0123456789", 1, vector2(40 * TILE_SIZE, 30.6f * TILE_SIZE), 0xFF4F5E9C);
 		SetUIElement(quitButton, "QUIT", 2, vector2(41 * TILE_SIZE, 0.25f * TILE_SIZE));
 		SetUIElement(connectButton, "DISCONNECT", 2, vector2(34 * TILE_SIZE, 0.25f * TILE_SIZE));
-		SetUIElement(disconnected, "DISCONNECTED", 4, vector2(16 * TILE_SIZE, 16 * TILE_SIZE), 0xFF4F5E9C);
+		SetUIElement(gameStateUI, "DISCONNECTED", 4, vector2(16 * TILE_SIZE, 16 * TILE_SIZE), 0xFF4F5E9C);
 		
 	}
 
@@ -105,7 +105,7 @@ namespace tankett {
 			receive();
 		}
 		if (state_ == CONNECTED) {
-			entityManager_->update(keyboard_, mouse_, dt);
+			if (gameState_ == ROUND_RUNNING) entityManager_->update(keyboard_, mouse_, dt);
 			messages_.push_back(entityManager_->checkInput(keyboard_, mouse_));
 			entityManager_->manageCollisions();
 			SetCoolDownDisplay();
@@ -128,6 +128,51 @@ namespace tankett {
 		SetPingUI(2, p3Ping);
 		SetPingUI(3, p4Ping);
 		HandleConnectButton();
+		SetGamestateUI();
+	}
+
+	void client_app::SetGamestateUI() {
+		if (state_ == DISCONNECTED) {
+			gameStateUI.text_.set_text("DISCONNECTED");
+			gameStateUI.text_.set_scale(4);
+		}
+		else {
+			if (gameState_ == WAITING_FOR_PLAYER) {
+				gameStateUI.text_.set_text("WAITING FOR PLAYERS ...");
+				gameStateUI.text_.set_scale(2);
+			}
+			else if (gameState_ == ROUND_END) {
+				gameStateUI.text_.set_text(GetWinner().c_str());
+				gameStateUI.text_.set_scale(3);
+			}
+			else {
+				gameStateUI.text_.set_text("");
+			}
+		}
+	}
+
+	string client_app::GetWinner() {
+		if (remoteClientData_[0].eliminations_ > remoteClientData_[1].eliminations_ &&
+			remoteClientData_[0].eliminations_ > remoteClientData_[2].eliminations_ &&
+			remoteClientData_[0].eliminations_ > remoteClientData_[3].eliminations_&&) {
+			return "PLAYER 1 WINS";
+		}
+		if (remoteClientData_[1].eliminations_ > remoteClientData_[0].eliminations_ &&
+			remoteClientData_[1].eliminations_ > remoteClientData_[2].eliminations_ &&
+			remoteClientData_[1].eliminations_ > remoteClientData_[3].eliminations_&&) {
+			return "PLAYER 2 WINS";
+		}
+		if (remoteClientData_[2].eliminations_ > remoteClientData_[0].eliminations_ &&
+			remoteClientData_[2].eliminations_ > remoteClientData_[1].eliminations_ &&
+			remoteClientData_[2].eliminations_ > remoteClientData_[3].eliminations_&&) {
+			return "PLAYER 3 WINS";
+		}
+		if (remoteClientData_[3].eliminations_ > remoteClientData_[0].eliminations_ &&
+			remoteClientData_[3].eliminations_ > remoteClientData_[1].eliminations_ &&
+			remoteClientData_[3].eliminations_ > remoteClientData_[2].eliminations_&&) {
+			return "PLAYER 4 WINS";
+		}
+		return "IT'S A TIE";
 	}
 
 	bool client_app::HandleQuitButton() {
@@ -150,12 +195,10 @@ namespace tankett {
 		}
 		if (state_ == DISCONNECTED) {
 			connectButton.text_.set_text("CONNECT");
-			disconnected.text_.text_ = "DISCONNECTED";
 			if (DetectMouseClick(connectButton)) Reconnect();
 		}
 		else {
 			connectButton.text_.set_text("DISCONNECT");
-			disconnected.text_.text_ = "";
 			if (DetectMouseClick(connectButton)) Disconnect();
 		}
 	}
@@ -237,7 +280,7 @@ namespace tankett {
 		renderUI(p4Ping);
 		renderUI(quitButton);
 		renderUI(connectButton);
-		renderUI(disconnected);
+		renderUI(gameStateUI);
 	}
 
 	void client_app::renderUI(UIElement pUI) {
@@ -417,8 +460,12 @@ namespace tankett {
 				}
 				else {
 					debugText_.set_text("CONNECTED");
-					state_ = CONNECTED;
+					if (state_ != CONNECTED) {
+						state_ = CONNECTED;
+						gameState_ = WAITING_FOR_PLAYER;
+					}
 					parsePayload(payload);
+					
 				}
 				break;
 			}
@@ -500,6 +547,7 @@ namespace tankett {
 			remoteClientData_[i].eliminations_ = pMessage.client_data[i].eliminations;
 			remoteClientData_[i].ping_ = pMessage.client_data[i].ping;
 			remoteClientData_[i].connected_ = pMessage.client_data[i].connected;
+			gameState_ = pMessage.game_state;
 			entityManager_->UpdateTank(pMessage.client_data[i]);
 		}
 	}
