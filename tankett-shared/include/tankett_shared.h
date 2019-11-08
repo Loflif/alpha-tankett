@@ -11,6 +11,8 @@ namespace tankett {
 	static const float TILE_SIZE = 28;
 	static const float TANK_SIZE = 1.5f;
 	static const float BULLET_SIZE = 0.2f;
+	static const float TANK_SPEED = 4.0f;
+	static const float BULLET_SPEED = 8.0f;
 	static const float ROUND_TIME = 90.0f;
 	static const float FIRE_RATE = 1.0f;
 	static const float ROUNDENDTIME = 20.0f;

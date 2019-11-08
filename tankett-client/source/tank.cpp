@@ -39,8 +39,8 @@ namespace tankett {
 		if (isLocal_) {
 			UpdatePosition(kb, dt);
 			transform_.set_rotation(targetRotation(kb));
-			lastPredictedAngle = targetTurretRotation(ms) - turretTransform_.rotation_;
-			SetAngle(lerp(turretTransform_.rotation_, targetTurretRotation(ms), 0.9f));
+			lastPredictedAngle = targetTurretRotation() - turretTransform_.rotation_;
+			SetTurretAngle(lerp(turretTransform_.rotation_, targetTurretRotation(), 0.9f));
 		}
 		else {
 			interpolateEntity(dt);
@@ -84,7 +84,7 @@ namespace tankett {
 	void tank::interpolateEntity(time dt) {
 		float lerpDistance = dt.as_seconds() / messageDeltaTime_.as_seconds();
 		SetPosition(vector2::Lerp(transform_.position_, lastReceivedPosition_, lerpDistance));
-		SetAngle(lerp(turretTransform_.rotation_, lastReceivedAngle_, lerpDistance));
+		SetTurretAngle(lerp(turretTransform_.rotation_, lastReceivedAngle_, lerpDistance));
 	}
 
 	void tank::setColliderPosition() {
@@ -108,7 +108,7 @@ namespace tankett {
 	}
 
 	void tank::UpdatePosition(keyboard kb, time dt) {
-		vector2 newOffset = targetMoveDirection(kb) * (SPEED_ * TILE_SIZE *dt.as_seconds());
+		vector2 newOffset = targetMoveDirection(kb) * (TANK_SPEED * TILE_SIZE *dt.as_seconds());
 		predictedPositionOffsets_.push_back(newOffset);
 
 		vector2 destination = lastReceivedPosition_;
@@ -147,7 +147,7 @@ namespace tankett {
 		return transform_.rotation_;
 	}
 
-	float tank::targetTurretRotation(mouse ms) {
+	float tank::targetTurretRotation() {
 		vector2 aimVector = aimVector_;
 		turretRotation = atan2(aimVector.y_, aimVector.x_) * (180 / PI);
 		return turretRotation;
@@ -171,10 +171,9 @@ namespace tankett {
 
 #pragma region ClientSpecificFunctions
 
-	void tank::UpdateValues(bool pAlive,
+	void tank::SetTankValues(bool pAlive,
 							vector2 pPos, 
 							float pAngle){
-		//SetAngle(pAngle);
 		SetActive(pAlive);
 		
 
@@ -186,7 +185,7 @@ namespace tankett {
 			}
 			lastReceivedPosition_ = pPos + lastPrediction;
 			lastReceivedAngle_ = pAngle + lastPredictedAngle;
-			SetAngle(lerp(turretTransform_.rotation_, lastReceivedAngle_, 0.9f));
+			SetTurretAngle(lerp(turretTransform_.rotation_, lastReceivedAngle_, 0.9f));
 			predictedPositionOffsets_.clear();
 		}
 		//Entity Interpolation:
@@ -197,7 +196,7 @@ namespace tankett {
 
 			nextToLastReceivedAngle_ = lastReceivedAngle_;
 			lastReceivedAngle_ = pAngle;
-			SetAngle(lastReceivedAngle_);
+			SetTurretAngle(lastReceivedAngle_);
 
 			messageDeltaTime_ = time::now() - timeOfLastMessage;
 			timeOfLastMessage = time::now();
@@ -210,11 +209,7 @@ namespace tankett {
 		setColliderPosition();
 	}
 
-	void tank::PredictPosition(vector2 pReceivedPos) {
-
-	}
-
-	void tank::SetAngle(float pAngle) {
+	void tank::SetTurretAngle(float pAngle) {
 		turretTransform_.set_rotation(pAngle);
 	}
 

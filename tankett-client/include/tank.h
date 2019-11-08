@@ -18,16 +18,14 @@ namespace tankett {
 
 		dynamic_array<bullet*> bullets_;
 
-		//Client-specific (keep these when refactoring later):
-		void UpdateValues(bool pAlive,
+		void SetTankValues(bool pAlive,
 			vector2 pPos,
 			float pAngle);
 		void SetPosition(vector2 pPos);
-		void SetAngle(float pAngle);
+		void SetTurretAngle(float pAngle);
 		void SetActive(bool pIsActive);
 		void UpdatePosition(keyboard kb, time dt);
 		void SetLocal(bool pIsLocal);
-		//Also keep Constructor/Destructor, Render and Update, and only set aimvector when local
 
 		uint8 id_;
 
@@ -36,18 +34,16 @@ namespace tankett {
 		bullet* getBulletWithID(uint8 pID);
 		bool isLocal_ = false;
 	private:
-		void SetTurret(mouse ms);
 		void interpolateEntity(time dt);
-		vector2 targetMoveDirection(keyboard pKeyboard);
-		float targetRotation(keyboard pKeyboard);
-		float targetTurretRotation(mouse pMouse);
+		vector2 targetMoveDirection(keyboard kb);
+		float targetRotation(keyboard kb);
+		float targetTurretRotation();
 		void setColliderPosition();
 		void preventCollision();
 		bool ownsBullet(IEntity* pBullet);
-		void updateAimVector(mouse pMouse);
+		void updateAimVector(mouse ms);
 		void updateBulletList();
 
-		const float SPEED_ = 4.0f;
 		sprite turretSprite_;
 		sprite remoteSprite_;
 		sprite remoteTurretSprite_;
@@ -55,7 +51,6 @@ namespace tankett {
 		vector2 previousPosition;
 
 		//For Prediciton:
-		void PredictPosition(vector2 pReceivedPos);
 		dynamic_array<vector2> predictedPositionOffsets_;
 		float lastPredictedAngle;
 		vector2 lastReceivedPosition_;

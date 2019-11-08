@@ -118,7 +118,7 @@ namespace tankett {
 	}
 
 	void entityManager::UpdateTank(server_to_client_data pData) {
-		tanks_[pData.client_id]->UpdateValues(pData.alive,
+		tanks_[pData.client_id]->SetTankValues(pData.alive,
 										      pData.position * TILE_SIZE,
 										      pData.angle);
 		UpdateBullets(pData);
