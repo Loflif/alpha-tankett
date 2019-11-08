@@ -17,7 +17,6 @@ namespace tankett {
 	private:
 		void interpolateEntity(time dt);
 		vector2 direction_;
-		const float SPEED_ = 8.0f;
 		vector2 nextToLastReceivedPosition_;
 		vector2 lastReceivedPosition_;
 		time timeOfLastMessage;
