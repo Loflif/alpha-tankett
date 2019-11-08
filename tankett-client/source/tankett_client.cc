@@ -154,22 +154,22 @@ namespace tankett {
 	string client_app::GetWinner() {
 		if (remoteClientData_[0].eliminations_ > remoteClientData_[1].eliminations_ &&
 			remoteClientData_[0].eliminations_ > remoteClientData_[2].eliminations_ &&
-			remoteClientData_[0].eliminations_ > remoteClientData_[3].eliminations_&&) {
+			remoteClientData_[0].eliminations_ > remoteClientData_[3].eliminations_) {
 			return "PLAYER 1 WINS";
 		}
 		if (remoteClientData_[1].eliminations_ > remoteClientData_[0].eliminations_ &&
 			remoteClientData_[1].eliminations_ > remoteClientData_[2].eliminations_ &&
-			remoteClientData_[1].eliminations_ > remoteClientData_[3].eliminations_&&) {
+			remoteClientData_[1].eliminations_ > remoteClientData_[3].eliminations_) {
 			return "PLAYER 2 WINS";
 		}
 		if (remoteClientData_[2].eliminations_ > remoteClientData_[0].eliminations_ &&
 			remoteClientData_[2].eliminations_ > remoteClientData_[1].eliminations_ &&
-			remoteClientData_[2].eliminations_ > remoteClientData_[3].eliminations_&&) {
+			remoteClientData_[2].eliminations_ > remoteClientData_[3].eliminations_) {
 			return "PLAYER 3 WINS";
 		}
 		if (remoteClientData_[3].eliminations_ > remoteClientData_[0].eliminations_ &&
 			remoteClientData_[3].eliminations_ > remoteClientData_[1].eliminations_ &&
-			remoteClientData_[3].eliminations_ > remoteClientData_[2].eliminations_&&) {
+			remoteClientData_[3].eliminations_ > remoteClientData_[2].eliminations_) {
 			return "PLAYER 4 WINS";
 		}
 		return "IT'S A TIE";
