@@ -257,7 +257,7 @@ namespace tankett {
 	void client_app::SetCoolDownDisplay() {
 		string text;
 		int coolDown = (int)(entityManager_->shootingCooldown_ * 10);
-		if (coolDown < 0) text = "";
+		if (coolDown < 0 || state_ == DISCONNECTED || gameState_ != ROUND_RUNNING) text = "";
 		else text = std::to_string(coolDown);
 		vector2 targetPosition = entityManager_->getTank(entityManager_->getLocalTankID())->transform_.position_;
 		targetPosition += vector2(0 * TILE_SIZE, -1.7f * TILE_SIZE);
