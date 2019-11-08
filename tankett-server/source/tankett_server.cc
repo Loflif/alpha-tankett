@@ -447,11 +447,16 @@ namespace tankett {
 
 	void server::queueMessage(client& pClient) {
 		message_server_to_client* msg = new message_server_to_client;
-		msg->client_count = (uint8)clients_.size();
+		msg->client_count = connectedClientCount();
+		int it = 0;
 		for (int i = 0; i < 4; i++) {
 			clientData[i].eliminations = gameManager::score_[i];
 			clientData[i].angle = entityManager_->getTank(i)->turretRotation_;
-			msg->client_data[i] = clientData[i];
+			if (clientData[i].connected) {
+				msg->client_data[it] = clientData[i];
+				it++;
+			}
+			
 		}
 		for (int i = 0; i < clients_.size(); i++) {
 			clientData[i].ping = (uint32)clients_[i].ping_.as_milliseconds();
@@ -459,6 +464,14 @@ namespace tankett {
 		msg->game_state = state_;
 		msg->round_time = currentRoundTime_;
 		msg->receiver_id = pClient.id_;
+		int x = 0;
+		for (int i = 0; i < 4; i++) 			{
+			if (msg->client_data[i].client_id == 255) 				
+				x++;
+			}
+		if (x > 3) {
+			int u = 0; //Break here if weird Message gets send
+		}
 		msg->type_ = NETWORK_MESSAGE_SERVER_TO_CLIENT;
 		pClient.messages_.push_back(msg);
 	}
@@ -494,8 +507,8 @@ namespace tankett {
 
 	uint8 server::connectedClientCount() {
 		uint8 count = 0;
-		for (client client : clients_) {
-			if (client.state_ == CONNECTED) count++;
+		for (int i = 0; i < 4; i++) {
+			if (clientData[i].connected) count++;
 		}
 		return count;
 	}
