@@ -51,6 +51,8 @@ namespace tankett {
 		bool hasAddress(ip_address addr);
 
 		void updateClientData();
+		void StartRound();
+		void EndRound();
 
 		void processConnectionRequest(ip_address remote, protocol_connection_request& msg);
 		void processChallengeResponse(ip_address remote, protocol_challenge_response& msg);
@@ -59,13 +61,14 @@ namespace tankett {
 		void parsePingMessage(network_message_ping message, uint8 clientID);
 		void queueMessage(client& pClient);
 		void queuePing(client& pClient);
+		uint8 GetUnusedClientID();
 
 
 		void challengeClient(client& client);
 
 		uint8 connectedClientCount();
 
-		void SpawnTank();
+		void SpawnTank(int id);
 
 		server_to_client_data clientData[4];
 

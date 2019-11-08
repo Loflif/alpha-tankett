@@ -132,6 +132,7 @@ namespace tankett {
 	void serverEntityManager::disableAllTanks() {
 		for (serverTank* t : tanks_) {
 			t->isAlive = true;
+			t->SetPosition(SPAWN_POINTS[t->id_]);
 			t->isEnabled = false;
 		}
 	}

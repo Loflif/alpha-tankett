@@ -14,7 +14,7 @@ namespace tankett {
 	static const float ROUND_TIME = 10.0f;
 	static const float FIRE_RATE = 1.0f;
 	static const int RESPAWN_MILLISECONDS = 3000;
-	static const float ROUNDENDTIME = 30.0f;
+	static const float ROUNDENDTIME = 20.0f;
 
 	static const int BULLET_MAX_COUNT = 10;
 	static const int COLLISION_PAIR_COUNT = 4;
@@ -348,7 +348,7 @@ namespace tankett {
 	   vector2 position = { 0,0 };
 	   float angle = 0.0f;
 	   uint8 eliminations = 0;
-	   uint8 client_id = 0;
+	   uint8 client_id = 255;
 	   uint32 ping = ~0U;
 	   uint8 bullet_count = 0;
 	   bullet_data bullets[10];

@@ -62,50 +62,31 @@ namespace tankett {
 	}
 #pragma region Update
 	void server::update(const time& dt) {
+		if (connectedClientCount() < 2) {
+			state_ = WAITING_FOR_PLAYER;
+			currentRoundTime_ = ROUND_TIME;
+		}
 		switch (state_) {
 		case ROUND_RUNNING: {
 			currentRoundTime_ -= dt.as_seconds();
 			if (currentRoundTime_ < 0) {
-				state_ = ROUND_END;
-				currentRoundTime_ = ROUNDENDTIME;
-				entityManager_->disableAllTanks();
-			}
-			else if (connectedClientCount() < 2) {
-				state_ = WAITING_FOR_PLAYER;
-				currentRoundTime_ = ROUND_TIME;
-				for (int i = 0; i < connectedClientCount(); i++) {
-					entityManager_->getTank(clients_[i].id_)->isEnabled = false;
-					entityManager_->getTank(clients_[i].id_)->SetPosition(SPAWN_POINTS[clients_[i].id_]);
-				}
+				EndRound();
 			}
 		}
-			break;
+		break;
 		case WAITING_FOR_PLAYER: {
 			if (connectedClientCount() >= 2) {
-				state_ = ROUND_RUNNING;
+				StartRound();
 			}
 		}
-			break;
-		case ROUND_END: {			
+								 break;
+		case ROUND_END: {
 			currentRoundTime_ -= dt.as_seconds();
-			if (connectedClientCount() < 2) {
-				state_ = WAITING_FOR_PLAYER;
-				currentRoundTime_ = ROUND_TIME;
-				for (int i = 0; i < connectedClientCount(); i++) {
-					entityManager_->getTank(clients_[i].id_)->isEnabled = false;
-					entityManager_->getTank(clients_[i].id_)->SetPosition(SPAWN_POINTS[clients_[i].id_]);
-				}
-			}
-			else if (currentRoundTime_ < 0) {
-				state_ = ROUND_RUNNING;
-				currentRoundTime_ = ROUND_TIME;
-				for (int i = 0; i < connectedClientCount(); i++) {
-					entityManager_->getTank(clients_[i].id_)->isEnabled = true;
-					entityManager_->getTank(clients_[i].id_)->SetPosition(SPAWN_POINTS[clients_[i].id_]);
-				}				
-			}
+			if (currentRoundTime_ < 0) {
+				StartRound();
+			}			
 		}
-			break;
+						break;
 		default:
 			break;
 		}
@@ -135,6 +116,18 @@ namespace tankett {
 			}
 		}
 	}
+	void server::StartRound() {
+		state_ = ROUND_RUNNING;
+		for (int i = 0; i < connectedClientCount(); i++) {
+			entityManager_->getTank(clients_[i].id_)->isEnabled = true;
+			entityManager_->getTank(clients_[i].id_)->SetPosition(SPAWN_POINTS[clients_[i].id_]);
+		}
+	}
+	void server::EndRound() {
+		state_ = ROUND_END;
+		currentRoundTime_ = ROUNDENDTIME;
+		entityManager_->disableAllTanks();
+	}
 #pragma endregion
 
 #pragma region Receive
@@ -143,11 +136,11 @@ namespace tankett {
 		byte_stream stream(1024 * 4, dst_);
 		byte_stream_reader reader(stream);
 		while (!reader.eos()) {
-		if (!socket_.recv_from(remote, stream)) {
-			return;
-		}		
+			if (!socket_.recv_from(remote, stream)) {
+				return;
+			}
 			const uint8 type = reader.peek();
-			if(type != PACKET_TYPE_PAYLOAD) {
+			if (type != PACKET_TYPE_PAYLOAD) {
 				int i = 0;
 			}
 
@@ -160,7 +153,7 @@ namespace tankett {
 				}
 				processConnectionRequest(remote, msg);
 			}
-											   break;
+												 break;
 			case PACKET_TYPE_CHALLENGE_RESPONSE: {
 				protocol_challenge_response msg;
 				if (!msg.serialize(reader)) {
@@ -169,7 +162,7 @@ namespace tankett {
 				}
 				processChallengeResponse(remote, msg);
 			}
-											   break;
+												 break;
 			case PACKET_TYPE_PAYLOAD: {
 				protocol_payload msg;
 				if (!msg.serialize(reader)) {
@@ -178,7 +171,7 @@ namespace tankett {
 				}
 				processPayload(remote, msg);
 			}
-									break;
+									  break;
 			case PACKET_TYPE_DISCONNECT: {
 				protocol_disconnect msg;
 				if (!msg.serialize(reader)) {
@@ -208,7 +201,9 @@ namespace tankett {
 			client client;
 			client.address_ = remote;
 			client.state_ = CHALLENGE;
-			client.client_key_ = msg.client_key_;
+			client.client_key_ = msg.client_key_;			
+			client.id_ = GetUnusedClientID();
+			clientData[client.id_].client_id = client.id_;
 			clients_.push_back(client);
 			debugf("[Info] New client added: %s", remote.as_string());
 		}
@@ -220,13 +215,12 @@ namespace tankett {
 				crypt::xorinator xorinator(client.client_key_, key);
 				uint64 encryptedKeys = 0;
 				client.xorinator_ = xorinator;
-				xorinator.encrypt(sizeof(uint64), (uint8*)&encryptedKeys);
+				xorinator.encrypt(sizeof(uint64), (uint8*)& encryptedKeys);
 				if (encryptedKeys == msg.combined_key_) {
 					if (client.state_ != CONNECTED) {
 						client.state_ = CONNECTED;
 						debugf("[Info] Client connected: %s", client.address_.as_string());
-						client.id_ = connectedClientCount() - 1;
-						SpawnTank();
+						SpawnTank(client.id_);
 					}
 				}
 				else {
@@ -245,7 +239,7 @@ namespace tankett {
 					byte_stream_reader reader(stream);
 
 					client.latest_received_sequence_ = msg.sequence_;
-					
+
 					client.xorinator_.decrypt(msg.length_, msg.payload_);
 
 					entityManager_->getTank(client.id_)->SetPreviousPosition();
@@ -272,7 +266,7 @@ namespace tankett {
 							}
 							else {
 								time deltaReceiveTime = time::now() - client.latest_receive_time_;
-								entityManager_->parseClientMessage(message, client.id_, deltaReceiveTime);
+								if (state_ == ROUND_RUNNING) entityManager_->parseClientMessage(message, client.id_, deltaReceiveTime);
 							}
 						}
 															   break;
@@ -282,7 +276,7 @@ namespace tankett {
 													break;
 						default:
 							invalidMessageReceived = true;
-						break;
+							break;
 						}
 					}
 					client.latest_receive_time_ = time::now();
@@ -303,6 +297,7 @@ namespace tankett {
 		if (iterator >= 0) {
 			clients_.erase(clients_.begin() + iterator);
 			clientData[iterator].connected = false;
+			clientData[iterator].client_id = 255;
 			//ResetTank(uint8 clientID); function in Entitymanager?
 			//TODO: Make people disabled
 		}
@@ -310,18 +305,26 @@ namespace tankett {
 	void server::parsePingMessage(network_message_ping message, uint8 clientID) {
 		int it = 0;
 		bool hasPing = false;
-		for (std::pair<uint8, time> pair : clients_[clientID].pings_) {
-			if (pair.first == message.sequence_) {
-				clients_[clientID].ping_ = time::now() - pair.second;
-				hasPing = true;
-				break;
+		for (int i = 0; i < clients_.size(); i++) {
+			if (clients_[i].id_ == clientID) {
+				for (std::pair<uint8, time> pair : clients_[i].pings_) {
+					if (pair.first == message.sequence_) {
+						clients_[i].ping_ = time::now() - pair.second;
+						hasPing = true;
+						break;
+					}
+					it++;
+				}
+				if (clients_[i].pings_.size() > it) {
+					if (hasPing) clients_[i].pings_.erase(clients_[i].pings_.begin() + it);
+				}
 			}
-			it++;
 		}
-		if (hasPing) clients_[clientID].pings_.erase(clients_[clientID].pings_.begin() + it);
+
+
 	}
 #pragma endregion
-	
+
 #pragma region Send
 	void server::send(const time& dt) {
 		send_accumulator_ += dt;
@@ -336,8 +339,8 @@ namespace tankett {
 				case CONNECTED:
 					queueMessage(client);
 					queuePing(client);
-					
-					
+
+
 					break;
 				default:
 					break;
@@ -450,7 +453,7 @@ namespace tankett {
 			clientData[i].angle = entityManager_->getTank(i)->turretRotation_;
 			msg->client_data[i] = clientData[i];
 		}
-		for(int i = 0; i < clients_.size(); i++) {
+		for (int i = 0; i < clients_.size(); i++) {
 			clientData[i].ping = (uint32)clients_[i].ping_.as_milliseconds();
 		}
 		msg->game_state = state_;
@@ -466,6 +469,13 @@ namespace tankett {
 		pClient.messages_.push_back(msg);
 		pClient.pings_.push_back(std::make_pair(pClient.pingSequence_, time::now()));
 		pClient.pingSequence_++;
+	}
+
+	uint8 server::GetUnusedClientID() {
+		for (uint8 i = 0; i < 4; i++) {
+			if (clientData[i].connected == false) return i;
+		}
+		return 255;
 	}
 
 	void server::challengeClient(client& client) {
@@ -492,15 +502,12 @@ namespace tankett {
 
 #pragma endregion
 
-	void server::SpawnTank() {
-		for (int i = 0; i < 4; i++) {
-			if (!clientData[i].connected) {
-				clientData[i].client_id = connectedClientCount() - 1;
-				clientData[i].connected = true;
-				clientData[i].position = SPAWN_POINTS[i];
-				entityManager_->spawnTank(i);
-				return;
-			}
+	void server::SpawnTank(int id) {
+		if (!clientData[id].connected) {
+			clientData[id].connected = true;
+			clientData[id].position = SPAWN_POINTS[id];
+			entityManager_->spawnTank(id);
+			return;
 		}
 	}
 } // !tankett
