@@ -13,12 +13,12 @@ namespace tankett {
 	static const float BULLET_SIZE = 0.2f;
 	static const float ROUND_TIME = 90.0f;
 	static const float FIRE_RATE = 1.0f;
-	static const int RESPAWN_MILLISECONDS = 3000;
 	static const float ROUNDENDTIME = 20.0f;
 	static const float TIME_OUT_THRESHOLD_SECONDS = 5;
 
 	static const int BULLET_MAX_COUNT = 10;
 	static const int COLLISION_PAIR_COUNT = 4;
+	static const int RESPAWN_MILLISECONDS = 3000;
 
 	static const vector2 SPAWN_POINTS[4]{
 			vector2(4,4),

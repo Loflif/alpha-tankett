@@ -9,8 +9,5 @@ namespace tankett {
 		void render(render_system& pRenderSystem);
 		void update(keyboard kb, mouse ms, time dt) {};
 		void onCollision(IEntity* collider) {};
-	private:
-		sprite sprite_;
-		transform transform_;
 	};
 }

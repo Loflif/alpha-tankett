@@ -13,7 +13,6 @@ namespace tankett {
 		void update(keyboard pKeyboard, mouse pMouse, time pDeltaTime);
 		void onCollision(IEntity* pCollider);
 		vector2 aimVector_;
-		transform transform_;
 
 		float turretRotation = 0.0f;
 
@@ -49,14 +48,11 @@ namespace tankett {
 		void updateBulletList();
 
 		const float SPEED_ = 4.0f;
-		vector2 size_ = { 0,0 };
-		sprite sprite_;
 		sprite turretSprite_;
 		sprite remoteSprite_;
 		sprite remoteTurretSprite_;
 		transform turretTransform_;
 		vector2 previousPosition;
-		
 
 		//For Prediciton:
 		void PredictPosition(vector2 pReceivedPos);
