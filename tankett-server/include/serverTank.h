@@ -15,7 +15,6 @@ namespace tankett {
 
 		vector2 getAimVector();
 
-		const float SPEED_ = 4.0f;
 		float turretRotation_ = 0.0f;
 		float shootingCooldown_ = 0.0f;
 		int id_;

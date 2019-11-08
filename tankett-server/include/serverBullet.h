@@ -15,7 +15,6 @@ namespace tankett {
 		int id_;
 	private:
 		vector2 direction_;
-		const float SPEED_ = 8.0f;
 	};
 
 }
