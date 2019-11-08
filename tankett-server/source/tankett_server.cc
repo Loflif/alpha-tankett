@@ -90,6 +90,14 @@ namespace tankett {
 		default:
 			break;
 		}
+		int it = 0;
+		for(int i = 0; i < clients_.size(); i++) {
+			if (time::now().as_seconds() - clients_[i].latest_receive_time_.as_seconds() > TIME_OUT_THRESHOLD_SECONDS)
+				it = i;
+		}
+		clients_.erase(clients_.begin() + it);
+		clientData[it].connected = false;
+		clientData[it].client_id = 255;
 		entityManager_->update(dt);
 		entityManager_->manageCollisions();
 		updateClientData();
