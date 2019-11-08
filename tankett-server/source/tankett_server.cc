@@ -120,6 +120,7 @@ namespace tankett {
 	void server::StartRound() {
 		state_ = ROUND_RUNNING;
 		gameManager::ResetScore();
+		currentRoundTime_ = ROUND_TIME;
 		for (int i = 0; i < connectedClientCount(); i++) {
 			entityManager_->getTank(clients_[i].id_)->isEnabled = true;
 			entityManager_->getTank(clients_[i].id_)->SetPosition(SPAWN_POINTS[clients_[i].id_]);
@@ -467,14 +468,6 @@ namespace tankett {
 		msg->game_state = state_;
 		msg->round_time = currentRoundTime_;
 		msg->receiver_id = pClient.id_;
-		int x = 0;
-		for (int i = 0; i < 4; i++) 			{
-			if (msg->client_data[i].client_id == 255) 				
-				x++;
-			}
-		if (x > 3) {
-			int u = 0; //Break here if weird Message gets send
-		}
 		msg->type_ = NETWORK_MESSAGE_SERVER_TO_CLIENT;
 		pClient.messages_.push_back(msg);
 	}
