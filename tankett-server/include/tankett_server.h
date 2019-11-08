@@ -62,6 +62,7 @@ namespace tankett {
 		void queueMessage(client& pClient);
 		void queuePing(client& pClient);
 		uint8 GetUnusedClientID();
+		void DisconnectAfterTimeout();
 
 
 		void challengeClient(client& client);

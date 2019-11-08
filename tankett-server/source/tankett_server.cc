@@ -90,16 +90,7 @@ namespace tankett {
 		default:
 			break;
 		}
-		int it = 0;
-		bool erase = false;
-		for(int i = 0; i < clients_.size(); i++) {
-			if (time::now().as_seconds() - clients_[i].latest_receive_time_.as_seconds() > TIME_OUT_THRESHOLD_SECONDS)
-				it = i;
-			erase = true;
-		}
-		if (erase) clients_.erase(clients_.begin() + it);
-		clientData[it].connected = false;
-		clientData[it].client_id = 255;
+		DisconnectAfterTimeout();
 		entityManager_->update(dt);
 		entityManager_->manageCollisions();
 		updateClientData();
@@ -213,6 +204,7 @@ namespace tankett {
 			client.state_ = CHALLENGE;
 			client.client_key_ = msg.client_key_;			
 			client.id_ = GetUnusedClientID();
+			client.latest_receive_time_ = time::now();
 			clientData[client.id_].client_id = client.id_;
 			clients_.push_back(client);
 			debugf("[Info] New client added: %s", remote.as_string());
@@ -499,6 +491,22 @@ namespace tankett {
 			if (clientData[i].connected == false) return i;
 		}
 		return 255;
+	}
+
+	void server::DisconnectAfterTimeout() {
+		int it = 0;
+		bool erase = false;
+		for (int i = 0; i < clients_.size(); i++) {
+			if (time::now().as_seconds() - clients_[i].latest_receive_time_.as_seconds() > TIME_OUT_THRESHOLD_SECONDS) {
+				it = i;
+				erase = true;
+			}
+		}
+		if (erase) {
+			clients_.erase(clients_.begin() + it);
+			clientData[it].connected = false;
+			clientData[it].client_id = 255;
+		}
 	}
 
 	void server::challengeClient(client& client) {
