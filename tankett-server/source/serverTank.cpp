@@ -9,7 +9,7 @@ namespace tankett {
 		collider_ = rectangle(0, 0, size_.x_, size_.y_);
 		SetPosition(pSpawnPos);
 		id_ = ID;
-		isAlive = true;
+		isAlive = false;
 		respawnTime = time(RESPAWN_MILLISECONDS);
 	}
 

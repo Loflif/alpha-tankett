@@ -20,6 +20,10 @@ namespace tankett {
 	}
 
 	tank::~tank() {
+		for(InputData &i : sentInputData_)
+		{
+			delete(i.message_);
+		}
 	}
 
 	void tank::render(render_system& pRenderSystem) {
@@ -37,9 +41,7 @@ namespace tankett {
 	void tank::update(keyboard kb, mouse ms, time dt) {
 		previousPosition = transform_.position_;
 		if (isLocal_) {
-			UpdatePosition(kb, dt);
 			transform_.set_rotation(targetRotation(kb));
-			lastPredictedAngle = targetTurretRotation() - turretTransform_.rotation_;
 			SetTurretAngle(lerp(turretTransform_.rotation_, targetTurretRotation(), 0.9f));
 		}
 		else {
@@ -107,31 +109,34 @@ namespace tankett {
 		if (collider->type_ == WALL) preventCollision();
 	}
 
-	void tank::UpdatePosition(keyboard kb, time dt) {
-		vector2 newOffset = targetMoveDirection(kb) * (TANK_SPEED * TILE_SIZE *dt.as_seconds());
-		predictedPositionOffsets_.push_back(newOffset);
-
-		vector2 destination = lastReceivedPosition_;
-		for (vector2 offset : predictedPositionOffsets_) {
-			destination += offset;
-		}
-
-		SetPosition(vector2::Lerp(transform_.position_, destination, 0.9f));
-	}
-
 	void tank::SetLocal(bool pIsLocal) {
 		isLocal_ = pIsLocal;
 	}
 
-	vector2 tank::targetMoveDirection(keyboard kb) {
-		if (kb.is_down(KEYCODE_W) && kb.is_down(KEYCODE_D)) return { 0.7071f ,-0.7071f };  //Normalised Diagonal Vector
-		if (kb.is_down(KEYCODE_W) && kb.is_down(KEYCODE_A)) return { -0.7071f ,-0.7071f };
-		if (kb.is_down(KEYCODE_S) && kb.is_down(KEYCODE_A)) return { -0.7071f ,0.7071f };
-		if (kb.is_down(KEYCODE_S) && kb.is_down(KEYCODE_D)) return { 0.7071f ,0.7071f };
-		if (kb.is_down(KEYCODE_D))  return { 1.0f ,0 };
-		if (kb.is_down(KEYCODE_A))  return { -1.0f,0 };
-		if (kb.is_down(KEYCODE_W))	return { 0,-1.0f };
-		if (kb.is_down(KEYCODE_S))	return { 0, 1.0f };
+	void tank::AddSentMessage(message_client_to_server* pMessage, time dt) {
+		if (!isEnabled)
+			return;
+		SetPosition(transform_.position_ + targetMoveDirection(pMessage) * (TILE_SIZE * TANK_SPEED * dt.as_seconds()));
+		message_client_to_server* sentMessage = new message_client_to_server;
+		sentMessage->input_field = pMessage->input_field;
+		sentMessage->turret_angle = pMessage->turret_angle;
+		sentMessage->input_number = pMessage->input_number;
+
+		InputData data;
+		data.message_ = sentMessage;
+		data.dt_ = dt;
+		sentInputData_.push_back(data);
+	}
+
+	vector2 tank::targetMoveDirection(message_client_to_server* pMessage) {
+		if (pMessage->get_input(message_client_to_server::UP) && pMessage->get_input(message_client_to_server::RIGHT)) return { 0.7071f ,-0.7071f };  //Normalised Diagonal Vector
+		if (pMessage->get_input(message_client_to_server::UP) && pMessage->get_input(message_client_to_server::LEFT)) return { -0.7071f ,-0.7071f };
+		if (pMessage->get_input(message_client_to_server::DOWN) && pMessage->get_input(message_client_to_server::LEFT)) return { -0.7071f ,0.7071f };
+		if (pMessage->get_input(message_client_to_server::DOWN) && pMessage->get_input(message_client_to_server::RIGHT)) return { 0.7071f ,0.7071f };
+		if (pMessage->get_input(message_client_to_server::RIGHT))  return { 1.0f ,0 };
+		if (pMessage->get_input(message_client_to_server::LEFT))  return { -1.0f,0 };
+		if (pMessage->get_input(message_client_to_server::UP))	return { 0,-1.0f };
+		if (pMessage->get_input(message_client_to_server::DOWN))	return { 0, 1.0f };
 		return { 0,0 };
 	}
 
@@ -171,36 +176,52 @@ namespace tankett {
 
 #pragma region ClientSpecificFunctions
 
-	void tank::SetTankValues(bool pAlive,
+	void tank::UpdateRemoteTank(bool pAlive,
 							vector2 pPos, 
-							float pAngle){
+							float pAngle) {
+		if (isLocal_)
+			return;
+
 		SetActive(pAlive);
+
+		nextToLastReceivedPosition_ = lastReceivedPosition_;
+		lastReceivedPosition_ = pPos;
+		SetPosition(nextToLastReceivedPosition_);
+
+		nextToLastReceivedAngle_ = lastReceivedAngle_;
+		lastReceivedAngle_ = pAngle;
+		SetTurretAngle(lastReceivedAngle_);
+
+		messageDeltaTime_ = time::now() - timeOfLastMessage;
+		timeOfLastMessage = time::now();
+	}
+
+	void tank::UpdateLocalTank(bool pAlive, 
+							   vector2 pPos,  
+							   uint32 pInputNumber) {
+		if (!isLocal_)
+			return;
+		SetActive(pAlive);
+		previousPosition = transform_.position_;
 		
-
-		//Input Prediction:
-		if (isLocal_) {
-			vector2 lastPrediction = vector2::zero();
-			if (predictedPositionOffsets_.size() > 0) {
-				lastPrediction = predictedPositionOffsets_[predictedPositionOffsets_.size() - 1];
+		int it = 0;
+		bool hasMessage = false;
+		for(int i = 0; i < sentInputData_.size(); i++) {
+			if(pInputNumber == sentInputData_[i].message_->input_number) {
+				it = i;
+				hasMessage = true;
+				break;
 			}
-			lastReceivedPosition_ = pPos + lastPrediction;
-			lastReceivedAngle_ = pAngle + lastPredictedAngle;
-			SetTurretAngle(lerp(turretTransform_.rotation_, lastReceivedAngle_, 0.9f));
-			predictedPositionOffsets_.clear();
 		}
-		//Entity Interpolation:
-		else {
-			nextToLastReceivedPosition_ = lastReceivedPosition_;
-			lastReceivedPosition_ = pPos;
-			SetPosition(nextToLastReceivedPosition_);
-
-			nextToLastReceivedAngle_ = lastReceivedAngle_;
-			lastReceivedAngle_ = pAngle;
-			SetTurretAngle(lastReceivedAngle_);
-
-			messageDeltaTime_ = time::now() - timeOfLastMessage;
-			timeOfLastMessage = time::now();
+		if (!hasMessage) {
+			return;
 		}
+		vector2 targetPos = pPos;
+		for (int i = it; i < sentInputData_.size(); i++) {
+			targetPos += targetMoveDirection(sentInputData_[i].message_) * (TILE_SIZE * TANK_SPEED * sentInputData_[i].dt_.as_seconds());
+		}
+		sentInputData_.erase(sentInputData_.begin(), sentInputData_.begin() + it);
+		SetPosition(targetPos);
 	}
 
 	void tank::SetPosition(vector2 pPos) {

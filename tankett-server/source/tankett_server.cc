@@ -69,6 +69,8 @@ namespace tankett {
 		switch (state_) {
 		case ROUND_RUNNING: {
 			currentRoundTime_ -= dt.as_seconds();
+			entityManager_->update(dt);
+			entityManager_->manageCollisions();
 			if (currentRoundTime_ < 0) {
 				EndRound();
 			}
@@ -91,8 +93,6 @@ namespace tankett {
 			break;
 		}
 		DisconnectAfterTimeout();
-		entityManager_->update(dt);
-		entityManager_->manageCollisions();
 		updateClientData();
 	}
 
@@ -123,6 +123,7 @@ namespace tankett {
 		currentRoundTime_ = ROUND_TIME;
 		for (int i = 0; i < connectedClientCount(); i++) {
 			entityManager_->getTank(clients_[i].id_)->isEnabled = true;
+			entityManager_->getTank(clients_[i].id_)->isAlive = true;
 			entityManager_->getTank(clients_[i].id_)->SetPosition(SPAWN_POINTS[clients_[i].id_]);
 		}
 	}
@@ -270,6 +271,7 @@ namespace tankett {
 							}
 							else {
 								time deltaReceiveTime = time::now() - client.latest_receive_time_;
+								client.inputNumber_ = message.input_number;
 								if (state_ == ROUND_RUNNING) entityManager_->parseClientMessage(message, client.id_, deltaReceiveTime);
 							}
 						}
@@ -302,8 +304,6 @@ namespace tankett {
 			clients_.erase(clients_.begin() + iterator);
 			clientData[iterator].connected = false;
 			clientData[iterator].client_id = 255;
-			//ResetTank(uint8 clientID); function in Entitymanager?
-			//TODO: Make people disabled
 		}
 	}
 	void server::parsePingMessage(network_message_ping message, uint8 clientID) {
@@ -456,6 +456,7 @@ namespace tankett {
 		for (int i = 0; i < 4; i++) {
 			clientData[i].eliminations = gameManager::score_[i];
 			clientData[i].angle = entityManager_->getTank(i)->turretRotation_;
+			clientData[i].alive = entityManager_->getTank(i)->isAlive;
 			if (clientData[i].connected) {
 				msg->client_data[it] = clientData[i];
 				it++;
@@ -469,6 +470,7 @@ namespace tankett {
 		msg->round_time = currentRoundTime_;
 		msg->receiver_id = pClient.id_;
 		msg->type_ = NETWORK_MESSAGE_SERVER_TO_CLIENT;
+		msg->input_number = pClient.inputNumber_;
 		pClient.messages_.push_back(msg);
 	}
 

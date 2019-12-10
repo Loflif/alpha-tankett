@@ -106,7 +106,7 @@ namespace tankett {
 		}
 		if (state_ == CONNECTED) {
 			if (gameState_ == ROUND_RUNNING) entityManager_->update(keyboard_, mouse_, dt);
-			messages_.push_back(entityManager_->checkInput(keyboard_, mouse_));
+			messages_.push_back(entityManager_->checkInput(keyboard_, mouse_, dt));
 			entityManager_->manageCollisions();
 			SetCoolDownDisplay();
 		}
@@ -331,8 +331,6 @@ namespace tankett {
 				protocol_payload payload(send_sequence_);
 
 				pack_payload(payload);
-				//send_payload(payload);
-
 				send_sequence_++;
 			}
 			}
@@ -356,9 +354,6 @@ namespace tankett {
 	}
 
 	bool client_app::pack_payload(protocol_payload& pPayload) {
-		/*byte_stream stream(sizeof(pPayload.payload_), pPayload.payload_);
-		byte_stream_writer writer(stream);*/
-
 		// note: calculate the number of messages we can pack into the payload
 		int messages_evaluated = 0;
 		byte_stream stream(sizeof(pPayload.payload_), pPayload.payload_);
@@ -548,7 +543,7 @@ namespace tankett {
 			remoteClientData_[i].ping_ = pMessage.client_data[i].ping;
 			remoteClientData_[i].connected_ = pMessage.client_data[i].connected;
 			gameState_ = pMessage.game_state;
-			entityManager_->UpdateTank(pMessage.client_data[i]);
+			entityManager_->UpdateTank(pMessage.client_data[i], pMessage.input_number);
 		}
 	}
 

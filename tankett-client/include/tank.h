@@ -18,14 +18,19 @@ namespace tankett {
 
 		dynamic_array<bullet*> bullets_;
 
-		void SetTankValues(bool pAlive,
+		void UpdateRemoteTank(bool pAlive,
 			vector2 pPos,
 			float pAngle);
+		void UpdateLocalTank(bool pAlive,
+							 vector2 pPos,
+							 uint32 pInputNumber);
+		
 		void SetPosition(vector2 pPos);
 		void SetTurretAngle(float pAngle);
 		void SetActive(bool pIsActive);
 		void UpdatePosition(keyboard kb, time dt);
 		void SetLocal(bool pIsLocal);
+		void AddSentMessage(message_client_to_server *pMessage, time dt);
 
 		uint8 id_;
 
@@ -35,7 +40,7 @@ namespace tankett {
 		bool isLocal_ = false;
 	private:
 		void interpolateEntity(time dt);
-		vector2 targetMoveDirection(keyboard kb);
+		vector2 targetMoveDirection(message_client_to_server* pMessage);
 		float targetRotation(keyboard kb);
 		float targetTurretRotation();
 		void setColliderPosition();
@@ -51,11 +56,16 @@ namespace tankett {
 		vector2 previousPosition;
 
 		//For Prediciton:
-		dynamic_array<vector2> predictedPositionOffsets_;
-		float lastPredictedAngle;
+		struct InputData {
+			message_client_to_server* message_;
+			time dt_;
+		};
+
+		dynamic_array<InputData> sentInputData_;
+		
+		//For interpolation:
 		vector2 lastReceivedPosition_;
 		float lastReceivedAngle_;
-		//For interpolation:
 		vector2 nextToLastReceivedPosition_;
 		float nextToLastReceivedAngle_;
 		time timeOfLastMessage;

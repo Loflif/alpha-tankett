@@ -35,6 +35,7 @@ namespace tankett {
 		dynamic_array<std::pair<uint8, time>> pings_;
 		uint8 pingSequence_ = 0;
 		dynamic_array<network_message_header*> messages_;
+		uint32 inputNumber_ = 0;
 	};
 
 	struct server {

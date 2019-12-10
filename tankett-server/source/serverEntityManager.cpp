@@ -34,7 +34,6 @@ namespace tankett {
 	}
 
 	void serverEntityManager::spawnTank(int id) {
-		tanks_[id]->isEnabled = true;
 		tanks_[id]->SetPosition(SPAWN_POINTS[id]);
 	}
 
@@ -131,7 +130,7 @@ namespace tankett {
 
 	void serverEntityManager::disableAllTanks() {
 		for (serverTank* t : tanks_) {
-			t->isAlive = true;
+			t->isAlive = false;
 			t->SetPosition(SPAWN_POINTS[t->id_]);
 			t->isEnabled = false;
 		}

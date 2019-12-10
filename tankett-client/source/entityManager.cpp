@@ -117,10 +117,13 @@ namespace tankett {
 		}
 	}
 
-	void entityManager::UpdateTank(server_to_client_data pData) {
-		tanks_[pData.client_id]->SetTankValues(pData.alive,
-										      pData.position * TILE_SIZE,
-										      pData.angle);
+	void entityManager::UpdateTank(server_to_client_data pData, uint32 pInputNumber) {
+		tanks_[pData.client_id]->UpdateRemoteTank(pData.alive,
+											      pData.position * TILE_SIZE,
+											      pData.angle);
+		tanks_[pData.client_id]->UpdateLocalTank(pData.alive,
+												 pData.position * TILE_SIZE,
+												 pInputNumber);
 		UpdateBullets(pData);
 	}
 	void entityManager::UpdateBullets(server_to_client_data pData) {
@@ -197,7 +200,7 @@ namespace tankett {
 		}
 	}
 
-	message_client_to_server* entityManager::checkInput(keyboard pKeyboard, mouse pMouse) {
+	message_client_to_server* entityManager::checkInput(keyboard pKeyboard, mouse pMouse, time dt) {
 		message_client_to_server* msg = new message_client_to_server;
 		bool shoot = false;
 		bool right = false;
@@ -226,6 +229,9 @@ namespace tankett {
 		}
 		msg->set_input(shoot, right, left, down, up);
 		msg->type_ = NETWORK_MESSAGE_CLIENT_TO_SERVER;
+		msg->input_number = inputNumber_;
+		tanks_[localTankID_]->AddSentMessage(msg, dt);
+		inputNumber_++;
 		return msg;
 	}
 

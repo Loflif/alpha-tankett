@@ -16,14 +16,14 @@ namespace tankett {
 		uint8 getLocalTankID();
 		void update(keyboard pKeyboard, mouse pMouse, time dt);
 		void render(render_system& pRenderSystem);
-		message_client_to_server* checkInput(keyboard pKeyboard, mouse pMouse);
+		message_client_to_server* checkInput(keyboard pKeyboard, mouse pMouse, time dt);
 		
 		float shootingCooldown_ = 0.0f;
 
 		void manageCollisions();
 		void CompareBulletLists(server_to_client_data pData);
 		bool isBulletInList(server_to_client_data pData, uint8 pID);
-		void UpdateTank(server_to_client_data pData);
+		void UpdateTank(server_to_client_data pData, uint32 pInputNumber);
 		void UpdateBullets(server_to_client_data pData);
 		void Reset();
 	private:
@@ -52,5 +52,6 @@ namespace tankett {
 		texture remotetankTexture_;
 		texture turretTexture_;
 		texture remoteturretTexture_;
+		uint32 inputNumber_ = 0;
 	};
 }
