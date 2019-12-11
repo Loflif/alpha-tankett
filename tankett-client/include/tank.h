@@ -20,7 +20,8 @@ namespace tankett {
 
 		void UpdateRemoteTank(bool pAlive,
 			vector2 pPos,
-			float pAngle);
+			float pAngle,
+			float pTimeStamp);
 		void UpdateLocalTank(bool pAlive,
 							 vector2 pPos,
 							 uint32 pInputNumber);
@@ -39,7 +40,7 @@ namespace tankett {
 		bullet* getBulletWithID(uint8 pID);
 		bool isLocal_ = false;
 	private:
-		void interpolateEntity(time dt);
+		void interpolateEntity();
 		vector2 targetMoveDirection(message_client_to_server* pMessage);
 		float targetRotation(keyboard kb);
 		float targetTurretRotation();
@@ -61,15 +62,17 @@ namespace tankett {
 			time dt_;
 		};
 
+		struct RemoteTankData {
+			vector2 position_;
+			float angle_;
+			float timestamp_;
+		};
+
+		dynamic_array<RemoteTankData> entityHistory_;
+
 		dynamic_array<InputData> sentInputData_;
-		
-		//For interpolation:
-		vector2 lastReceivedPosition_;
-		float lastReceivedAngle_;
-		vector2 nextToLastReceivedPosition_;
-		float nextToLastReceivedAngle_;
-		time timeOfLastMessage;
-		time messageDeltaTime_;
+
+		static bool compareTimeStamps(RemoteTankData data1, RemoteTankData data2);
 	};
 
 }

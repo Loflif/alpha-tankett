@@ -117,10 +117,11 @@ namespace tankett {
 		}
 	}
 
-	void entityManager::UpdateTank(server_to_client_data pData, uint32 pInputNumber) {
+	void entityManager::UpdateTank(server_to_client_data pData, uint32 pInputNumber, float pTimestamp) {
 		tanks_[pData.client_id]->UpdateRemoteTank(pData.alive,
 											      pData.position * TILE_SIZE,
-											      pData.angle);
+											      pData.angle,
+												  pTimestamp);
 		tanks_[pData.client_id]->UpdateLocalTank(pData.alive,
 												 pData.position * TILE_SIZE,
 												 pInputNumber);

@@ -471,6 +471,7 @@ namespace tankett {
 		msg->receiver_id = pClient.id_;
 		msg->type_ = NETWORK_MESSAGE_SERVER_TO_CLIENT;
 		msg->input_number = pClient.inputNumber_;
+		msg->timestamp = time::now().as_milliseconds();
 		pClient.messages_.push_back(msg);
 	}
 

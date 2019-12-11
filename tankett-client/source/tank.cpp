@@ -1,4 +1,5 @@
 #include <tank.h>
+#include <algorithm>
 
 namespace tankett {
 	tank::tank(sprite pSprite, sprite pTurretSprite, sprite pRemoteSprite, sprite pRemoteTurretSprite, float pPosX, float pPosY, uint8 pID) {
@@ -15,7 +16,6 @@ namespace tankett {
 		setColliderPosition();
 		type_ = TANK;
 		id_ = pID;
-		timeOfLastMessage = time::now();
 		isEnabled = false;
 	}
 
@@ -45,12 +45,7 @@ namespace tankett {
 			SetTurretAngle(lerp(turretTransform_.rotation_, targetTurretRotation(), 0.9f));
 		}
 		else {
-			interpolateEntity(dt);
-			if (nextToLastReceivedPosition_ != lastReceivedPosition_) {
-				vector2 direction = nextToLastReceivedPosition_ - lastReceivedPosition_;
-				float angle = atan2(direction.y_, direction.x_) * (180 / PI);
-				transform_.set_rotation(angle);
-			}
+			interpolateEntity();
 		}
 
 
@@ -83,12 +78,6 @@ namespace tankett {
 		return nullptr;
 	}
 
-	void tank::interpolateEntity(time dt) {
-		float lerpDistance = dt.as_seconds() / messageDeltaTime_.as_seconds();
-		SetPosition(vector2::Lerp(transform_.position_, lastReceivedPosition_, lerpDistance));
-		SetTurretAngle(lerp(turretTransform_.rotation_, lastReceivedAngle_, lerpDistance));
-	}
-
 	void tank::setColliderPosition() {
 		vector2 targetPosition = transform_.position_ - size_ / 2;
 		collider_.set_position(targetPosition);
@@ -103,6 +92,10 @@ namespace tankett {
 			}
 		}
 		bullets_ = newBullets;
+	}
+
+	bool tank::compareTimeStamps(RemoteTankData data1, RemoteTankData data2) {
+		return (data1.timestamp_ < data2.timestamp_);
 	}
 
 	void tank::onCollision(IEntity* collider) {
@@ -126,6 +119,58 @@ namespace tankett {
 		data.message_ = sentMessage;
 		data.dt_ = dt;
 		sentInputData_.push_back(data);
+	}
+
+	void tank::interpolateEntity() {
+
+		//go back in time
+		float past = time::now().as_milliseconds() - REMOTE_TANK_UPDATE_DELAY;
+
+		//get target and source of lerp
+		bool hasData = false;
+		RemoteTankData lerpSource;
+		RemoteTankData lerpTarget;
+		for (int i = 0; i < entityHistory_.size(); i++) {
+			if (entityHistory_[i].timestamp_ > past) {
+				if (i < 1) {
+					return;
+				}
+				lerpTarget = entityHistory_[i];
+				lerpSource = entityHistory_[i - 1];
+				hasData = true;
+				break;
+			}
+		}
+		if (!hasData) return;
+		//get lerp amount
+		float timestampDeltaTime = lerpTarget.timestamp_ - lerpSource.timestamp_;
+		float timeSinceMessage = past - lerpSource.timestamp_;
+		float lerpAmount = timeSinceMessage / timestampDeltaTime;
+
+		//lerp
+		vector2 targetPosition = vector2::Lerp(lerpSource.position_, lerpTarget.position_, lerpAmount);
+		SetPosition(targetPosition);
+
+		float targetRotation = lerp(lerpSource.angle_, lerpTarget.angle_, lerpAmount);
+		SetTurretAngle(targetRotation);
+
+		//delete what's older than 1000ms
+		int it = -1;
+		for (int i = 0; i < entityHistory_.size(); i++) {
+			if (entityHistory_[i].timestamp_ < time::now().as_milliseconds() - REMOTE_TANK_HISTORY_SPAN) {
+				it = i;
+			}
+		}
+		if (it >= 0) {
+			entityHistory_.erase(entityHistory_.begin(), entityHistory_.begin() + it);
+		}
+
+		//Set Tank Rotation
+		if (lerpSource.position_ != lerpTarget.position_) {
+			vector2 direction = lerpSource.position_ - lerpTarget.position_;
+			float angle = atan2(direction.y_, direction.x_) * (180 / PI);
+			transform_.set_rotation(angle);
+		}
 	}
 
 	vector2 tank::targetMoveDirection(message_client_to_server* pMessage) {
@@ -178,22 +223,19 @@ namespace tankett {
 
 	void tank::UpdateRemoteTank(bool pAlive,
 							vector2 pPos, 
-							float pAngle) {
+							float pAngle,
+							float pTimeStamp) {
 		if (isLocal_)
 			return;
 
 		SetActive(pAlive);
 
-		nextToLastReceivedPosition_ = lastReceivedPosition_;
-		lastReceivedPosition_ = pPos;
-		SetPosition(nextToLastReceivedPosition_);
-
-		nextToLastReceivedAngle_ = lastReceivedAngle_;
-		lastReceivedAngle_ = pAngle;
-		SetTurretAngle(lastReceivedAngle_);
-
-		messageDeltaTime_ = time::now() - timeOfLastMessage;
-		timeOfLastMessage = time::now();
+		RemoteTankData newData;
+		newData.timestamp_ = pTimeStamp;
+		newData.position_ = pPos;
+		newData.angle_ = pAngle;
+		entityHistory_.push_back(newData);
+		std::sort(entityHistory_.begin(), entityHistory_.end(), compareTimeStamps);
 	}
 
 	void tank::UpdateLocalTank(bool pAlive, 

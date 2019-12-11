@@ -13,10 +13,12 @@ namespace tankett {
 	static const float BULLET_SIZE = 0.2f;
 	static const float TANK_SPEED = 4.0f;
 	static const float BULLET_SPEED = 8.0f;
-	static const float ROUND_TIME = 26.0f;
+	static const float ROUND_TIME = 90.0f;
 	static const float FIRE_RATE = 1.0f;
 	static const float ROUNDENDTIME = 20.0f;
 	static const float TIME_OUT_THRESHOLD_SECONDS = 5;
+	static const float REMOTE_TANK_UPDATE_DELAY = 100;
+	static const float REMOTE_TANK_HISTORY_SPAN = 1000;
 
 	static const int BULLET_MAX_COUNT = 10;
 	static const int COLLISION_PAIR_COUNT = 4;

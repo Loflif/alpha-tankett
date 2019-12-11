@@ -543,7 +543,7 @@ namespace tankett {
 			remoteClientData_[i].ping_ = pMessage.client_data[i].ping;
 			remoteClientData_[i].connected_ = pMessage.client_data[i].connected;
 			gameState_ = pMessage.game_state;
-			entityManager_->UpdateTank(pMessage.client_data[i], pMessage.input_number);
+			entityManager_->UpdateTank(pMessage.client_data[i], pMessage.input_number, pMessage.timestamp);
 		}
 	}
 

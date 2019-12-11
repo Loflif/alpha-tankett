@@ -23,7 +23,7 @@ namespace tankett {
 		void manageCollisions();
 		void CompareBulletLists(server_to_client_data pData);
 		bool isBulletInList(server_to_client_data pData, uint8 pID);
-		void UpdateTank(server_to_client_data pData, uint32 pInputNumber);
+		void UpdateTank(server_to_client_data pData, uint32 pInputNumber, float pTimestamp);
 		void UpdateBullets(server_to_client_data pData);
 		void Reset();
 	private:
